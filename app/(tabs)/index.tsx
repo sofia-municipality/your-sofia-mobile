@@ -37,21 +37,21 @@ const getQuickServices = (t: (key: string) => string) => [
     id: 2,
     title: t('services.parking'),
     icon: Car,
-    color: '#DC2626',
+    color: '#268adcff',
     description: t('services.findAndPay')
   },
   {
     id: 3,
     title: t('services.documents'),
     icon: FileCheck,
-    color: '#7C2D12',
+    color: '#ac5538ff',
     description: t('services.certificates')
   },
   {
     id: 4,
     title: t('services.emergency'),
     icon: Phone,
-    color: '#B91C1C',
+    color: '#e25454ff',
     description: t('services.contactHelp')
   }
 ];
