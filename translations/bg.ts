@@ -18,6 +18,14 @@ export default {
     cityServices: 'Това е твоята София!',
     quickServices: 'Бързи услуги',
     cityService: 'Градски услуги',
+    newsForYou: 'Новини за теб',
+    seeAll: 'Виж всички',
+    topics: {
+      all: 'Всички новини',
+      festivals: 'Фестивали',
+      streetClosure: 'Затворени улици',
+      cityEvents: 'Градски събития'
+    },
     emergencyServices: 'Спешни услуги',
     payments: 'Плащания',
     profile: 'Профил',

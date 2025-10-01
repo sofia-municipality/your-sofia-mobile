@@ -22,7 +22,11 @@ import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@e
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AirQualityCard } from '../../components/AirQualityCard';
+import { TopicFilter } from '../../components/TopicFilter';
+import { NewsCard } from '../../components/NewsCard';
 import type { AirQualityData } from '../../types/airQuality';
+import type { NewsItem, NewsTopicType } from '../../types/news';
+import { useState } from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -34,6 +38,33 @@ const mockAirQualityData: AirQualityData = {
   mainPollutant: 'PM2.5',
   status: 'Good'
 };
+
+// Mock news data (replace with real API data later)
+const mockNewsData: NewsItem[] = [
+  {
+    id: '1',
+    title: 'Sofia Film Fest 2025',
+    description: 'The 29th edition of Sofia Film Fest brings international cinema to the heart of Sofia.',
+    date: '5 Oct 2025',
+    topic: 'festivals',
+    image: 'https://example.com/sofia-film-fest.jpg'
+  },
+  {
+    id: '2',
+    title: 'Shishman Street Maintenance',
+    description: 'Temporary closure of Shishman Street for scheduled tram line maintenance.',
+    date: '3 Oct 2025',
+    topic: 'street-closure'
+  },
+  {
+    id: '3',
+    title: 'Meeting on Urban Development',
+    description: 'Discussion on the future of urban development in Sofia.',
+    date: '10 Oct 2025',
+    topic: 'city-events',
+    image: 'https://example.com/city-garden.jpg'
+  }
+];
 
 const getQuickServices = (t: (key: string) => string) => [
   {
@@ -104,6 +135,7 @@ interface Service {
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all');
   
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -117,6 +149,10 @@ export default function HomeScreen() {
 
   const quickServices = getQuickServices(t);
   const cityServices = getCityServices(t);
+
+  const filteredNews = mockNewsData.filter(
+    item => selectedTopic === 'all' || item.topic === selectedTopic
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,6 +170,25 @@ export default function HomeScreen() {
         {/* Air Quality */}
         <View style={styles.section}>
           <AirQualityCard data={mockAirQualityData} />
+        </View>
+
+        {/* News For You */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>{t('common.newsForYou')}</Text>
+          </View>
+          
+          <TopicFilter
+            selectedTopic={selectedTopic}
+            onTopicChange={setSelectedTopic}
+            t={t}
+          />
+          
+          <View style={styles.newsContainer}>
+            {filteredNews.map((item) => (
+              <NewsCard key={item.id} item={item} />
+            ))}
+          </View>
         </View>
 
         {/* Quick Services */}
@@ -262,7 +317,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1F2937',
-    marginBottom: 16,
     fontFamily: 'Inter-Bold',
   },
   quickServicesGrid: {
@@ -331,6 +385,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  seeAllButton: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E40AF',
+  },
+  newsContainer: {
+    marginTop: 16,
   },
   serviceIconContainer: {
     width: 48,

@@ -18,6 +18,14 @@ export default {
     cityServices: 'This is your Sofia!',
     quickServices: 'Quick Services',
     cityService: 'City Services',
+    newsForYou: 'News For You',
+    seeAll: 'See All',
+    topics: {
+      all: 'All News',
+      festivals: 'Festivals',
+      streetClosure: 'Street Closure',
+      cityEvents: 'City Events'
+    },
     emergencyServices: 'Emergency Services',
     profile: 'Profile',
     edit: 'Edit',
