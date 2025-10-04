@@ -26,6 +26,7 @@ import { TopicFilter } from '../../components/TopicFilter';
 import { NewsCard } from '../../components/NewsCard';
 import { NewsMap } from '../../components/NewsMap';
 import { useNews } from '../../hooks/useNews';
+import { useNotifications } from '../../hooks/useNotifications';
 import type { AirQualityData } from '../../types/airQuality';
 import type { NewsTopicType } from '../../types/news';
 import { useState } from 'react';
@@ -116,6 +117,9 @@ export default function HomeScreen() {
   // Load news from Payload API
   const { news, loading: newsLoading, error: newsError, refresh } = useNews(selectedTopic);
   
+  // Setup push notifications
+  const { unreadCount, clearUnreadCount } = useNotifications();
+  
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
@@ -137,8 +141,15 @@ export default function HomeScreen() {
           <View>
             <Text style={styles.headerTitle}>{t('common.goodMorning')}</Text>
           </View>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity style={styles.headerButton} onPress={clearUnreadCount}>
             <Bell size={24} color="#6B7280" />
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -311,6 +322,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#DC2626',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  notificationBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '700',
+    fontFamily: 'Inter-Bold',
   },
   headerRight: {
     flexDirection: 'row',
