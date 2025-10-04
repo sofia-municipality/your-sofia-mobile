@@ -11,7 +11,7 @@ export interface PayloadNewsItem {
   title: string;
   description: string;
   content?: any; // Lexical rich text
-  topic: 'festivals' | 'street-closure' | 'city-events';
+  topic: 'festivals' | 'street-closure' | 'city-events' | 'alerts';
   image?: {
     id: string;
     url: string;

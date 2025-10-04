@@ -1,4 +1,4 @@
-export type NewsTopicType = 'festivals' | 'street-closure' | 'city-events' | 'all';
+export type NewsTopicType = 'festivals' | 'street-closure' | 'city-events' | 'alerts' | 'all';
 
 export interface NewsItem {
   id: string;
