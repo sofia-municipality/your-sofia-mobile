@@ -194,7 +194,7 @@ export default function NewSignalScreen() {
         />
       </View>
 
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={styles.label}>{t('signals.form.category')} *</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
           {['waste-container', 'street-damage', 'lighting', 'green-spaces', 'parking', 'public-transport', 'other'].map((cat) => (
@@ -218,7 +218,7 @@ export default function NewSignalScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+      </View> */}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
