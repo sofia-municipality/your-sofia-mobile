@@ -93,10 +93,10 @@ export function WasteContainerCard({ container, onClose }: WasteContainerCardPro
           </View>
         )}
 
-        {container.collectorName && (
+        {container.servicedBy && (
           <View style={styles.infoRow}>
             <User size={16} color="#6B7280" />
-            <Text style={styles.infoText}>{container.collectorName}</Text>
+            <Text style={styles.infoText}>{container.servicedBy}</Text>
           </View>
         )}
 

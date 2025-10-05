@@ -13,7 +13,7 @@ export interface WasteContainer {
   capacityVolume: number;
   capacitySize: 'tiny' | 'small' | 'standard' | 'big' | 'industrial';
   serviceInterval?: string;
-  collectorName?: string;
+  servicedBy?: string;
   wasteType: 'general' | 'recyclables' | 'organic' | 'glass' | 'paper' | 'plastic' | 'metal';
   status: 'active' | 'full' | 'maintenance' | 'inactive';
   notes?: string;
