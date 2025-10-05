@@ -153,9 +153,11 @@ export default {
     createSignal: 'Създай сигнал',
     signalDetails: 'Детайли за сигнала',
     form: {
+      header: 'Нов сигнал',
+      about: 'Относно обект',
       title: 'Заглавие',
       titlePlaceholder: 'Кратко описание на проблема',
-      description: 'Описание',
+      description: 'Подробно описание',
       descriptionPlaceholder: 'Подробно описание на проблема',
       category: 'Категория',
       containerState: 'Състояние на контейнера',

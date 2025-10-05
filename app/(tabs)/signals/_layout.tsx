@@ -15,7 +15,7 @@ export default function SignalsLayout() {
       <Stack.Screen
         name="new"
         options={{
-          title: t('signals.form.newSignal'),
+          title: t('signals.form.header'),
           headerShown: true,
           presentation: 'card',
         }}

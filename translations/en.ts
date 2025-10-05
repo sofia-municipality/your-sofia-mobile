@@ -153,9 +153,11 @@ export default {
     createSignal: 'Create Signal',
     signalDetails: 'Signal Details',
     form: {
+      header: 'New Signal',
+      about: 'About object',
       title: 'Title',
       titlePlaceholder: 'Brief description of the problem',
-      description: 'Description',
+      description: 'Detailed Description',
       descriptionPlaceholder: 'Detailed description of the problem',
       category: 'Category',
       containerState: 'Container State',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ export default function NewSignalScreen() {
   const prefilledCategory = (params.prefilledCategory as string) || 'other';
 
   const [loading, setLoading] = useState(false);
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [formData, setFormData] = useState<Partial<CreateSignalInput>>({
     title: '',
     description: '',
@@ -38,30 +39,55 @@ export default function NewSignalScreen() {
       name: containerPublicNumber,
     } : undefined,
     location: containerLocation,
-    reporterName: '',
-    reporterEmail: '',
-    reporterPhone: '',
   });
+
+  const toggleState = (state: string) => {
+    setSelectedStates(prev => 
+      prev.includes(state) 
+        ? prev.filter(s => s !== state)
+        : [...prev, state]
+    );
+  };
+
+  // Auto-generate title from container number and selected states
+  useEffect(() => {
+    if (containerPublicNumber && selectedStates.length > 0) {
+      const statesText = selectedStates
+        .map(state => t(`signals.containerStates.${state}`))
+        .join(', ');
+      const autoTitle = `${containerPublicNumber} - ${statesText}`;
+      setFormData(prev => ({ ...prev, title: autoTitle }));
+    } else if (containerPublicNumber) {
+      setFormData(prev => ({ ...prev, title: containerPublicNumber }));
+    }
+  }, [containerPublicNumber, selectedStates, t]);
 
   const handleSubmit = async () => {
     // Validation
-    if (!formData.title || !formData.description) {
-      Alert.alert(t('common.error'), 'Моля, попълнете заглавие и описание');
+    if (!formData.title) {
+      Alert.alert(t('common.error'), 'Моля, попълнете заглавие');
       return;
     }
 
-    if (formData.category === 'waste-container' && !formData.containerState) {
+    if (formData.category === 'waste-container' && selectedStates.length === 0) {
       Alert.alert(t('common.error'), 'Моля, изберете състояние на контейнера');
       return;
     }
 
     try {
       setLoading(true);
-      await createSignal(formData as CreateSignalInput, i18n.language as 'bg' | 'en');
+      
+      // Prepare submission data with selected states
+      const submitData = {
+        ...formData,
+        containerState: selectedStates,
+      };
+      
+      await createSignal(submitData as CreateSignalInput, i18n.language as 'bg' | 'en');
       Alert.alert(t('signals.success'), '', [
         {
           text: 'OK',
-          onPress: () => router.back(),
+          onPress: () => router.push('/signals'),
         },
       ]);
     } catch (error) {
@@ -74,19 +100,74 @@ export default function NewSignalScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('signals.form.title')} *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('signals.form.titlePlaceholder')}
-          value={formData.title}
-          onChangeText={(text) => setFormData({ ...formData, title: text })}
-          editable={!loading}
-        />
-      </View>
+      <View style={styles.label}>
+          <Text style={styles.label}>{t('signals.form.about')}</Text>
+        </View>
+      {containerPublicNumber && (
+        <View style={[styles.section, styles.infoBox]}>
+          <Text style={styles.infoLabel}>📦 Контейнер: {containerPublicNumber}</Text>
+          {containerLocation?.address && (
+            <Text style={styles.infoText}>📍 {containerLocation.address}</Text>
+          )}
+        </View>
+      )}
+
+      {formData.category === 'waste-container' && (
+        <View style={styles.section}>
+          <Text style={styles.label}>{t('signals.form.containerState')} *</Text>
+          <View style={styles.stateTagsContainer}>
+            {['full', 'dirty', 'damaged'].map((state) => {
+              const getStateColor = (state: string) => {
+                switch (state) {
+                  case 'full':
+                    return '#DC2626'; // Red
+                  case 'dirty':
+                    return '#92400E'; // Brown
+                  case 'damaged':
+                    return '#1F2937'; // Black/Dark Gray
+                  default:
+                    return '#1E40AF'; // Default Blue
+                }
+              };
+
+              const stateColor = getStateColor(state);
+              const isActive = selectedStates.includes(state);
+
+              return (
+                <TouchableOpacity
+                  key={state}
+                  style={[
+                    styles.stateTag,
+                    isActive && { backgroundColor: stateColor, borderColor: stateColor },
+                  ]}
+                  onPress={() => toggleState(state)}
+                  disabled={loading}
+                >
+                  <Text
+                    style={[
+                      styles.stateTagText,
+                      isActive && styles.stateTagTextActive,
+                    ]}
+                  >
+                    {t(`signals.containerStates.${state}`)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+      
+      {/* Auto-generated title preview */}
+      {formData.title && (
+        <View style={styles.section}>
+          <Text style={styles.label}>{t('signals.form.title')}:</Text>
+          <TextInput style={styles.input}>{formData.title}</TextInput>
+        </View>
+      )}
 
       <View style={styles.section}>
-        <Text style={styles.label}>{t('signals.form.description')} *</Text>
+        <Text style={styles.label}>{t('signals.form.description')}</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder={t('signals.form.descriptionPlaceholder')}
@@ -123,73 +204,6 @@ export default function NewSignalScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
-
-      {formData.category === 'waste-container' && (
-        <View style={styles.section}>
-          <Text style={styles.label}>{t('signals.form.containerState')} *</Text>
-          <View style={styles.radioGroup}>
-            {['full', 'dirty', 'damaged'].map((state) => (
-              <TouchableOpacity
-                key={state}
-                style={styles.radioOption}
-                onPress={() => setFormData({ ...formData, containerState: state as any })}
-                disabled={loading}
-              >
-                <View style={styles.radio}>
-                  {formData.containerState === state && <View style={styles.radioInner} />}
-                </View>
-                <Text style={styles.radioLabel}>{t(`signals.containerStates.${state}`)}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {containerPublicNumber && (
-        <View style={[styles.section, styles.infoBox]}>
-          <Text style={styles.infoLabel}>📦 Контейнер:</Text>
-          <Text style={styles.infoText}>{containerPublicNumber}</Text>
-          {containerLocation?.address && (
-            <Text style={styles.infoText}>📍 {containerLocation.address}</Text>
-          )}
-        </View>
-      )}
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('signals.form.reporterName')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('signals.form.reporterName')}
-          value={formData.reporterName}
-          onChangeText={(text) => setFormData({ ...formData, reporterName: text })}
-          editable={!loading}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('signals.form.reporterEmail')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('signals.form.reporterEmail')}
-          value={formData.reporterEmail}
-          onChangeText={(text) => setFormData({ ...formData, reporterEmail: text })}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          editable={!loading}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('signals.form.reporterPhone')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('signals.form.reporterPhone')}
-          value={formData.reporterPhone}
-          onChangeText={(text) => setFormData({ ...formData, reporterPhone: text })}
-          keyboardType="phone-pad"
-          editable={!loading}
-        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -269,6 +283,79 @@ const styles = StyleSheet.create({
   },
   categoryChipTextActive: {
     color: '#ffffff',
+  },
+  stateTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  stateTag: {
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+  },
+  stateTagActive: {
+    backgroundColor: '#1E40AF',
+    borderColor: '#1E40AF',
+  },
+  stateTagText: {
+    fontSize: 15,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  stateTagTextActive: {
+    color: '#ffffff',
+  },
+  titlePreview: {
+    backgroundColor: '#F0F9FF',
+    padding: 14,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#1E40AF',
+  },
+  titlePreviewLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1E40AF',
+    marginBottom: 6,
+  },
+  titlePreviewText: {
+    fontSize: 16,
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  checkboxGroup: {
+    gap: 12,
+  },
+  checkboxOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#1E40AF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
+  checkboxChecked: {
+    backgroundColor: '#1E40AF',
+  },
+  checkboxInner: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#ffffff',
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: '#1F2937',
   },
   radioGroup: {
     gap: 12,

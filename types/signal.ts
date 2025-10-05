@@ -8,7 +8,7 @@ export interface Signal {
     referenceId?: string;
     name?: string;
   };
-  containerState?: 'full' | 'dirty' | 'damaged';
+  containerState?: Array<'full' | 'dirty' | 'damaged'>;
   location?: {
     latitude?: number;
     longitude?: number;
@@ -30,12 +30,9 @@ export interface Signal {
 
 export interface CreateSignalInput {
   title: string;
-  description: string;
+  description?: string;
   category: Signal['category'];
   cityObject?: Signal['cityObject'];
-  containerState?: Signal['containerState'];
+  containerState?: Array<'full' | 'dirty' | 'damaged'>;
   location?: Signal['location'];
-  reporterName?: string;
-  reporterEmail?: string;
-  reporterPhone?: string;
 }
