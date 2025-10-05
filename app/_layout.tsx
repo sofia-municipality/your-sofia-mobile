@@ -16,6 +16,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ 
         headerShown: true,
         headerTitle: t('common.header'),
+        headerShadowVisible: true,
         headerLeft: () => (
           <Image 
             source={require('../assets/images/sofia-gerb.png')}

@@ -105,14 +105,6 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={commonStyles.header}>
-        <Text style={commonStyles.headerTitle}>{t('common.profile')}</Text>
-        <TouchableOpacity style={commonStyles.headerButton}>
-          <Edit3 size={20} color="#1E40AF" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
         <View style={styles.profileCard}>

@@ -160,11 +160,6 @@ export default function ServicesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={commonStyles.header}>
-        <Text style={commonStyles.headerTitle}>{t('common.cityService')}</Text>
-      </View>
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search */}
         <View style={styles.searchContainer}>

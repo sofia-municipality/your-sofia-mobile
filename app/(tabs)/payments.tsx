@@ -111,14 +111,6 @@ export default function PaymentsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={commonStyles.header}>
-        <Text style={commonStyles.headerTitle}>{t('common.payments')}</Text>
-        <TouchableOpacity style={commonStyles.headerButton}>
-          <Plus size={24} color="#6B7280" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search Bar */}
         <View style={styles.searchContainer}>
