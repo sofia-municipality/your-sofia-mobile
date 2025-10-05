@@ -15,8 +15,18 @@ export default function SignalsLayout() {
       <Stack.Screen
         name="new"
         options={{
-          title: t('signals.form.header'),
+          title: t('signals.form.headerNew'),
           headerShown: true,
+          headerTitleAlign: 'left',
+          presentation: 'card',
+        }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: t('signals.form.headerView'),
+          headerShown: true,
+          headerTitleAlign: 'left',
           presentation: 'card',
         }}
       />

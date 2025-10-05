@@ -224,13 +224,13 @@ export default function SignalDetailsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#1F2937" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('signals.details')}</Text>
+        <Text style={styles.headerTitle}>{t('signals.form.headerView')} #{signal.id}</Text>
         <View style={styles.headerActions}>
           {isEditing ? (
             <>

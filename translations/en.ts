@@ -160,7 +160,8 @@ export default {
     updateSuccess: 'Signal updated successfully!',
     updateError: 'Error updating signal',
     form: {
-      header: 'New Signal',
+      headerNew: 'New Signal',
+      headerView: 'Signal',
       about: 'About object',
       title: 'Title',
       titlePlaceholder: 'Brief description of the problem',

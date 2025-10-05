@@ -160,7 +160,8 @@ export default {
     updateSuccess: 'Сигналът е актуализиран успешно!',
     updateError: 'Грешка при актуализиране на сигнала',
     form: {
-      header: 'Нов сигнал',
+      headerNew: 'Нов сигнал',
+      headerView: 'Сигнал',
       about: 'Относно обект',
       title: 'Заглавие',
       titlePlaceholder: 'Кратко описание на проблема',
