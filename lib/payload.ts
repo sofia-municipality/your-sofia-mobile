@@ -199,8 +199,10 @@ export async function fetchSignals(options?: {
   category?: string;
   limit?: number;
   page?: number;
+  reporterUniqueId?: string;
+  containerReferenceId?: string;
 }): Promise<PayloadResponse<Signal>> {
-  const { locale = 'bg', status, category, limit = 20, page = 1 } = options || {};
+  const { locale = 'bg', status, category, limit = 20, page = 1, reporterUniqueId, containerReferenceId } = options || {};
 
   // Build query parameters
   const params = new URLSearchParams({
@@ -219,6 +221,16 @@ export async function fetchSignals(options?: {
   // Add category filter if specified
   if (category) {
     params.append('where[category][equals]', category);
+  }
+
+  // Add reporterUniqueId filter if specified
+  if (reporterUniqueId) {
+    params.append('where[reporterUniqueId][equals]', reporterUniqueId);
+  }
+
+  // Add container reference ID filter if specified
+  if (containerReferenceId) {
+    params.append('where[cityObject.referenceId][equals]', containerReferenceId);
   }
 
   const url = `${API_URL}/api/signals?${params}`;
@@ -293,6 +305,38 @@ export async function createSignal(
   }
 
   return response.json();
+}
+
+/**
+ * Check if reporter already has an active signal for the same container
+ */
+export async function checkExistingSignal(
+  reporterUniqueId: string,
+  containerReferenceId: string,
+  locale: 'bg' | 'en' = 'bg',
+): Promise<{ exists: boolean; signal?: Signal }> {
+  try {
+    const response = await fetchSignals({
+      locale,
+      reporterUniqueId,
+      containerReferenceId,
+      category: 'waste-container',
+      limit: 1,
+    });
+
+    // Check if there are any non-resolved signals
+    const activeSignal = response.docs.find(
+      signal => signal.status !== 'resolved' && signal.status !== 'rejected'
+    );
+
+    return {
+      exists: !!activeSignal,
+      signal: activeSignal,
+    };
+  } catch (error) {
+    console.error('Error checking existing signal:', error);
+    return { exists: false };
+  }
 }
 
 /**

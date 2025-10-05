@@ -43,6 +43,7 @@ export default {
     retry: 'Try again',
     noNews: 'No news available',
     payments: 'Payments',
+    cancel: 'Cancel',
   },
   services: {
     payBills: 'Pay Bills',
@@ -159,6 +160,9 @@ export default {
     cannotEdit: 'You can only edit signals created from this device.',
     updateSuccess: 'Signal updated successfully!',
     updateError: 'Error updating signal',
+    duplicateTitle: 'You already have an active signal',
+    duplicateMessage: 'You have already reported a problem for this container (Signal #{{id}}). You can view or edit the existing signal.',
+    viewExisting: 'View existing signal',
     form: {
       headerNew: 'New Signal',
       headerView: 'Signal',

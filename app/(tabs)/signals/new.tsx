@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getUniqueReporterId } from '../../../lib/deviceId';
-import { createSignal } from '../../../lib/payload';
+import { createSignal, checkExistingSignal } from '../../../lib/payload';
 import type { CreateSignalInput } from '../../../types/signal';
 
 export default function NewSignalScreen() {
@@ -90,6 +90,36 @@ export default function NewSignalScreen() {
     try {
       setLoading(true);
       
+      // Check for existing signal if this is a waste container signal
+      if (formData.category === 'waste-container' && containerPublicNumber && deviceId) {
+        const { exists, signal: existingSignal } = await checkExistingSignal(
+          deviceId,
+          containerPublicNumber,
+          i18n.language as 'bg' | 'en'
+        );
+
+        if (exists && existingSignal) {
+          Alert.alert(
+            t('signals.duplicateTitle'),
+            t('signals.duplicateMessage', { id: existingSignal.id }),
+            [
+              {
+                text: t('signals.viewExisting'),
+                onPress: () => {
+                  router.push(`/(tabs)/signals/${existingSignal.id}` as any);
+                },
+              },
+              {
+                text: t('common.cancel'),
+                style: 'cancel',
+              },
+            ]
+          );
+          setLoading(false);
+          return;
+        }
+      }
+      
       // Prepare submission data with selected states and device ID
       const submitData = {
         ...formData,
@@ -106,7 +136,34 @@ export default function NewSignalScreen() {
       ]);
     } catch (error) {
       console.error('Error creating signal:', error);
-      Alert.alert(t('signals.error'), error instanceof Error ? error.message : 'Unknown error');
+      
+      // Check if it's a duplicate signal error from backend
+      if (error instanceof Error && error.message.includes('Signal for same object already exists')) {
+        // Extract signal ID from error message
+        const match = error.message.match(/Signal ID: (\d+)/);
+        const signalId = match ? match[1] : null;
+        
+        Alert.alert(
+          t('signals.duplicateTitle'),
+          signalId 
+            ? t('signals.duplicateMessage', { id: signalId })
+            : error.message,
+          [
+            ...(signalId ? [{
+              text: t('signals.viewExisting'),
+              onPress: () => {
+                router.push(`/(tabs)/signals/${signalId}` as any);
+              },
+            }] : []),
+            {
+              text: t('common.cancel'),
+              style: 'cancel',
+            },
+          ]
+        );
+      } else {
+        Alert.alert(t('signals.error'), error instanceof Error ? error.message : 'Unknown error');
+      }
     } finally {
       setLoading(false);
     }
