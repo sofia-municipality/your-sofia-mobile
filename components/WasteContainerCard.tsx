@@ -15,9 +15,14 @@ export function WasteContainerCard({ container, onClose }: WasteContainerCardPro
   const router = useRouter();
 
   const handleReportIssue = () => {
+    // Close the card first
+    if (onClose) {
+      onClose();
+    }
+    
     // Navigate to signal creation form with prepopulated container data
     router.push({
-      pathname: '/signals/new',
+      pathname: '/(tabs)/signals/new',
       params: {
         containerPublicNumber: container.publicNumber,
         containerLocation: JSON.stringify(container.location),

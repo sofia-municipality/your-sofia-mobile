@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { createSignal } from '../../lib/payload';
-import type { CreateSignalInput } from '../../types/signal';
+import { createSignal } from '../../../lib/payload';
+import type { CreateSignalInput } from '../../../types/signal';
 
 export default function NewSignalScreen() {
   const { t, i18n } = useTranslation();

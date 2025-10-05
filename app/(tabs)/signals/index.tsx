@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
-import { useBellAction } from '../../contexts/BellActionContext';
-import { fetchSignals } from '../../lib/payload';
-import type { Signal } from '../../types/signal';
+import { useBellAction } from '../../../contexts/BellActionContext';
+import { fetchSignals } from '../../../lib/payload';
+import type { Signal } from '../../../types/signal';
 import { AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react-native';
 
 export default function SignalsScreen() {
@@ -25,7 +25,7 @@ export default function SignalsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateSignal = useCallback(() => {
-    router.push('/signals/new' as any);
+    router.push('/(tabs)/signals/new' as any);
   }, [router]);
 
   // Register the Plus button action
