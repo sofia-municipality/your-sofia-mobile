@@ -64,6 +64,8 @@ export default {
     municipalOffices: 'Municipal offices and services',
   },
   profile: {
+    staticScreenNotice: 'This is a sample static screen. If you want to make it functional, come to GitHub.',
+    anonymity: 'The main functionality of the app works without registration. For extended features, you\'ll need to register.',
     accountSettings: 'Account Settings',
     personalInfo: 'Personal Information',
     updateProfile: 'Update your profile details',

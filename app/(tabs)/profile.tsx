@@ -22,6 +22,7 @@ import {
   Mail,
   MapPin,
   Fingerprint,
+  AlertCircle
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -31,7 +32,7 @@ import { getUniqueReporterId } from '../../lib/deviceId';
 import { fetchSignalStats } from '../../lib/payload';
 
 
-const getProfileSections = (t: (key: string) => string, deviceId: string) => [
+const getProfileSections = (t: (key: string) => string) => [
   {
     id: 1,
     title: t('profile.accountSettings'),
@@ -53,12 +54,6 @@ const getProfileSections = (t: (key: string) => string, deviceId: string) => [
         title: t('profile.security'),
         icon: Shield,
         description: t('profile.securitySettings')
-      },
-      {
-        id: 14,
-        title: t('profile.deviceId'),
-        icon: Fingerprint,
-        description: deviceId || t('profile.loading')
       }
     ]
   },
@@ -144,7 +139,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const profileSections = getProfileSections(t, deviceId);
+  const profileSections = getProfileSections(t);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -155,9 +150,18 @@ export default function ProfileScreen() {
           onPress={() => Linking.openURL('https://github.com/sofia-municipality')} //append your-sofia when created
         >
           <Text style={styles.notificationText}>
-            Това е примерен статичен екран. Ако искате да го оживите елате в Гитхъб.
+            {t('profile.staticScreenNotice')}
           </Text>
           <GitHubIcon size={24} color="#1E40AF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.notificationBar}
+        >
+          <Text style={styles.notificationText}>
+            {t('profile.anonymity')}
+          </Text>
+          <AlertCircle size={24} color="#1E40AF" />
         </TouchableOpacity>
 
         {/* Profile Card */}
@@ -171,12 +175,12 @@ export default function ProfileScreen() {
             </View>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Димитър Петров</Text>
+            <Text style={styles.profileName}>Анонимен Потребител</Text>
             <Text style={styles.profileStatus}>{t('common.verifiedCitizen')}</Text>
             <View style={styles.profileDetails}>
               <View style={styles.profileDetailItem}>
                 <Mail size={14} color="#6B7280" />
-                <Text style={styles.profileDetailText}>dimitar.petrov@email.com</Text>
+                <Text style={styles.profileDetailText}>anonymous.user@email.com</Text>
               </View>
               <View style={styles.profileDetailItem}>
                 <Phone size={14} color="#6B7280" />
@@ -185,6 +189,10 @@ export default function ProfileScreen() {
               <View style={styles.profileDetailItem}>
                 <MapPin size={14} color="#6B7280" />
                 <Text style={styles.profileDetailText}>{t('cities.sofia')}</Text>
+              </View>
+              <View style={styles.profileDetailItem}>
+                <Fingerprint size={14} color="#6B7280" />
+                <Text style={styles.profileDetailText}>{deviceId}</Text>
               </View>
             </View>
           </View>
@@ -377,7 +385,7 @@ const styles = StyleSheet.create({
   },
   profileStatus: {
     fontSize: 14,
-    color: '#059669',
+    color: '#055796ff',
     fontWeight: '500',
     marginBottom: 16,
   },
