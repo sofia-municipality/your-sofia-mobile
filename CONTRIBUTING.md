@@ -52,7 +52,7 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 ### 1. 🐛 Reporting Bugs
 
-Use the provided [issue templates](https://github.com/yourusername/your-sofia/issues/new/choose) to report bugs. Include:
+Use the provided [issue templates](https://github.com/sofia-municipality/your-sofia/issues/new/choose) to report bugs. Include:
 
 - Clear title and steps to reproduce
 - Expected vs actual behavior
@@ -61,7 +61,7 @@ Use the provided [issue templates](https://github.com/yourusername/your-sofia/is
 
 ### 2. 💡 Suggesting Features
 
-Have an idea? Check [existing issues](https://github.com/yourusername/your-sofia/issues) first. Describe:
+Have an idea? Check [existing issues](https://github.com/sofia-municipality/your-sofia/issues) first. Describe:
 
 - What problem it solves
 - Proposed solution
@@ -99,7 +99,7 @@ Help make the app accessible to everyone:
 
 ### 1. Fork the Repository
 
-Click the "Fork" button on the [GitHub repository](https://github.com/yourusername/your-sofia).
+Click the "Fork" button on the [GitHub repository](https://github.com/sofia-municipality/your-sofia).
 
 ### 2. Clone Your Fork
 

@@ -49,7 +49,7 @@ Comprehensive PR template covering:
 
 ### Reporting an Issue
 
-1. Go to [Issues](https://github.com/yourusername/your-sofia/issues/new/choose)
+1. Go to [Issues](https://github.com/sofia-municipality/your-sofia/issues/new/choose)
 2. Choose the appropriate template
 3. Fill out all required fields
 4. Submit the issue
@@ -324,7 +324,7 @@ Your Sofia is Bulgarian-first:
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Full contribution guide
 - [README.md](../README.md) - Project documentation
 - [Code of Conduct](../CONTRIBUTING.md#code-of-conduct) - Community standards
-- [GitHub Discussions](https://github.com/yourusername/your-sofia/discussions) - Community forum
+- [GitHub Discussions](https://github.com/sofia-municipality/your-sofia/discussions) - Community forum
 
 ## 💡 Tips for Success
 

@@ -7,7 +7,7 @@
 ## Project Overview
 A bilingual (Bulgarian/English) React Native mobile app for Sofia city services, built with Expo. The app provides city services, news, air quality monitoring, and payment features for Sofia residents.
 
-**Sister Repository**: [your-sofia-api](https://github.com/yourusername/your-sofia-api) - Payload CMS backend
+**Sister Repository**: [your-sofia-api](https://github.com/sofia-municipality/your-sofia-api) - Payload CMS backend
 
 ## Architecture
 
