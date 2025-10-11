@@ -1,15 +1,15 @@
-import { StyleSheet, View, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import type { NewsItem } from '../types/news';
+import {StyleSheet, View, Dimensions} from 'react-native'
+import MapView, {Marker} from 'react-native-maps'
+import type {NewsItem} from '../types/news'
 
 interface NewsMapProps {
-  news: NewsItem[];
-  onMarkerPress?: (item: NewsItem) => void;
+  news: NewsItem[]
+  onMarkerPress?: (item: NewsItem) => void
 }
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window')
 
-export function NewsMap({ news, onMarkerPress }: NewsMapProps) {
+export function NewsMap({news, onMarkerPress}: NewsMapProps) {
   return (
     <View style={styles.container}>
       <MapView
@@ -35,7 +35,7 @@ export function NewsMap({ news, onMarkerPress }: NewsMapProps) {
         ))}
       </MapView>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -49,4 +49,4 @@ const styles = StyleSheet.create({
     width: width - 40,
     height: 300,
   },
-});
+})

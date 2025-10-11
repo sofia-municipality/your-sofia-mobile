@@ -1,32 +1,23 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router';
-import type { WasteContainer } from '../types/wasteContainer';
-import {
-  Trash2,
-  MapPin,
-  Calendar,
-  User,
-  AlertTriangle,
-} from 'lucide-react-native';
+import React from 'react'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {useTranslation} from 'react-i18next'
+import {useRouter} from 'expo-router'
+import type {WasteContainer} from '../types/wasteContainer'
+import {Trash2, MapPin, Calendar, User, AlertTriangle} from 'lucide-react-native'
 
 interface WasteContainerCardProps {
-  container: WasteContainer;
-  onClose?: () => void;
+  container: WasteContainer
+  onClose?: () => void
 }
 
-export function WasteContainerCard({
-  container,
-  onClose,
-}: WasteContainerCardProps) {
-  const { t } = useTranslation();
-  const router = useRouter();
+export function WasteContainerCard({container, onClose}: WasteContainerCardProps) {
+  const {t} = useTranslation()
+  const router = useRouter()
 
   const handleReportIssue = () => {
     // Close the card first
     if (onClose) {
-      onClose();
+      onClose()
     }
 
     // Navigate to signal creation form with prepopulated container data
@@ -37,8 +28,8 @@ export function WasteContainerCard({
         containerLocation: JSON.stringify(container.location),
         prefilledCategory: 'waste-container',
       },
-    } as any);
-  };
+    } as any)
+  }
 
   const getCapacitySizeLabel = (size: string) => {
     const labels: Record<string, string> = {
@@ -47,9 +38,9 @@ export function WasteContainerCard({
       standard: t('wasteContainers.size.standard') || 'Standard',
       big: t('wasteContainers.size.big') || 'Big',
       industrial: t('wasteContainers.size.industrial') || 'Industrial',
-    };
-    return labels[size] || size;
-  };
+    }
+    return labels[size] || size
+  }
 
   const getWasteTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -60,9 +51,9 @@ export function WasteContainerCard({
       paper: t('wasteContainers.type.paper') || 'Paper',
       plastic: t('wasteContainers.type.plastic') || 'Plastic',
       metal: t('wasteContainers.type.metal') || 'Metal',
-    };
-    return labels[type] || type;
-  };
+    }
+    return labels[type] || type
+  }
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -70,38 +61,26 @@ export function WasteContainerCard({
       full: '#EF4444',
       maintenance: '#F59E0B',
       inactive: '#6B7280',
-    };
-    return colors[status] || '#6B7280';
-  };
+    }
+    return colors[status] || '#6B7280'
+  }
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
+        <View style={{flex: 1}}>
           <Text style={styles.containerNumber}>
             {t('wasteContainers.name')}: {container.publicNumber}
           </Text>
           <View style={styles.statusBadge}>
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(container.status) },
-              ]}
-            />
-            <Text style={styles.statusText}>
-              {container.status.toUpperCase()}
-            </Text>
+            <View style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]} />
+            <Text style={styles.statusText}>{container.status.toUpperCase()}</Text>
           </View>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={handleReportIssue}
-            style={styles.reportButton}
-          >
+          <TouchableOpacity onPress={handleReportIssue} style={styles.reportButton}>
             <AlertTriangle size={16} color="#ffffff" />
-            <Text style={styles.reportButtonText}>
-              {t('wasteContainers.reportIssue')}
-            </Text>
+            <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
           </TouchableOpacity>
           {onClose && (
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -112,11 +91,7 @@ export function WasteContainerCard({
       </View>
 
       {container.image?.url && (
-        <Image
-          source={{ uri: container.image.url }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{uri: container.image.url}} style={styles.image} resizeMode="cover" />
       )}
 
       <View style={styles.content}>
@@ -124,8 +99,7 @@ export function WasteContainerCard({
           <Trash2 size={16} color="#6B7280" />
           <Text style={styles.infoText}>
             {getWasteTypeLabel(container.wasteType)} •{' '}
-            {getCapacitySizeLabel(container.capacitySize)} (
-            {container.capacityVolume}m³)
+            {getCapacitySizeLabel(container.capacitySize)} ({container.capacityVolume}m³)
           </Text>
         </View>
 
@@ -152,15 +126,13 @@ export function WasteContainerCard({
 
         {container.notes && (
           <View style={styles.notesContainer}>
-            <Text style={styles.notesLabel}>
-              {t('wasteContainers.notes') || 'Notes'}:
-            </Text>
+            <Text style={styles.notesLabel}>{t('wasteContainers.notes') || 'Notes'}:</Text>
             <Text style={styles.notesText}>{container.notes}</Text>
           </View>
         )}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -169,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
@@ -270,4 +242,4 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     lineHeight: 20,
   },
-});
+})

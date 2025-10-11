@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import {Tabs} from 'expo-router'
 import {
   Home,
   FileText,
@@ -8,22 +8,22 @@ import {
   Edit3,
   MapPin,
   AlertTriangle,
-} from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import { BellActionProvider } from '../../contexts/BellActionContext';
-import { TabHeader } from '../../components/TabHeader';
+} from 'lucide-react-native'
+import {useTranslation} from 'react-i18next'
+import {BellActionProvider} from '../../contexts/BellActionContext'
+import {TabHeader} from '../../components/TabHeader'
 
 export default function TabLayout() {
-  const { t } = useTranslation();
+  const {t} = useTranslation()
 
   return (
     <BellActionProvider>
       <TabLayoutContent t={t} />
     </BellActionProvider>
-  );
+  )
 }
 
-function TabLayoutContent({ t }: { t: (key: string) => string }) {
+function TabLayoutContent({t}: {t: (key: string) => string}) {
   return (
     <Tabs
       screenOptions={{
@@ -50,10 +50,8 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         options={{
           title: t('common.home'),
           tabBarLabel: t('common.home'),
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-          headerTitle: () => (
-            <TabHeader title={t('common.goodMorning')} showActionIcon={true} />
-          ),
+          tabBarIcon: ({color}) => <Home size={24} color={color} />,
+          headerTitle: () => <TabHeader title={t('common.goodMorning')} showActionIcon={true} />,
         }}
       />
       <Tabs.Screen
@@ -61,7 +59,7 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         options={{
           title: t('common.map'),
           tabBarLabel: t('common.map'),
-          tabBarIcon: ({ color }) => <MapPin size={24} color={color} />,
+          tabBarIcon: ({color}) => <MapPin size={24} color={color} />,
           headerTitle: () => <TabHeader title={t('common.map')} />,
         }}
       />
@@ -70,13 +68,9 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         options={{
           title: t('common.signals'),
           tabBarLabel: t('common.signals'),
-          tabBarIcon: ({ color }) => <AlertTriangle size={24} color={color} />,
+          tabBarIcon: ({color}) => <AlertTriangle size={24} color={color} />,
           headerTitle: () => (
-            <TabHeader
-              title={t('signals.title')}
-              showActionIcon={false}
-              ActionIcon={Plus}
-            />
+            <TabHeader title={t('signals.title')} showActionIcon={false} ActionIcon={Plus} />
           ),
         }}
       />
@@ -86,7 +80,7 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         options={{
           href: null, // Hide from tab bar
           title: t('common.cityService'),
-          tabBarIcon: ({ color }) => <FileText size={24} color={color} />,
+          tabBarIcon: ({color}) => <FileText size={24} color={color} />,
           headerTitle: () => <TabHeader title={t('common.cityService')} />,
         }}
       />
@@ -96,13 +90,9 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         options={{
           href: null, // Hide from tab bar
           title: t('common.quickServices'),
-          tabBarIcon: ({ color }) => <CreditCard size={24} color={color} />,
+          tabBarIcon: ({color}) => <CreditCard size={24} color={color} />,
           headerTitle: () => (
-            <TabHeader
-              title={t('common.payments')}
-              showActionIcon={true}
-              ActionIcon={Plus}
-            />
+            <TabHeader title={t('common.payments')} showActionIcon={true} ActionIcon={Plus} />
           ),
         }}
       />
@@ -110,16 +100,12 @@ function TabLayoutContent({ t }: { t: (key: string) => string }) {
         name="profile"
         options={{
           title: t('common.profile'),
-          tabBarIcon: ({ color }) => <User size={24} color={color} />,
+          tabBarIcon: ({color}) => <User size={24} color={color} />,
           headerTitle: () => (
-            <TabHeader
-              title={t('common.profile')}
-              showActionIcon={true}
-              ActionIcon={Edit3}
-            />
+            <TabHeader title={t('common.profile')} showActionIcon={true} ActionIcon={Edit3} />
           ),
         }}
       />
     </Tabs>
-  );
+  )
 }

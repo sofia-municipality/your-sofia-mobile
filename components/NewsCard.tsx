@@ -1,20 +1,14 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import type { NewsItem } from '../types/news';
+import {View, Text, StyleSheet, Image} from 'react-native'
+import type {NewsItem} from '../types/news'
 
 interface NewsCardProps {
-  item: NewsItem;
+  item: NewsItem
 }
 
-export function NewsCard({ item }: NewsCardProps) {
+export function NewsCard({item}: NewsCardProps) {
   return (
     <View style={styles.container}>
-      {item.image && (
-        <Image
-          source={{ uri: item.image }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
+      {item.image && <Image source={{uri: item.image}} style={styles.image} resizeMode="cover" />}
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
@@ -25,7 +19,7 @@ export function NewsCard({ item }: NewsCardProps) {
         <Text style={styles.date}>{item.date}</Text>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -37,7 +31,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -65,4 +59,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
   },
-});
+})
