@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
+import {useFocusEffect} from '@react-navigation/native'
 import {
   View,
   Text,
@@ -9,7 +10,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native'
-import MapView, {Marker, PROVIDER_DEFAULT, Callout} from 'react-native-maps'
+import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {useWasteContainers} from '../../hooks/useWasteContainers'
@@ -27,9 +28,21 @@ export default function MapScreen() {
   const [selectedFilter, setSelectedFilter] = useState<MapFilter>('all')
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
+  const [isFirstFocus, setIsFirstFocus] = useState(true)
 
   // Fetch waste containers
-  const {containers, loading: containersLoading} = useWasteContainers()
+  const {containers, loading: containersLoading, refresh: refreshContainers} = useWasteContainers()
+
+  // Refresh containers when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus) {
+        setIsFirstFocus(false)
+        return
+      }
+      refreshContainers()
+    }, [isFirstFocus, refreshContainers])
+  )
 
   useEffect(() => {
     ;(async () => {

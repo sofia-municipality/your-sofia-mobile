@@ -8,17 +8,8 @@ import {
   Dimensions,
 } from 'react-native'
 import {useRef, useEffect, useCallback, useState} from 'react'
-import {
-  MapPin,
-  Phone,
-  Bell,
-  Car,
-  Building2,
-  FileCheck,
-  Zap,
-  Heart,
-  ChevronRight,
-} from 'lucide-react-native'
+import {useFocusEffect} from '@react-navigation/native'
+import {MapPin, Phone, Bell, Car, Building2, FileCheck, Zap, Heart} from 'lucide-react-native'
 import {
   useFonts,
   Inter_400Regular,
@@ -119,6 +110,7 @@ export default function HomeScreen() {
   const {t} = useTranslation()
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
   const [isMapView, setIsMapView] = useState(false)
+  const [isFirstFocus, setIsFirstFocus] = useState(true)
   const scrollViewRef = useRef<ScrollView>(null)
   const newsSectionRef = useRef<View>(null)
   const {registerBellAction} = useBellAction()
@@ -148,6 +140,17 @@ export default function HomeScreen() {
   useEffect(() => {
     registerBellAction(handleBellPress)
   }, [registerBellAction, handleBellPress])
+
+  // Refresh news when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus) {
+        setIsFirstFocus(false)
+        return
+      }
+      refresh()
+    }, [isFirstFocus, refresh])
+  )
 
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,

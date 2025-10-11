@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react'
+import {useFocusEffect} from '@react-navigation/native'
 import {
   View,
   Text,
@@ -23,6 +24,7 @@ export default function SignalsScreen() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isFirstFocus, setIsFirstFocus] = useState(true)
 
   const handleCreateSignal = useCallback(() => {
     router.push('/(tabs)/signals/new' as any)
@@ -33,27 +35,41 @@ export default function SignalsScreen() {
     registerBellAction(handleCreateSignal)
   }, [registerBellAction, handleCreateSignal])
 
-  const loadSignals = async (isRefreshing = false) => {
-    try {
-      if (!isRefreshing) setLoading(true)
-      setError(null)
-      const response = await fetchSignals({
-        locale: i18n.language as 'bg' | 'en',
-        limit: 50,
-      })
-      setSignals(response.docs)
-    } catch (err) {
-      console.error('Error loading signals:', err)
-      setError(err instanceof Error ? err.message : t('signals.error'))
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }
+  const loadSignals = useCallback(
+    async (isRefreshing = false) => {
+      try {
+        if (!isRefreshing) setLoading(true)
+        setError(null)
+        const response = await fetchSignals({
+          locale: i18n.language as 'bg' | 'en',
+          limit: 50,
+        })
+        setSignals(response.docs)
+      } catch (err) {
+        console.error('Error loading signals:', err)
+        setError(err instanceof Error ? err.message : t('signals.error'))
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
+      }
+    },
+    [i18n.language, t]
+  )
 
   useEffect(() => {
     loadSignals()
-  }, [i18n.language])
+  }, [loadSignals])
+
+  // Refresh signals when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus) {
+        setIsFirstFocus(false)
+        return
+      }
+      loadSignals()
+    }, [isFirstFocus, loadSignals])
+  )
 
   const onRefresh = () => {
     setRefreshing(true)

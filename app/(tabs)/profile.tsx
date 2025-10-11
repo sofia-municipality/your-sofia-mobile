@@ -17,7 +17,6 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
-  Edit3,
   Phone,
   Mail,
   MapPin,
@@ -25,7 +24,8 @@ import {
   AlertCircle,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
+import {useFocusEffect} from '@react-navigation/native'
 import {GitHubIcon} from '../../components/GitHubIcon'
 import {getUniqueReporterId} from '../../lib/deviceId'
 import {fetchSignalStats} from '../../lib/payload'
@@ -113,6 +113,22 @@ export default function ProfileScreen() {
     active: number
   }>({total: 0, active: 0})
   const [loadingStats, setLoadingStats] = useState(true)
+  const [isFirstFocus, setIsFirstFocus] = useState(true)
+
+  const loadSignalStats = useCallback(
+    async (reporterId: string) => {
+      try {
+        setLoadingStats(true)
+        const stats = await fetchSignalStats(reporterId, i18n.language as 'bg' | 'en')
+        setSignalStats(stats)
+      } catch (error) {
+        console.error('Error loading signal stats:', error)
+      } finally {
+        setLoadingStats(false)
+      }
+    },
+    [i18n.language]
+  )
 
   useEffect(() => {
     getUniqueReporterId().then((id) => {
@@ -120,26 +136,27 @@ export default function ProfileScreen() {
       // Fetch signal stats once we have the device ID
       loadSignalStats(id)
     })
-  }, [])
+  }, [loadSignalStats])
 
   useEffect(() => {
     // Reload stats when language changes
     if (deviceId) {
       loadSignalStats(deviceId)
     }
-  }, [i18n.language])
+  }, [i18n.language, deviceId, loadSignalStats])
 
-  const loadSignalStats = async (reporterId: string) => {
-    try {
-      setLoadingStats(true)
-      const stats = await fetchSignalStats(reporterId, i18n.language as 'bg' | 'en')
-      setSignalStats(stats)
-    } catch (error) {
-      console.error('Error loading signal stats:', error)
-    } finally {
-      setLoadingStats(false)
-    }
-  }
+  // Refresh stats when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus) {
+        setIsFirstFocus(false)
+        return
+      }
+      if (deviceId) {
+        loadSignalStats(deviceId)
+      }
+    }, [isFirstFocus, deviceId, loadSignalStats])
+  )
 
   const profileSections = getProfileSections(t)
 
