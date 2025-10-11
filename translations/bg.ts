@@ -44,6 +44,8 @@ export default {
     yourLocation: 'Вашето местоположение',
     error: 'Грешка',
     cancel: 'Остави',
+    success: 'Успех',
+    confirm: 'Потвърди',
   },
   services: {
     payBills: 'Плащане на сметки',
@@ -206,5 +208,14 @@ export default {
     },
     success: 'Сигналът е изпратен успешно!',
     error: 'Грешка при изпращане на сигнала',
+  },
+  settings: {
+    apiEnvironment: 'API Среда',
+    devModeOnly: 'Налично само в разработчески режим',
+    current: 'Текуща',
+    changeEnvironment: 'Смяна на среда',
+    changeEnvironmentWarning: 'Сигурни ли сте, че искате да смените средата на {{env}}? Приложението ще се свърже с различен API сървър.',
+    environmentChanged: 'Средата е сменена успешно на {{env}}',
+    environmentChangeFailed: 'Неуспешна смяна на средата',
   },
 };

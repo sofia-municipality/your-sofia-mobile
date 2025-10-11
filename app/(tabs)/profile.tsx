@@ -26,10 +26,10 @@ import {
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useState, useEffect} from 'react'
-import {commonStyles} from '../../styles/common'
 import {GitHubIcon} from '../../components/GitHubIcon'
 import {getUniqueReporterId} from '../../lib/deviceId'
 import {fetchSignalStats} from '../../lib/payload'
+import {EnvironmentSwitcher} from '@/components/EnvironmentSwitcher'
 
 const getProfileSections = (t: (key: string) => string) => [
   {
@@ -193,6 +193,9 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+
+        {/* Environment Switcher - Dev Only */}
+        <EnvironmentSwitcher />
 
         {/* Profile Sections */}
         {profileSections.map((section: ProfileSection) => (

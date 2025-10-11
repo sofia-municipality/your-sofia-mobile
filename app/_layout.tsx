@@ -1,30 +1,31 @@
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Image } from 'react-native';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { LanguageSwitch } from '@/components/LanguageSwitch';
-import { useTranslation } from 'react-i18next';
-import { initializeReporterId } from '@/lib/deviceId';
-import '../i18n';
+import {useEffect} from 'react'
+import {Stack} from 'expo-router'
+import {StatusBar} from 'expo-status-bar'
+import {Image} from 'react-native'
+import {useFrameworkReady} from '@/hooks/useFrameworkReady'
+import {LanguageSwitch} from '@/components/LanguageSwitch'
+import {useTranslation} from 'react-i18next'
+import {initializeReporterId} from '@/lib/deviceId'
+import {EnvironmentProvider} from '@/contexts/EnvironmentContext'
+import '../i18n'
 
 export default function RootLayout() {
-  useFrameworkReady();
-  const { t } = useTranslation();
+  useFrameworkReady()
+  const {t} = useTranslation()
 
   // Initialize unique reporter ID on app start
   useEffect(() => {
     initializeReporterId()
       .then((id) => {
-        console.log('Unique Reporter ID initialized:', id);
+        console.log('Unique Reporter ID initialized:', id)
       })
       .catch((error) => {
-        console.error('Failed to initialize reporter ID:', error);
-      });
-  }, []);
+        console.error('Failed to initialize reporter ID:', error)
+      })
+  }, [])
 
   return (
-    <>
+    <EnvironmentProvider>
       <Stack
         screenOptions={{
           headerShown: true,
@@ -44,10 +45,10 @@ export default function RootLayout() {
           headerRight: () => <LanguageSwitch />,
         }}
       >
-        <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
+        <Stack.Screen name="(tabs)" options={{headerShown: true}} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </>
-  );
+    </EnvironmentProvider>
+  )
 }

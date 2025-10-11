@@ -4,10 +4,11 @@
  * Client for fetching content from Payload CMS
  */
 
-import type { WasteContainer } from '../types/wasteContainer';
-import type { Signal, CreateSignalInput } from '../types/signal';
+import type { WasteContainer } from '../types/wasteContainer'
+import type { Signal, CreateSignalInput } from '../types/signal'
+import { environmentManager } from './environment'
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+const getApiUrl = () => environmentManager.getApiUrl()
 
 export interface PayloadNewsItem {
   id: string;
@@ -76,7 +77,7 @@ export async function fetchNews(options?: {
     params.append('where[topic][equals]', topic);
   }
 
-  const url = `${API_URL}/api/news?${params}`;
+  const url = `${getApiUrl()}/api/news?${params}`;
   console.log('[fetchNews] Request URL:', url);
 
   const response = await fetch(url);
@@ -95,7 +96,7 @@ export async function fetchNewsById(
   id: string,
   locale: 'bg' | 'en' = 'bg',
 ): Promise<PayloadNewsItem> {
-  const response = await fetch(`${API_URL}/api/news/${id}?locale=${locale}`);
+  const response = await fetch(`${getApiUrl()}/api/news/${id}?locale=${locale}`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch news item: ${response.statusText}`);
@@ -109,8 +110,8 @@ export async function fetchNewsById(
  */
 export function getMediaUrl(media: any): string | undefined {
   if (!media) return undefined;
-  if (typeof media === 'string') return `${API_URL}${media}`;
-  if (media.url) return `${API_URL}${media.url}`;
+  if (typeof media === 'string') return `${getApiUrl()}${media}`;
+  if (media.url) return `${getApiUrl()}${media.url}`;
   return undefined;
 }
 
@@ -142,7 +143,7 @@ export async function fetchWasteContainers(options?: {
     params.append('where[wasteType][equals]', wasteType);
   }
 
-  const url = `${API_URL}/api/waste-containers?${params}`;
+  const url = `${getApiUrl()}/api/waste-containers?${params}`;
   console.log('[fetchWasteContainers] Request URL:', url);
 
   const response = await fetch(url);
@@ -171,7 +172,7 @@ export async function fetchWasteContainers(options?: {
  * Fetch a single waste container by ID
  */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
-  const response = await fetch(`${API_URL}/api/waste-containers/${id}?depth=1`);
+  const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch waste container: ${response.statusText}`);
@@ -233,7 +234,7 @@ export async function fetchSignals(options?: {
     params.append('where[cityObject.referenceId][equals]', containerReferenceId);
   }
 
-  const url = `${API_URL}/api/signals?${params}`;
+  const url = `${getApiUrl()}/api/signals?${params}`;
   console.log('[fetchSignals] Request URL:', url);
 
   const response = await fetch(url);
@@ -265,7 +266,7 @@ export async function fetchSignalById(
   id: string,
   locale: 'bg' | 'en' = 'bg',
 ): Promise<Signal> {
-  const response = await fetch(`${API_URL}/api/signals/${id}?locale=${locale}&depth=1`);
+  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}&depth=1`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch signal: ${response.statusText}`);
@@ -291,7 +292,7 @@ export async function createSignal(
   signalData: CreateSignalInput,
   locale: 'bg' | 'en' = 'bg',
 ): Promise<Signal> {
-  const response = await fetch(`${API_URL}/api/signals?locale=${locale}`, {
+  const response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -376,7 +377,7 @@ export async function updateSignal(
   signalData: Partial<CreateSignalInput>,
   locale: 'bg' | 'en' = 'bg',
 ): Promise<Signal> {
-  const response = await fetch(`${API_URL}/api/signals/${id}?locale=${locale}`, {
+  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

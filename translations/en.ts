@@ -44,6 +44,8 @@ export default {
     noNews: 'No news available',
     payments: 'Payments',
     cancel: 'Cancel',
+    success: 'Success',
+    confirm: 'Confirm',
   },
   services: {
     payBills: 'Pay Bills',
@@ -206,5 +208,15 @@ export default {
     },
     success: 'Signal submitted successfully!',
     error: 'Error submitting signal',
+  },
+  settings: {
+    apiEnvironment: 'API Environment',
+    devModeOnly: 'Development mode only',
+    current: 'Current',
+    changeEnvironment: 'Change Environment',
+    changeEnvironmentWarning:
+      'Are you sure you want to switch the environment to {{env}}? The app will connect to a different API server.',
+    environmentChanged: 'Environment successfully changed to {{env}}',
+    environmentChangeFailed: 'Failed to change environment',
   },
 };
