@@ -168,11 +168,3 @@ body:
         - Other tabs (Services, Profile) load much faster
     validations:
       required: false
-
-  - type: checkboxes
-    id: willing-to-fix
-    attributes:
-      label: Are you willing to submit a PR to fix this?
-      description: Performance improvements are valuable contributions!
-      options:
-        - label: Yes, I'd like to work on optimizing this

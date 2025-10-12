@@ -134,13 +134,3 @@ body:
         - Related to existing issue #123
     validations:
       required: false
-
-  - type: checkboxes
-    id: willing-to-implement
-    attributes:
-      label: Are you willing to submit a PR to implement this?
-      description: We welcome contributions from the community!
-      options:
-        - label: Yes, I'd like to work on implementing this feature
-        - label: I can help with design/mockups
-        - label: I can help with testing

@@ -101,11 +101,3 @@ body:
         - Similar issue exists in the Contributing guide
     validations:
       required: false
-
-  - type: checkboxes
-    id: willing-to-fix
-    attributes:
-      label: Are you willing to submit a PR to fix this?
-      description: Documentation PRs are great first contributions!
-      options:
-        - label: Yes, I'd like to update the documentation

@@ -128,7 +128,7 @@ Use this template to report performance problems or suggest optimizations.
 ### 🔒 Security Vulnerability (`security.yml`)
 Use this template for **low-severity** security concerns only.
 
-**⚠️ IMPORTANT:** For critical security vulnerabilities, **DO NOT** create a public issue. Report privately to: security@your-sofia.bg
+**⚠️ IMPORTANT:** For critical security vulnerabilities, **DO NOT** create a public issue. Report privately to: itsecurity@sofia.bg
 
 **When to use:**
 - Low-severity security improvements

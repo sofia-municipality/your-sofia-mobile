@@ -150,11 +150,3 @@ body:
         - Works fine on Android but fails on iOS
     validations:
       required: false
-
-  - type: checkboxes
-    id: willing-to-fix
-    attributes:
-      label: Are you willing to submit a PR to fix this?
-      description: We welcome contributions from the community!
-      options:
-        - label: Yes, I'd like to work on fixing this bug
