@@ -3,6 +3,7 @@ import {View, Text, StyleSheet} from 'react-native'
 import {Wind} from 'lucide-react-native'
 import {AirQualityData} from '../types/airQuality'
 import {useTranslation} from 'react-i18next'
+import {ImplementMeGithub} from './ImplementMeGithub'
 
 interface Props {
   data: AirQualityData
@@ -49,6 +50,7 @@ export function AirQualityCard({data}: Props) {
           {data.aqi} - {getTranslatedStatus(data.status)}
         </Text>
       </View>
+      <ImplementMeGithub issueUrl="https://github.com/sofia-municipality/your-sofia-mobile/issues/2" />
     </View>
   )
 }

@@ -46,6 +46,8 @@ export default {
     cancel: 'Остави',
     success: 'Успех',
     confirm: 'Потвърди',
+    implementMeMessage:
+      'Това е примерна функционалност. Ще се радваме да помогнеш с имплементацията в GitHub:',
   },
   services: {
     payBills: 'Плащане на сметки',
