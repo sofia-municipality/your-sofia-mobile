@@ -254,7 +254,7 @@ Go to the original repository and click "New Pull Request".
 **Review etiquette:**
 
 - Be respectful and constructive
-- Explain *why* changes are needed
+- Explain _why_ changes are needed
 - Acknowledge good work
 - Suggest improvements, don't demand them
 - Approve quickly when appropriate

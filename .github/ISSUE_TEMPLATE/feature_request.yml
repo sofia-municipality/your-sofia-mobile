@@ -1,7 +1,7 @@
 name: 💡 Feature Request
 description: Suggest a new feature or enhancement for Your Sofia
-title: "[Feature]: "
-labels: ["enhancement", "needs-triage"]
+title: '[Feature]: '
+labels: ['enhancement', 'needs-triage']
 assignees: []
 body:
   - type: markdown

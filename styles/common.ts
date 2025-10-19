@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native'
 
 export const commonStyles = StyleSheet.create({
   header: {
@@ -25,4 +25,4 @@ export const commonStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})

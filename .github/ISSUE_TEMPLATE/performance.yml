@@ -1,7 +1,7 @@
 name: ⚡ Performance Issue
 description: Report slow performance, memory leaks, or optimization opportunities
-title: "[Performance]: "
-labels: ["performance", "needs-triage"]
+title: '[Performance]: '
+labels: ['performance', 'needs-triage']
 assignees: []
 body:
   - type: markdown
@@ -68,7 +68,7 @@ body:
       value: |
         1. 
         2. 
-        3. 
+        3.
     validations:
       required: true
 
@@ -116,7 +116,7 @@ body:
     attributes:
       label: Device Information
       description: Device model and specifications
-      placeholder: "iPhone 13 Pro (6GB RAM)"
+      placeholder: 'iPhone 13 Pro (6GB RAM)'
     validations:
       required: false
 

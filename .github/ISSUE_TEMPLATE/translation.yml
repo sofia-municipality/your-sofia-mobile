@@ -1,7 +1,7 @@
 name: 🌍 Translation Issue
 description: Report missing, incorrect, or unclear translations
-title: "[Translation]: "
-labels: ["translation", "i18n", "needs-triage"]
+title: '[Translation]: '
+labels: ['translation', 'i18n', 'needs-triage']
 assignees: []
 body:
   - type: markdown
@@ -81,7 +81,7 @@ body:
       description: Provide the corrected or improved translation
       placeholder: |
         Suggested text: "Качеството на въздуха е нездравословно!"
-        
+
         This is more formal and clearly indicates health concerns, which is important for a civic notification.
     validations:
       required: true
@@ -91,7 +91,7 @@ body:
     attributes:
       label: Translation Key (if known)
       description: The i18n key in the translation files (e.g., airQuality.alert)
-      placeholder: "airQuality.alert"
+      placeholder: 'airQuality.alert'
     validations:
       required: false
 
@@ -100,7 +100,7 @@ body:
     attributes:
       label: File Location (if known)
       description: Path to the translation file (e.g., app/translations/bg.ts)
-      placeholder: "app/translations/bg.ts"
+      placeholder: 'app/translations/bg.ts'
     validations:
       required: false
 

@@ -8,8 +8,8 @@ export default {
       moderate: 'Moderate',
       unhealthy: 'Unhealthy',
       veryUnhealthy: 'Very Unhealthy',
-      hazardous: 'Hazardous'
-    }
+      hazardous: 'Hazardous',
+    },
   },
   common: {
     header: 'Your Sofia',
@@ -28,7 +28,7 @@ export default {
       festivals: 'Festivals',
       streetClosure: 'Street Closure',
       cityEvents: 'City Events',
-      alerts: 'Alerts'
+      alerts: 'Alerts',
     },
     emergencyServices: 'Emergency Services',
     profile: 'Profile',
@@ -68,8 +68,10 @@ export default {
     municipalOffices: 'Municipal offices and services',
   },
   profile: {
-    staticScreenNotice: 'This is a sample static screen. If you want to make it functional, come to GitHub.',
-    anonymity: 'The main functionality of the app works without registration. For extended features, you\'ll need to register.',
+    staticScreenNotice:
+      'This is a sample static screen. If you want to make it functional, come to GitHub.',
+    anonymity:
+      "The main functionality of the app works without registration. For extended features, you'll need to register.",
     accountSettings: 'Account Settings',
     personalInfo: 'Personal Information',
     updateProfile: 'Update your profile details',
@@ -167,7 +169,8 @@ export default {
     updateSuccess: 'Signal updated successfully!',
     updateError: 'Error updating signal',
     duplicateTitle: 'You already have an active signal',
-    duplicateMessage: 'You have already reported a problem for this container (Signal #{{id}}). You can view or edit the existing signal.',
+    duplicateMessage:
+      'You have already reported a problem for this container (Signal #{{id}}). You can view or edit the existing signal.',
     viewExisting: 'View existing signal',
     form: {
       headerNew: 'New Signal',
@@ -191,11 +194,11 @@ export default {
     categories: {
       'waste-container': 'Waste Container Issue',
       'street-damage': 'Street Damage',
-      'lighting': 'Lighting',
+      lighting: 'Lighting',
       'green-spaces': 'Green Spaces',
-      'parking': 'Parking',
+      parking: 'Parking',
       'public-transport': 'Public Transport',
-      'other': 'Other',
+      other: 'Other',
     },
     containerStates: {
       full: 'Full',
@@ -221,4 +224,4 @@ export default {
     environmentChanged: 'Environment successfully changed to {{env}}',
     environmentChangeFailed: 'Failed to change environment',
   },
-};
+}

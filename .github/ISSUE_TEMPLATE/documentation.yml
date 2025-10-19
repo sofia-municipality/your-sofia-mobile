@@ -1,7 +1,7 @@
 name: 📖 Documentation Improvement
 description: Suggest improvements to documentation, guides, or examples
-title: "[Docs]: "
-labels: ["documentation", "needs-triage"]
+title: '[Docs]: '
+labels: ['documentation', 'needs-triage']
 assignees: []
 body:
   - type: markdown
@@ -50,7 +50,7 @@ body:
       description: What does the current documentation say? (Paste relevant section or provide link)
       placeholder: |
         Link: https://github.com/sofia-municipality/your-sofia/blob/main/README.md#section
-        
+
         Current text:
         "To start the app, run npm start"
     validations:
@@ -73,7 +73,7 @@ body:
       description: How should the documentation be changed or improved?
       placeholder: |
         Change "npm start" to "pnpm dev" to match the actual package manager used.
-        
+
         Also add a note at the beginning stating:
         "This project uses pnpm, not npm or yarn. Install it with: npm install -g pnpm"
     validations:

@@ -1,64 +1,66 @@
 /**
  * Payload CMS API Client
- * 
+ *
  * Client for fetching content from Payload CMS
  */
 
-import type { WasteContainer } from '../types/wasteContainer'
-import type { Signal, CreateSignalInput } from '../types/signal'
-import { environmentManager } from './environment'
+import type {WasteContainer} from '../types/wasteContainer'
+import type {Signal, CreateSignalInput} from '../types/signal'
+import {environmentManager} from './environment'
 
 const getApiUrl = () => environmentManager.getApiUrl()
 
 export interface PayloadNewsItem {
-  id: string;
-  title: string;
-  description: string;
-  content?: any; // Lexical rich text
-  topic: 'festivals' | 'street-closure' | 'city-events' | 'alerts';
-  image?: {
-    id: string;
-    url: string;
-    alt?: string;
-    filename?: string;
-    mimeType?: string;
-    filesize?: number;
-    width?: number;
-    height?: number;
-  } | string; // Can be populated object or just ID string
+  id: string
+  title: string
+  description: string
+  content?: any // Lexical rich text
+  topic: 'festivals' | 'street-closure' | 'city-events' | 'alerts'
+  image?:
+    | {
+        id: string
+        url: string
+        alt?: string
+        filename?: string
+        mimeType?: string
+        filesize?: number
+        width?: number
+        height?: number
+      }
+    | string // Can be populated object or just ID string
   location?: {
-    latitude: number;
-    longitude: number;
-  };
-  status: 'draft' | 'published';
-  publishedAt: string;
-  createdAt: string;
-  updatedAt: string;
+    latitude: number
+    longitude: number
+  }
+  status: 'draft' | 'published'
+  publishedAt: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface PayloadResponse<T> {
-  docs: T[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
-  page: number;
-  pagingCounter: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number | null;
-  nextPage: number | null;
+  docs: T[]
+  totalDocs: number
+  limit: number
+  totalPages: number
+  page: number
+  pagingCounter: number
+  hasPrevPage: boolean
+  hasNextPage: boolean
+  prevPage: number | null
+  nextPage: number | null
 }
 
 /**
  * Fetch news from Payload CMS
  */
 export async function fetchNews(options?: {
-  locale?: 'bg' | 'en';
-  topic?: string;
-  limit?: number;
-  page?: number;
+  locale?: 'bg' | 'en'
+  topic?: string
+  limit?: number
+  page?: number
 }): Promise<PayloadResponse<PayloadNewsItem>> {
-  const { locale = 'bg', topic, limit = 10, page = 1 } = options || {};
+  const {locale = 'bg', topic, limit = 10, page = 1} = options || {}
 
   // Build query parameters
   const params = new URLSearchParams({
@@ -67,26 +69,26 @@ export async function fetchNews(options?: {
     page: page.toString(),
     depth: '1', // Populate image relationship
     sort: '-publishedAt',
-  });
+  })
 
   // Add status filter
-  params.append('where[status][equals]', 'published');
+  params.append('where[status][equals]', 'published')
 
   // Add topic filter if specified
   if (topic && topic !== 'all') {
-    params.append('where[topic][equals]', topic);
+    params.append('where[topic][equals]', topic)
   }
 
-  const url = `${getApiUrl()}/api/news?${params}`;
-  console.log('[fetchNews] Request URL:', url);
+  const url = `${getApiUrl()}/api/news?${params}`
+  console.log('[fetchNews] Request URL:', url)
 
-  const response = await fetch(url);
-  
+  const response = await fetch(url)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch news: ${response.statusText}`);
+    throw new Error(`Failed to fetch news: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -94,116 +96,126 @@ export async function fetchNews(options?: {
  */
 export async function fetchNewsById(
   id: string,
-  locale: 'bg' | 'en' = 'bg',
+  locale: 'bg' | 'en' = 'bg'
 ): Promise<PayloadNewsItem> {
-  const response = await fetch(`${getApiUrl()}/api/news/${id}?locale=${locale}`);
-  
+  const response = await fetch(`${getApiUrl()}/api/news/${id}?locale=${locale}`)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch news item: ${response.statusText}`);
+    throw new Error(`Failed to fetch news item: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
  * Fetch media URL
  */
 export function getMediaUrl(media: any): string | undefined {
-  if (!media) return undefined;
-  if (typeof media === 'string') return `${getApiUrl()}${media}`;
-  if (media.url) return `${getApiUrl()}${media.url}`;
-  return undefined;
+  if (!media) return undefined
+  if (typeof media === 'string') return `${getApiUrl()}${media}`
+  if (media.url) return `${getApiUrl()}${media.url}`
+  return undefined
 }
 
 /**
  * Fetch waste containers from Payload CMS
  */
 export async function fetchWasteContainers(options?: {
-  status?: 'active' | 'full' | 'maintenance' | 'inactive';
-  wasteType?: string;
-  limit?: number;
-  page?: number;
+  status?: 'active' | 'full' | 'maintenance' | 'inactive'
+  wasteType?: string
+  limit?: number
+  page?: number
 }): Promise<PayloadResponse<WasteContainer>> {
-  const { status, wasteType, limit = 100, page = 1 } = options || {};
+  const {status, wasteType, limit = 100, page = 1} = options || {}
 
   // Build query parameters
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
     depth: '1', // Populate image relationship
-  });
+  })
 
   // Add status filter - default to active containers
   if (status) {
-    params.append('where[status][equals]', status);
+    params.append('where[status][equals]', status)
   }
 
   // Add waste type filter if specified
   if (wasteType) {
-    params.append('where[wasteType][equals]', wasteType);
+    params.append('where[wasteType][equals]', wasteType)
   }
 
-  const url = `${getApiUrl()}/api/waste-containers?${params}`;
-  console.log('[fetchWasteContainers] Request URL:', url);
+  const url = `${getApiUrl()}/api/waste-containers?${params}`
+  console.log('[fetchWasteContainers] Request URL:', url)
 
-  const response = await fetch(url);
-  
+  const response = await fetch(url)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch waste containers: ${response.statusText}`);
+    throw new Error(`Failed to fetch waste containers: ${response.statusText}`)
   }
 
-  const data = await response.json();
-  
+  const data = await response.json()
+
   // Transform image URLs
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
-      image: container.image ? {
-        ...container.image,
-        url: getMediaUrl(container.image),
-      } : undefined,
-    }));
+      image: container.image
+        ? {
+            ...container.image,
+            url: getMediaUrl(container.image),
+          }
+        : undefined,
+    }))
   }
 
-  return data;
+  return data
 }
 
 /**
  * Fetch a single waste container by ID
  */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
-  const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`);
-  
+  const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch waste container: ${response.statusText}`);
+    throw new Error(`Failed to fetch waste container: ${response.statusText}`)
   }
 
-  const container = await response.json();
-  
+  const container = await response.json()
+
   // Transform image URL
   if (container.image) {
     container.image = {
       ...container.image,
       url: getMediaUrl(container.image),
-    };
+    }
   }
 
-  return container;
+  return container
 }
 
 /**
  * Fetch signals from Payload CMS
  */
 export async function fetchSignals(options?: {
-  locale?: 'bg' | 'en';
-  status?: string;
-  category?: string;
-  limit?: number;
-  page?: number;
-  reporterUniqueId?: string;
-  containerReferenceId?: string;
+  locale?: 'bg' | 'en'
+  status?: string
+  category?: string
+  limit?: number
+  page?: number
+  reporterUniqueId?: string
+  containerReferenceId?: string
 }): Promise<PayloadResponse<Signal>> {
-  const { locale = 'bg', status, category, limit = 20, page = 1, reporterUniqueId, containerReferenceId } = options || {};
+  const {
+    locale = 'bg',
+    status,
+    category,
+    limit = 20,
+    page = 1,
+    reporterUniqueId,
+    containerReferenceId,
+  } = options || {}
 
   // Build query parameters
   const params = new URLSearchParams({
@@ -212,39 +224,39 @@ export async function fetchSignals(options?: {
     page: page.toString(),
     depth: '1', // Populate image relationship
     sort: '-createdAt',
-  });
+  })
 
   // Add status filter if specified
   if (status) {
-    params.append('where[status][equals]', status);
+    params.append('where[status][equals]', status)
   }
 
   // Add category filter if specified
   if (category) {
-    params.append('where[category][equals]', category);
+    params.append('where[category][equals]', category)
   }
 
   // Add reporterUniqueId filter if specified
   if (reporterUniqueId) {
-    params.append('where[reporterUniqueId][equals]', reporterUniqueId);
+    params.append('where[reporterUniqueId][equals]', reporterUniqueId)
   }
 
   // Add container reference ID filter if specified
   if (containerReferenceId) {
-    params.append('where[cityObject.referenceId][equals]', containerReferenceId);
+    params.append('where[cityObject.referenceId][equals]', containerReferenceId)
   }
 
-  const url = `${getApiUrl()}/api/signals?${params}`;
-  console.log('[fetchSignals] Request URL:', url);
+  const url = `${getApiUrl()}/api/signals?${params}`
+  console.log('[fetchSignals] Request URL:', url)
 
-  const response = await fetch(url);
-  
+  const response = await fetch(url)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch signals: ${response.statusText}`);
+    throw new Error(`Failed to fetch signals: ${response.statusText}`)
   }
 
-  const data = await response.json();
-  
+  const data = await response.json()
+
   // Transform image URLs
   if (data.docs) {
     data.docs = data.docs.map((signal: any) => ({
@@ -253,36 +265,33 @@ export async function fetchSignals(options?: {
         ...img,
         url: getMediaUrl(img),
       })),
-    }));
+    }))
   }
 
-  return data;
+  return data
 }
 
 /**
  * Fetch a single signal by ID
  */
-export async function fetchSignalById(
-  id: string,
-  locale: 'bg' | 'en' = 'bg',
-): Promise<Signal> {
-  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}&depth=1`);
-  
+export async function fetchSignalById(id: string, locale: 'bg' | 'en' = 'bg'): Promise<Signal> {
+  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}&depth=1`)
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch signal: ${response.statusText}`);
+    throw new Error(`Failed to fetch signal: ${response.statusText}`)
   }
 
-  const signal = await response.json();
-  
+  const signal = await response.json()
+
   // Transform image URLs
   if (signal.images) {
     signal.images = signal.images.map((img: any) => ({
       ...img,
       url: getMediaUrl(img),
-    }));
+    }))
   }
 
-  return signal;
+  return signal
 }
 
 /**
@@ -290,7 +299,7 @@ export async function fetchSignalById(
  */
 export async function createSignal(
   signalData: CreateSignalInput,
-  locale: 'bg' | 'en' = 'bg',
+  locale: 'bg' | 'en' = 'bg'
 ): Promise<Signal> {
   const response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
     method: 'POST',
@@ -298,14 +307,14 @@ export async function createSignal(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(signalData),
-  });
-  
+  })
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Failed to create signal: ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Failed to create signal: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -314,8 +323,8 @@ export async function createSignal(
 export async function checkExistingSignal(
   reporterUniqueId: string,
   containerReferenceId: string,
-  locale: 'bg' | 'en' = 'bg',
-): Promise<{ exists: boolean; signal?: Signal }> {
+  locale: 'bg' | 'en' = 'bg'
+): Promise<{exists: boolean; signal?: Signal}> {
   try {
     const response = await fetchSignals({
       locale,
@@ -323,20 +332,20 @@ export async function checkExistingSignal(
       containerReferenceId,
       category: 'waste-container',
       limit: 1,
-    });
+    })
 
     // Check if there are any non-resolved signals
     const activeSignal = response.docs.find(
-      signal => signal.status !== 'resolved' && signal.status !== 'rejected'
-    );
+      (signal) => signal.status !== 'resolved' && signal.status !== 'rejected'
+    )
 
     return {
       exists: !!activeSignal,
       signal: activeSignal,
-    };
+    }
   } catch (error) {
-    console.error('Error checking existing signal:', error);
-    return { exists: false };
+    console.error('Error checking existing signal:', error)
+    return {exists: false}
   }
 }
 
@@ -345,27 +354,27 @@ export async function checkExistingSignal(
  */
 export async function fetchSignalStats(
   reporterUniqueId: string,
-  locale: 'bg' | 'en' = 'bg',
-): Promise<{ total: number; active: number }> {
+  locale: 'bg' | 'en' = 'bg'
+): Promise<{total: number; active: number}> {
   try {
     // Fetch all signals for this reporter
     const response = await fetchSignals({
       locale,
       reporterUniqueId,
       limit: 1000, // High limit to get all signals
-    });
+    })
 
-    const total = response.totalDocs;
-    
+    const total = response.totalDocs
+
     // Count active signals (not resolved or rejected)
     const active = response.docs.filter(
-      signal => signal.status !== 'resolved' && signal.status !== 'rejected'
-    ).length;
+      (signal) => signal.status !== 'resolved' && signal.status !== 'rejected'
+    ).length
 
-    return { total, active };
+    return {total, active}
   } catch (error) {
-    console.error('Error fetching signal stats:', error);
-    return { total: 0, active: 0 };
+    console.error('Error fetching signal stats:', error)
+    return {total: 0, active: 0}
   }
 }
 
@@ -375,7 +384,7 @@ export async function fetchSignalStats(
 export async function updateSignal(
   id: string,
   signalData: Partial<CreateSignalInput>,
-  locale: 'bg' | 'en' = 'bg',
+  locale: 'bg' | 'en' = 'bg'
 ): Promise<Signal> {
   const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}`, {
     method: 'PATCH',
@@ -383,12 +392,12 @@ export async function updateSignal(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(signalData),
-  });
-  
+  })
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Failed to update signal: ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Failed to update signal: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }

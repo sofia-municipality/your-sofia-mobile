@@ -1,14 +1,14 @@
 name: ❓ Question
 description: Ask a question about using or contributing to Your Sofia
-title: "[Question]: "
-labels: ["question", "needs-triage"]
+title: '[Question]: '
+labels: ['question', 'needs-triage']
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
         Have a question? We're here to help! 
-        
+
         **Note:** For general discussions, feature ideas, or broader topics, consider using [GitHub Discussions](https://github.com/sofia-municipality/your-sofia/discussions) instead.
 
   - type: checkboxes
@@ -47,7 +47,7 @@ body:
       description: What would you like to know?
       placeholder: |
         How do I configure the PostgreSQL database for development?
-        
+
         I followed the README instructions but I'm getting connection errors. Is there a specific configuration I need?
     validations:
       required: true

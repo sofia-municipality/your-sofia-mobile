@@ -8,6 +8,8 @@
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
+    "lint:fix": "expo lint --fix && prettier --write .",
+    "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

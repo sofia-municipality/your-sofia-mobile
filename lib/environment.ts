@@ -1,13 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const STORAGE_KEY = 'api-environment';
+const STORAGE_KEY = 'api-environment'
 
-export type Environment = 'development' | 'production' | 'staging';
+export type Environment = 'development' | 'production' | 'staging'
 
 export interface EnvironmentConfig {
-  name: Environment;
-  apiUrl: string;
-  displayName: string;
+  name: Environment
+  apiUrl: string
+  displayName: string
 }
 
 export const ENVIRONMENTS: Record<Environment, EnvironmentConfig> = {
@@ -26,69 +26,69 @@ export const ENVIRONMENTS: Record<Environment, EnvironmentConfig> = {
     apiUrl: process.env.EXPO_PUBLIC_PRODUCTION_API_URL || 'https://your.sofia.bg',
     displayName: 'Production',
   },
-};
+}
 
 // Default to development in dev mode, production in production builds
-const DEFAULT_ENV: Environment = __DEV__ ? 'development' : 'production';
+const DEFAULT_ENV: Environment = __DEV__ ? 'development' : 'production'
 
 class EnvironmentManager {
-  private currentEnv: Environment = DEFAULT_ENV;
-  private initialized = false;
+  private currentEnv: Environment = DEFAULT_ENV
+  private initialized = false
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) return
 
     try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const stored = await AsyncStorage.getItem(STORAGE_KEY)
       if (stored && this.isValidEnvironment(stored)) {
-        this.currentEnv = stored as Environment;
+        this.currentEnv = stored as Environment
       }
     } catch (error) {
-      console.warn('Failed to load environment from storage:', error);
+      console.warn('Failed to load environment from storage:', error)
     }
 
-    this.initialized = true;
+    this.initialized = true
   }
 
   private isValidEnvironment(env: string): env is Environment {
-    return env in ENVIRONMENTS;
+    return env in ENVIRONMENTS
   }
 
   getCurrentEnvironment(): Environment {
-    return this.currentEnv;
+    return this.currentEnv
   }
 
   getCurrentConfig(): EnvironmentConfig {
-    return ENVIRONMENTS[this.currentEnv];
+    return ENVIRONMENTS[this.currentEnv]
   }
 
   getApiUrl(): string {
-    return this.getCurrentConfig().apiUrl;
+    return this.getCurrentConfig().apiUrl
   }
 
   async setEnvironment(env: Environment): Promise<void> {
     if (!this.isValidEnvironment(env)) {
-      throw new Error(`Invalid environment: ${env}`);
+      throw new Error(`Invalid environment: ${env}`)
     }
 
-    this.currentEnv = env;
+    this.currentEnv = env
 
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, env);
+      await AsyncStorage.setItem(STORAGE_KEY, env)
     } catch (error) {
-      console.error('Failed to save environment to storage:', error);
-      throw error;
+      console.error('Failed to save environment to storage:', error)
+      throw error
     }
   }
 
   getAllEnvironments(): EnvironmentConfig[] {
-    return Object.values(ENVIRONMENTS);
+    return Object.values(ENVIRONMENTS)
   }
 
   // Only allow environment switching in development mode
   canSwitchEnvironment(): boolean {
-    return __DEV__;
+    return __DEV__
   }
 }
 
-export const environmentManager = new EnvironmentManager();
+export const environmentManager = new EnvironmentManager()

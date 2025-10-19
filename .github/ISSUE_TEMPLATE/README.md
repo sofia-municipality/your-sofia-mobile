@@ -5,9 +5,11 @@ This directory contains issue templates for the **Your Sofia** project. These te
 ## Available Templates
 
 ### 🐛 Bug Report (`bug_report.yml`)
+
 Use this template to report bugs or unexpected behavior in the app or backend.
 
 **When to use:**
+
 - App crashes or freezes
 - Features not working as expected
 - Error messages or exceptions
@@ -15,6 +17,7 @@ Use this template to report bugs or unexpected behavior in the app or backend.
 - Data not loading correctly
 
 **Includes:**
+
 - Component selection (frontend/backend/both)
 - Step-by-step reproduction guide
 - Platform and device information
@@ -24,9 +27,11 @@ Use this template to report bugs or unexpected behavior in the app or backend.
 ---
 
 ### 💡 Feature Request (`feature_request.yml`)
+
 Use this template to suggest new features or enhancements.
 
 **When to use:**
+
 - Proposing new functionality
 - Suggesting UX improvements
 - Requesting new API endpoints
@@ -34,6 +39,7 @@ Use this template to suggest new features or enhancements.
 - Enhancing existing features
 
 **Includes:**
+
 - Problem statement (what need does this address?)
 - Proposed solution
 - Alternative approaches considered
@@ -44,9 +50,11 @@ Use this template to suggest new features or enhancements.
 ---
 
 ### 📖 Documentation Improvement (`documentation.yml`)
+
 Use this template to report issues with documentation or suggest improvements.
 
 **When to use:**
+
 - Missing documentation
 - Outdated instructions
 - Unclear explanations
@@ -55,6 +63,7 @@ Use this template to report issues with documentation or suggest improvements.
 - Missing examples
 
 **Includes:**
+
 - Documentation area (README, Contributing, API docs, etc.)
 - Type of issue (missing, incorrect, unclear, etc.)
 - Current documentation state
@@ -64,9 +73,11 @@ Use this template to report issues with documentation or suggest improvements.
 ---
 
 ### 🌍 Translation Issue (`translation.yml`)
+
 Use this template to report missing or incorrect translations.
 
 **When to use:**
+
 - Missing translations (untranslated text)
 - Incorrect translations (wrong meaning)
 - Awkward or unclear phrasing
@@ -75,6 +86,7 @@ Use this template to report missing or incorrect translations.
 - Inconsistent terminology
 
 **Includes:**
+
 - Translation type (missing, incorrect, unclear, etc.)
 - Language (Bulgarian/English)
 - Location in app
@@ -85,9 +97,11 @@ Use this template to report missing or incorrect translations.
 ---
 
 ### ❓ Question (`question.yml`)
+
 Use this template to ask questions about using or contributing to the project.
 
 **When to use:**
+
 - Setup or installation questions
 - How to contribute questions
 - Usage questions
@@ -97,6 +111,7 @@ Use this template to ask questions about using or contributing to the project.
 **Note:** For general discussions or feature brainstorming, use [GitHub Discussions](https://github.com/sofia-municipality/your-sofia/discussions) instead.
 
 **Includes:**
+
 - Question category
 - What you've already tried
 - Environment details
@@ -105,9 +120,11 @@ Use this template to ask questions about using or contributing to the project.
 ---
 
 ### ⚡ Performance Issue (`performance.yml`)
+
 Use this template to report performance problems or suggest optimizations.
 
 **When to use:**
+
 - Slow loading times
 - High memory usage
 - Memory leaks
@@ -117,6 +134,7 @@ Use this template to report performance problems or suggest optimizations.
 - Slow database queries
 
 **Includes:**
+
 - Affected component
 - Performance issue type
 - Expected vs actual performance
@@ -126,11 +144,13 @@ Use this template to report performance problems or suggest optimizations.
 ---
 
 ### 🔒 Security Vulnerability (`security.yml`)
+
 Use this template for **low-severity** security concerns only.
 
 **⚠️ IMPORTANT:** For critical security vulnerabilities, **DO NOT** create a public issue. Report privately to: itsecurity@sofia.bg
 
 **When to use:**
+
 - Low-severity security improvements
 - Configuration best practices
 - Non-critical dependency vulnerabilities
@@ -138,6 +158,7 @@ Use this template for **low-severity** security concerns only.
 - Rate limiting suggestions
 
 **Includes:**
+
 - Severity confirmation
 - Security category
 - Potential impact
@@ -151,6 +172,7 @@ Use this template for **low-severity** security concerns only.
 Our issues use the following labels for organization:
 
 ### Type Labels
+
 - `bug` - Something isn't working
 - `enhancement` - New feature or request
 - `documentation` - Documentation improvements
@@ -160,6 +182,7 @@ Our issues use the following labels for organization:
 - `security` - Security-related issues
 
 ### Status Labels
+
 - `needs-triage` - Needs review by maintainers
 - `good first issue` - Good for newcomers
 - `help wanted` - Extra attention needed
@@ -168,12 +191,14 @@ Our issues use the following labels for organization:
 - `wontfix` - Will not be worked on
 
 ### Priority Labels
+
 - `priority: critical` - Must be fixed immediately
 - `priority: high` - Should be fixed soon
 - `priority: medium` - Normal priority
 - `priority: low` - Nice to have
 
 ### Component Labels
+
 - `frontend` - Mobile app (React Native)
 - `backend` - API/CMS (Payload)
 - `database` - Database-related
@@ -200,6 +225,7 @@ The `config.yml` file controls issue template behavior:
 ### Writing Good Issues
 
 **Do:**
+
 - ✅ Use descriptive titles
 - ✅ Provide complete information
 - ✅ Include reproduction steps for bugs
@@ -208,6 +234,7 @@ The `config.yml` file controls issue template behavior:
 - ✅ Follow the template structure
 
 **Don't:**
+
 - ❌ Use vague titles like "It doesn't work"
 - ❌ Submit duplicate issues
 - ❌ Include multiple unrelated issues in one report
@@ -246,7 +273,7 @@ When a new issue arrives:
 
 ## Contributing
 
-Have suggestions for improving our issue templates? 
+Have suggestions for improving our issue templates?
 
 - Open an issue using the **Documentation Improvement** template
 - Submit a PR with template changes
