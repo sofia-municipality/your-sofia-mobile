@@ -1,6 +1,9 @@
 import React, {createContext, useState, useContext, useEffect, ReactNode} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {Alert} from 'react-native'
+import {router} from 'expo-router'
 import {environmentManager} from '../lib/environment'
+import {setAuthErrorHandler} from '../lib/payload'
 
 interface User {
   id: number
@@ -33,6 +36,17 @@ export function AuthProvider({children}: {children: ReactNode}) {
   // Load auth state from AsyncStorage on mount
   useEffect(() => {
     loadAuthState()
+
+    // Register auth error handler that will logout and redirect to login
+    setAuthErrorHandler(() => {
+      console.log('[AuthContext] Token expired, logging out')
+      Alert.alert('Session Expired', 'Your session has expired. Please log in again.', [
+        {text: 'OK'},
+      ])
+      logout().finally(() => {
+        router.push('/auth/login' as any)
+      })
+    })
   }, [])
 
   const loadAuthState = async () => {

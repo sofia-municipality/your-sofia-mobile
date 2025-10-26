@@ -10,6 +10,23 @@ import {environmentManager} from './environment'
 
 const getApiUrl = () => environmentManager.getApiUrl()
 
+// Global auth error handler - will be set by AuthContext
+let globalAuthErrorHandler: (() => void) | null = null
+
+export function setAuthErrorHandler(handler: () => void) {
+  globalAuthErrorHandler = handler
+}
+
+/**
+ * Handle API response errors and check for authentication issues
+ */
+function handleAuthError(response: Response) {
+  if (response.status === 401 && globalAuthErrorHandler) {
+    console.log('[API] Authentication error detected, triggering logout')
+    globalAuthErrorHandler()
+  }
+}
+
 export interface PayloadNewsItem {
   id: string
   title: string
@@ -212,8 +229,9 @@ export async function cleanContainer(
   })
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || 'Failed to clean container')
+    handleAuthError(response)
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Failed to clean container: ${response.statusText}`)
   }
 
   return response.json()

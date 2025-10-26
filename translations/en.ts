@@ -267,8 +267,11 @@ export default {
     dontHaveAccount: "Don't have an account?",
     alreadyHaveAccount: 'Already have an account?',
     welcomeBack: 'Welcome back!',
-    notAuthenticated: 'Not logged in',
-    loginToAccess: 'Login to access all features',
-    containerAdmin: 'Container Administrator',
+    notAuthenticated: 'Not Authenticated',
+    loginToAccess: 'Log in to access all features',
+    containerAdmin: 'Container Admin',
+    sessionExpired: 'Session Expired',
+    sessionExpiredMessage: 'Your session has expired. Please log in again.',
   },
 }
+

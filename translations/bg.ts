@@ -271,5 +271,7 @@ export default {
     notAuthenticated: 'Не сте влезли',
     loginToAccess: 'Влезте, за да получите достъп до всички функции',
     containerAdmin: 'Администратор на контейнери',
+    sessionExpired: 'Сесията изтече',
+    sessionExpiredMessage: 'Вашата сесия е изтекла. Моля, влезте отново.',
   },
 }
