@@ -18,7 +18,7 @@ export function useWasteContainers(options?: UseWasteContainersOptions) {
       setError(null)
       const response = await fetchWasteContainers({
         ...options,
-        limit: 100, // Load all containers for map display
+        limit: 3000, // Increased limit to fetch all containers for map display
       })
       setContainers(response.docs)
     } catch (err) {
