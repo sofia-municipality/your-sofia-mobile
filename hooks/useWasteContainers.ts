@@ -36,6 +36,7 @@ export function useWasteContainers(options?: UseWasteContainersOptions) {
 
   return {
     containers,
+    setContainers,
     loading,
     error,
     refresh: loadContainers,

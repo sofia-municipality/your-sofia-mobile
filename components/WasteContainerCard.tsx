@@ -1,18 +1,35 @@
-import React from 'react'
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import React, {useState} from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
 import type {WasteContainer} from '../types/wasteContainer'
-import {Trash2, MapPin, Calendar, User, AlertTriangle} from 'lucide-react-native'
+import {Trash2, MapPin, Calendar, User, AlertTriangle, CheckCircle} from 'lucide-react-native'
+import {useAuth} from '../contexts/AuthContext'
+import {cleanContainer} from '../lib/payload'
 
 interface WasteContainerCardProps {
   container: WasteContainer
   onClose?: () => void
+  onContainerCleaned?: () => void
 }
 
-export function WasteContainerCard({container, onClose}: WasteContainerCardProps) {
+export function WasteContainerCard({
+  container,
+  onClose,
+  onContainerCleaned,
+}: WasteContainerCardProps) {
   const {t} = useTranslation()
   const router = useRouter()
+  const {isContainerAdmin, token} = useAuth()
+  const [isCleaning, setIsCleaning] = useState(false)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -29,6 +46,44 @@ export function WasteContainerCard({container, onClose}: WasteContainerCardProps
         prefilledCategory: 'waste-container',
       },
     } as any)
+  }
+
+  const handleCleanContainer = async () => {
+    if (!token) {
+      Alert.alert(t('common.error'), t('auth.notAuthenticated'))
+      return
+    }
+
+    Alert.alert(t('wasteContainers.cleanContainer'), t('wasteContainers.cleanDescription'), [
+      {
+        text: t('common.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: t('common.confirm'),
+        style: 'destructive',
+        onPress: async () => {
+          setIsCleaning(true)
+          try {
+            await cleanContainer(container.id, token)
+            Alert.alert(t('common.success'), t('wasteContainers.cleanSuccess'))
+            if (onContainerCleaned) {
+              onContainerCleaned()
+            }
+            if (onClose) {
+              onClose()
+            }
+          } catch (error) {
+            Alert.alert(
+              t('common.error'),
+              error instanceof Error ? error.message : t('wasteContainers.cleanError')
+            )
+          } finally {
+            setIsCleaning(false)
+          }
+        },
+      },
+    ])
   }
 
   const getCapacitySizeLabel = (size: string) => {
@@ -129,6 +184,24 @@ export function WasteContainerCard({container, onClose}: WasteContainerCardProps
             <Text style={styles.notesLabel}>{t('wasteContainers.notes') || 'Notes'}:</Text>
             <Text style={styles.notesText}>{container.notes}</Text>
           </View>
+        )}
+
+        {/* Clean Container Button - Only for Container Admins */}
+        {isContainerAdmin && container.status !== 'active' && (
+          <TouchableOpacity
+            style={[styles.cleanButton, isCleaning && styles.cleanButtonDisabled]}
+            onPress={handleCleanContainer}
+            disabled={isCleaning}
+          >
+            {isCleaning ? (
+              <ActivityIndicator color="#ffffff" size="small" />
+            ) : (
+              <>
+                <CheckCircle size={20} color="#ffffff" />
+                <Text style={styles.cleanButtonText}>{t('wasteContainers.cleanContainer')}</Text>
+              </>
+            )}
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -241,5 +314,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4B5563',
     lineHeight: 20,
+  },
+  cleanButton: {
+    flexDirection: 'row',
+    backgroundColor: '#10B981',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  cleanButtonDisabled: {
+    opacity: 0.6,
+  },
+  cleanButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 })

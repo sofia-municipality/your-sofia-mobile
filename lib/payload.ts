@@ -196,6 +196,30 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
 }
 
 /**
+ * Clean a waste container (mark signals as resolved and set status to active)
+ * Requires authentication token
+ */
+export async function cleanContainer(
+  containerId: string | number,
+  authToken: string
+): Promise<{success: boolean; container: WasteContainer; resolvedSignals: number}> {
+  const response = await fetch(`${getApiUrl()}/api/waste-containers/${containerId}/clean`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to clean container')
+  }
+
+  return response.json()
+}
+
+/**
  * Fetch signals from Payload CMS
  */
 export async function fetchSignals(options?: {

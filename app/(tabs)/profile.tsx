@@ -22,14 +22,17 @@ import {
   MapPin,
   Fingerprint,
   AlertCircle,
+  LogIn as LogInIcon,
+  UserPlus,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useState, useEffect, useCallback} from 'react'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect, useRouter} from 'expo-router'
 import {GitHubIcon} from '../../components/GitHubIcon'
 import {getUniqueReporterId} from '../../lib/deviceId'
 import {fetchSignalStats} from '../../lib/payload'
 import {EnvironmentSwitcher} from '@/components/EnvironmentSwitcher'
+import {useAuth} from '@/contexts/AuthContext'
 
 const getProfileSections = (t: (key: string) => string) => [
   {
@@ -107,6 +110,8 @@ interface ProfileSection {
 
 export default function ProfileScreen() {
   const {t, i18n} = useTranslation()
+  const router = useRouter()
+  const {user, isAuthenticated, isContainerAdmin, logout} = useAuth()
   const [deviceId, setDeviceId] = useState<string>('')
   const [signalStats, setSignalStats] = useState<{
     total: number
@@ -185,22 +190,30 @@ export default function ProfileScreen() {
             <View style={styles.avatar}>
               <User size={32} color="#1E40AF" />
             </View>
-            <View style={styles.verifiedBadge}>
-              <Shield size={16} color="#ffffff" />
-            </View>
+            {isAuthenticated && (
+              <View style={styles.verifiedBadge}>
+                <Shield size={16} color="#ffffff" />
+              </View>
+            )}
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Анонимен Потребител</Text>
-            <Text style={styles.profileStatus}>{t('common.verifiedCitizen')}</Text>
+            <Text style={styles.profileName}>
+              {isAuthenticated ? user?.name || user?.email : 'Анонимен Потребител'}
+            </Text>
+            <Text style={styles.profileStatus}>
+              {isContainerAdmin
+                ? t('auth.containerAdmin')
+                : isAuthenticated
+                  ? t('common.verifiedCitizen')
+                  : t('auth.notAuthenticated')}
+            </Text>
             <View style={styles.profileDetails}>
-              <View style={styles.profileDetailItem}>
-                <Mail size={14} color="#6B7280" />
-                <Text style={styles.profileDetailText}>anonymous.user@email.com</Text>
-              </View>
-              <View style={styles.profileDetailItem}>
-                <Phone size={14} color="#6B7280" />
-                <Text style={styles.profileDetailText}>+359 88 123 4567</Text>
-              </View>
+              {isAuthenticated && user?.email && (
+                <View style={styles.profileDetailItem}>
+                  <Mail size={14} color="#6B7280" />
+                  <Text style={styles.profileDetailText}>{user.email}</Text>
+                </View>
+              )}
               <View style={styles.profileDetailItem}>
                 <MapPin size={14} color="#6B7280" />
                 <Text style={styles.profileDetailText}>{t('cities.sofia')}</Text>
@@ -212,6 +225,34 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+
+        {/* Authentication Section */}
+        {!isAuthenticated ? (
+          <View style={styles.authSection}>
+            <Text style={styles.authTitle}>{t('auth.loginToAccess')}</Text>
+            <View style={styles.authButtons}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={() => router.push('/auth/login' as any)}
+              >
+                <LogInIcon size={20} color="#ffffff" />
+                <Text style={styles.loginButtonText}>{t('auth.login')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.registerButton}
+                onPress={() => router.push('/auth/register' as any)}
+              >
+                <UserPlus size={20} color="#1E40AF" />
+                <Text style={styles.registerButtonText}>{t('auth.register')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <LogOut size={20} color="#EF4444" />
+            <Text style={styles.logoutButtonText}>{t('auth.logout')}</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Environment Switcher - Dev Only */}
         <EnvironmentSwitcher />
@@ -526,5 +567,76 @@ const styles = StyleSheet.create({
   copyrightText: {
     fontSize: 12,
     color: '#9CA3AF',
+  },
+  authSection: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    padding: 20,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  authTitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  authButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  loginButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#1E40AF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  loginButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  registerButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#1E40AF',
+  },
+  registerButtonText: {
+    color: '#1E40AF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+  },
+  logoutButtonText: {
+    color: '#EF4444',
+    fontSize: 14,
+    fontWeight: '600',
   },
 })

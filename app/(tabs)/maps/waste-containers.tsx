@@ -16,6 +16,7 @@ import {useTranslation} from 'react-i18next'
 import {useWasteContainers} from '../../../hooks/useWasteContainers'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
+import {fetchWasteContainerById} from '../../../lib/payload'
 import type {WasteContainer} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-collection'
@@ -31,7 +32,12 @@ export default function WasteContainers() {
   const [isFirstFocus, setIsFirstFocus] = useState(true)
 
   // Fetch waste containers
-  const {containers, loading: containersLoading, refresh: refreshContainers} = useWasteContainers()
+  const {
+    containers,
+    setContainers,
+    loading: containersLoading,
+    refresh: refreshContainers,
+  } = useWasteContainers()
 
   // Refresh containers when tab comes into focus
   useFocusEffect(
@@ -127,6 +133,27 @@ export default function WasteContainers() {
   const handleCloseCard = () => {
     setShowContainerCard(false)
     setSelectedContainer(null)
+  }
+
+  const handleContainerCleaned = async () => {
+    if (!selectedContainer) return
+
+    try {
+      // Fetch the updated container from the API
+      const updatedContainer = await fetchWasteContainerById(selectedContainer.id)
+
+      // Update the container in the containers array
+      setContainers((prevContainers) =>
+        prevContainers.map((c) => (c.id === updatedContainer.id ? updatedContainer : c))
+      )
+
+      // Update the selected container to reflect the new status in the card
+      setSelectedContainer(updatedContainer)
+    } catch (error) {
+      console.error('Error refreshing container:', error)
+      // Fallback to full refresh if single container fetch fails
+      refreshContainers()
+    }
   }
 
   if (loading) {
@@ -241,7 +268,11 @@ export default function WasteContainers() {
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleCloseCard}>
           <View style={styles.modalContent}>
             {selectedContainer && (
-              <WasteContainerCard container={selectedContainer} onClose={handleCloseCard} />
+              <WasteContainerCard
+                container={selectedContainer}
+                onClose={handleCloseCard}
+                onContainerCleaned={handleContainerCleaned}
+              />
             )}
           </View>
         </TouchableOpacity>
