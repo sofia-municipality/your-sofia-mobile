@@ -17,6 +17,7 @@ export interface WasteContainer {
   wasteType: 'general' | 'recyclables' | 'organic' | 'glass' | 'paper' | 'plastic' | 'metal'
   status: 'active' | 'full' | 'maintenance' | 'inactive'
   notes?: string
+  lastCleaned?: string
   createdAt: string
   updatedAt: string
 }

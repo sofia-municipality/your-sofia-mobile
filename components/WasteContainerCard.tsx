@@ -131,13 +131,15 @@ export function WasteContainerCard({
             <View style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]} />
             <Text style={styles.statusText}>{container.status.toUpperCase()}</Text>
           </View>
+          <View style={styles.lastCleanedContainer}>
+            <CheckCircle size={14} color="#10B981" />
+            <Text style={styles.lastCleanedText}>
+              {t('wasteContainers.lastCleaned')}: {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
+            </Text>
+          </View>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={handleReportIssue} style={styles.reportButton}>
-            <AlertTriangle size={16} color="#ffffff" />
-            <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
-          </TouchableOpacity>
-          {onClose && (
+            {onClose && (
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
@@ -186,8 +188,13 @@ export function WasteContainerCard({
           </View>
         )}
 
+        <TouchableOpacity onPress={handleReportIssue} style={styles.reportButton}>
+          <AlertTriangle size={16} color="#ffffff" />
+          <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
+        </TouchableOpacity>
+
         {/* Clean Container Button - Only for Container Admins */}
-        {isContainerAdmin && container.status !== 'active' && (
+        {isContainerAdmin && (container.status !== 'active' || !container.lastCleaned) && (
           <TouchableOpacity
             style={[styles.cleanButton, isCleaning && styles.cleanButtonDisabled]}
             onPress={handleCleanContainer}
@@ -248,6 +255,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
   },
+  lastCleanedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  lastCleanedText: {
+    fontSize: 12,
+    color: '#10B981',
+  },
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -256,15 +273,16 @@ const styles = StyleSheet.create({
   reportButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     backgroundColor: '#EF4444',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    padding: 14,
     borderRadius: 8,
+    justifyContent: 'center',
+    marginTop: 8,
   },
   reportButtonText: {
     color: '#ffffff',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
   closeButton: {
@@ -323,14 +341,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    marginTop: 8,
+    marginTop: 2,
   },
   cleanButtonDisabled: {
     opacity: 0.6,
   },
   cleanButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
 })
