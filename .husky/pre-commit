@@ -1,0 +1,24 @@
+echo "Running pre-commit checks..."
+
+# Run prettier check
+echo "Checking code formatting..."
+pnpm exec prettier --check . || {
+  echo "❌ Prettier check failed. Run 'pnpm format' to fix formatting issues."
+  exit 1
+}
+
+# Run ESLint
+echo "Running ESLint..."
+pnpm lint || {
+  echo "❌ ESLint check failed. Run 'pnpm lint:fix' to fix formatting issues."
+  exit 1
+}
+
+# Run TypeScript type check
+echo "Running TypeScript type check..."
+pnpm typecheck || {
+  echo "❌ TypeScript check failed. Fix type errors before committing."
+  exit 1
+}
+
+echo "✅ All pre-commit checks passed!"

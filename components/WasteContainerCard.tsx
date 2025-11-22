@@ -66,7 +66,10 @@ export function WasteContainerCard({
   const requestCameraPermission = async () => {
     const {status} = await ImagePicker.requestCameraPermissionsAsync()
     if (status !== 'granted') {
-      Alert.alert(t('wasteContainers.permissionDenied'), t('wasteContainers.cameraPermissionRequired'))
+      Alert.alert(
+        t('wasteContainers.permissionDenied'),
+        t('wasteContainers.cameraPermissionRequired')
+      )
       return false
     }
     return true
@@ -187,7 +190,10 @@ export function WasteContainerCard({
               {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
             </Text>
             {container.lastCleanedPhoto && (
-              <TouchableOpacity onPress={() => setShowPhotoModal(true)} style={styles.photoIconButton}>
+              <TouchableOpacity
+                onPress={() => setShowPhotoModal(true)}
+                style={styles.photoIconButton}
+              >
                 <Camera size={16} color="#10B981" />
               </TouchableOpacity>
             )}
@@ -254,7 +260,10 @@ export function WasteContainerCard({
             {photoUri && (
               <View style={styles.photoPreview}>
                 <Image source={{uri: photoUri}} style={styles.previewImage} />
-                <TouchableOpacity style={styles.removePhotoButton} onPress={() => setPhotoUri(null)}>
+                <TouchableOpacity
+                  style={styles.removePhotoButton}
+                  onPress={() => setPhotoUri(null)}
+                >
                   <X size={20} color="#fff" />
                 </TouchableOpacity>
               </View>
@@ -295,7 +304,9 @@ export function WasteContainerCard({
                 ) : (
                   <>
                     <CheckCircle size={20} color="#ffffff" />
-                    <Text style={styles.cleanButtonText}>{t('wasteContainers.cleanContainer')}</Text>
+                    <Text style={styles.cleanButtonText}>
+                      {t('wasteContainers.cleanContainer')}
+                    </Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -325,7 +336,10 @@ export function WasteContainerCard({
                   resizeMode="contain"
                 />
               )}
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowPhotoModal(false)}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowPhotoModal(false)}
+              >
                 <X size={24} color="#fff" />
               </TouchableOpacity>
             </View>

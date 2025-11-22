@@ -10,7 +10,8 @@
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -67,6 +68,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "glob": "^11.0.3",
+    "husky": "^9.1.7",
     "inflight": "^1.0.6",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
