@@ -7,13 +7,25 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  TextInput,
+  Modal,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
 import type {WasteContainer} from '../types/wasteContainer'
-import {Trash2, MapPin, Calendar, User, AlertTriangle, CheckCircle} from 'lucide-react-native'
+import {
+  Trash2,
+  MapPin,
+  Calendar,
+  User,
+  AlertTriangle,
+  CheckCircle,
+  Camera,
+  X,
+} from 'lucide-react-native'
 import {useAuth} from '../contexts/AuthContext'
 import {cleanContainer} from '../lib/payload'
+import * as ImagePicker from 'expo-image-picker'
 
 interface WasteContainerCardProps {
   container: WasteContainer
@@ -30,6 +42,9 @@ export function WasteContainerCard({
   const router = useRouter()
   const {isContainerAdmin, token} = useAuth()
   const [isCleaning, setIsCleaning] = useState(false)
+  const [photoUri, setPhotoUri] = useState<string | null>(null)
+  const [notes, setNotes] = useState('')
+  const [showPhotoModal, setShowPhotoModal] = useState(false)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -46,6 +61,31 @@ export function WasteContainerCard({
         prefilledCategory: 'waste-container',
       },
     } as any)
+  }
+
+  const requestCameraPermission = async () => {
+    const {status} = await ImagePicker.requestCameraPermissionsAsync()
+    if (status !== 'granted') {
+      Alert.alert(t('wasteContainers.permissionDenied'), t('wasteContainers.cameraPermissionRequired'))
+      return false
+    }
+    return true
+  }
+
+  const takePhoto = async () => {
+    const hasPermission = await requestCameraPermission()
+    if (!hasPermission) return
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    })
+
+    if (!result.canceled) {
+      setPhotoUri(result.assets[0].uri)
+    }
   }
 
   const handleCleanContainer = async () => {
@@ -65,7 +105,16 @@ export function WasteContainerCard({
         onPress: async () => {
           setIsCleaning(true)
           try {
-            await cleanContainer(container.id, token)
+            let photo
+            if (photoUri) {
+              photo = {
+                uri: photoUri,
+                type: 'image/jpeg',
+                name: `observation-${container.id}-${Date.now()}.jpg`,
+              }
+            }
+
+            await cleanContainer(container.id, token, photo, notes)
             Alert.alert(t('common.success'), t('wasteContainers.cleanSuccess'))
             if (onContainerCleaned) {
               onContainerCleaned()
@@ -134,12 +183,18 @@ export function WasteContainerCard({
           <View style={styles.lastCleanedContainer}>
             <CheckCircle size={14} color="#10B981" />
             <Text style={styles.lastCleanedText}>
-              {t('wasteContainers.lastCleaned')}: {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
+              {t('wasteContainers.lastCleaned')}:{' '}
+              {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
             </Text>
+            {container.lastCleanedPhoto && (
+              <TouchableOpacity onPress={() => setShowPhotoModal(true)} style={styles.photoIconButton}>
+                <Camera size={16} color="#10B981" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         <View style={styles.headerButtons}>
-            {onClose && (
+          {onClose && (
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
@@ -193,24 +248,90 @@ export function WasteContainerCard({
           <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
         </TouchableOpacity>
 
-        {/* Clean Container Button - Only for Container Admins */}
+        {/* Photo preview and notes for Container Admins */}
         {isContainerAdmin && (container.status !== 'active' || !container.lastCleaned) && (
-          <TouchableOpacity
-            style={[styles.cleanButton, isCleaning && styles.cleanButtonDisabled]}
-            onPress={handleCleanContainer}
-            disabled={isCleaning}
-          >
-            {isCleaning ? (
-              <ActivityIndicator color="#ffffff" size="small" />
-            ) : (
-              <>
-                <CheckCircle size={20} color="#ffffff" />
-                <Text style={styles.cleanButtonText}>{t('wasteContainers.cleanContainer')}</Text>
-              </>
+          <>
+            {photoUri && (
+              <View style={styles.photoPreview}>
+                <Image source={{uri: photoUri}} style={styles.previewImage} />
+                <TouchableOpacity style={styles.removePhotoButton} onPress={() => setPhotoUri(null)}>
+                  <X size={20} color="#fff" />
+                </TouchableOpacity>
+              </View>
             )}
-          </TouchableOpacity>
+
+            {photoUri && (
+              <View style={styles.notesInputContainer}>
+                <TextInput
+                  style={styles.notesInput}
+                  placeholder={t('wasteContainers.addNotes')}
+                  value={notes}
+                  onChangeText={setNotes}
+                  multiline
+                  numberOfLines={3}
+                />
+              </View>
+            )}
+
+            <View style={styles.actionButtons}>
+              <TouchableOpacity
+                style={[styles.photoButton, photoUri && styles.photoButtonActive]}
+                onPress={takePhoto}
+                disabled={isCleaning}
+              >
+                <Camera size={20} color={photoUri ? '#10B981' : '#6B7280'} />
+                <Text style={styles.photoButtonText}>
+                  {photoUri ? t('wasteContainers.retakePhoto') : t('wasteContainers.takePhoto')}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.cleanButton, isCleaning && styles.cleanButtonDisabled]}
+                onPress={handleCleanContainer}
+                disabled={isCleaning}
+              >
+                {isCleaning ? (
+                  <ActivityIndicator color="#ffffff" size="small" />
+                ) : (
+                  <>
+                    <CheckCircle size={20} color="#ffffff" />
+                    <Text style={styles.cleanButtonText}>{t('wasteContainers.cleanContainer')}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
         )}
       </View>
+
+      {/* Photo Modal */}
+      <Modal
+        visible={showPhotoModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPhotoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalCloseArea}
+            activeOpacity={1}
+            onPress={() => setShowPhotoModal(false)}
+          >
+            <View style={styles.modalContent}>
+              {container.lastCleanedPhoto && (
+                <Image
+                  source={{uri: container.lastCleanedPhoto.url}}
+                  style={styles.modalImage}
+                  resizeMode="contain"
+                />
+              )}
+              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setShowPhotoModal(false)}>
+                <X size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -264,6 +385,10 @@ const styles = StyleSheet.create({
   lastCleanedText: {
     fontSize: 12,
     color: '#10B981',
+  },
+  photoIconButton: {
+    padding: 4,
+    marginLeft: 4,
   },
   headerButtons: {
     flexDirection: 'row',
@@ -333,7 +458,61 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     lineHeight: 20,
   },
+  photoPreview: {
+    position: 'relative',
+    marginBottom: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 16,
+    padding: 8,
+  },
+  notesInputContainer: {
+    marginBottom: 12,
+  },
+  notesInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    textAlignVertical: 'top',
+    minHeight: 80,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  photoButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#F3F4F6',
+    padding: 14,
+    borderRadius: 8,
+  },
+  photoButtonActive: {
+    backgroundColor: '#D1FAE5',
+  },
+  photoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
   cleanButton: {
+    flex: 1,
     flexDirection: 'row',
     backgroundColor: '#10B981',
     padding: 14,
@@ -341,7 +520,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    marginTop: 2,
   },
   cleanButtonDisabled: {
     opacity: 0.6,
@@ -350,5 +528,35 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCloseArea: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxWidth: 500,
+    aspectRatio: 4 / 3,
+    position: 'relative',
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 8,
   },
 })

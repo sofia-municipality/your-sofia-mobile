@@ -18,6 +18,10 @@ export interface WasteContainer {
   status: 'active' | 'full' | 'maintenance' | 'inactive'
   notes?: string
   lastCleaned?: string
+  lastCleanedPhoto?: {
+    url: string
+    alt?: string
+  }
   createdAt: string
   updatedAt: string
 }

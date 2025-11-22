@@ -30,7 +30,12 @@
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -47,7 +52,14 @@
           "locationAlwaysAndWhenInUsePermission": "Allow Your Sofia to use your location."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Позволете на Твоята София да използва камерата за снимки на контейнери.",
+          "cameraPermission": "Позволете на Твоята София да използва камерата."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -149,7 +149,7 @@ export async function fetchWasteContainers(options?: {
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
-    depth: '1', // Populate image relationship
+    depth: '2', // Populate image and observations relationships
   })
 
   // Add status filter - default to active containers
@@ -173,17 +173,41 @@ export async function fetchWasteContainers(options?: {
 
   const data = await response.json()
 
-  // Transform image URLs
+  // Transform image URLs and get latest observation photo
   if (data.docs) {
-    data.docs = data.docs.map((container: any) => ({
-      ...container,
-      image: container.image
-        ? {
-            ...container.image,
-            url: getMediaUrl(container.image),
+    data.docs = await Promise.all(
+      data.docs.map(async (container: any) => {
+        // Get latest observation with photo for this container
+        let lastCleanedPhoto
+        try {
+          const obsResponse = await fetch(
+            `${getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&sort=-cleanedAt&limit=1&depth=1`
+          )
+          if (obsResponse.ok) {
+            const obsData = await obsResponse.json()
+            if (obsData.docs && obsData.docs.length > 0 && obsData.docs[0].photo) {
+              lastCleanedPhoto = {
+                url: getMediaUrl(obsData.docs[0].photo),
+                alt: obsData.docs[0].photo.alt,
+              }
+            }
           }
-        : undefined,
-    }))
+        } catch (error) {
+          console.error('Error fetching observation photo:', error)
+        }
+
+        return {
+          ...container,
+          image: container.image
+            ? {
+                ...container.image,
+                url: getMediaUrl(container.image),
+              }
+            : undefined,
+          lastCleanedPhoto,
+        }
+      })
+    )
   }
 
   return data
@@ -218,14 +242,36 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
  */
 export async function cleanContainer(
   containerId: string | number,
-  authToken: string
-): Promise<{success: boolean; container: WasteContainer; resolvedSignals: number}> {
+  authToken: string,
+  photo?: {uri: string; type: string; name: string},
+  notes?: string
+): Promise<{
+  success: boolean
+  container: WasteContainer
+  resolvedSignals: number
+  observationId?: string
+}> {
+  const formData = new FormData()
+
+  if (photo) {
+    formData.append('photo', {
+      uri: photo.uri,
+      type: photo.type,
+      name: photo.name,
+    } as any)
+  }
+
+  if (notes) {
+    formData.append('notes', notes)
+  }
+
   const response = await fetch(`${getApiUrl()}/api/waste-containers/${containerId}/clean`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${authToken}`,
+      // Don't set Content-Type - let browser set it with boundary for multipart/form-data
     },
+    body: formData,
   })
 
   if (!response.ok) {

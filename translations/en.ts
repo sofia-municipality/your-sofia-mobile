@@ -169,7 +169,15 @@ export default {
     cleanConfirm: 'Are you sure you want to mark this container as clean?',
     lastCleaned: 'Last Cleaned',
     cleanDescription:
-      'This action will mark all active signals as resolved and change the container status to active.',
+      'This action will mark all active signals as resolved and set the container status to active.',
+    takePhoto: 'Take Photo',
+    retakePhoto: 'Retake Photo',
+    photoOptional: 'Photo is optional',
+    uploadingPhoto: 'Uploading photo...',
+    photoUploaded: 'Photo uploaded successfully',
+    addNotes: 'Add notes (optional)',
+    permissionDenied: 'Permission Denied',
+    cameraPermissionRequired: 'The app needs camera access to take photos of containers.',
   },
   signals: {
     title: 'Signals',
