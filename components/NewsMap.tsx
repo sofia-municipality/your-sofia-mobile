@@ -1,6 +1,21 @@
-import {StyleSheet, View, Dimensions} from 'react-native'
-import MapView, {Marker} from 'react-native-maps'
+import {StyleSheet, View, Dimensions, Platform} from 'react-native'
 import type {NewsItem} from '../types/news'
+
+// Conditional imports for native vs web
+let MapView: any
+let Marker: any
+let WebMapView: any
+let WebMarker: any
+
+if (Platform.OS === 'web') {
+  const WebComponents = require('./WebMapView')
+  WebMapView = WebComponents.WebMapView
+  WebMarker = WebComponents.WebMarker
+} else {
+  const RNMaps = require('react-native-maps')
+  MapView = RNMaps.default
+  Marker = RNMaps.Marker
+}
 
 interface NewsMapProps {
   news: NewsItem[]
@@ -10,9 +25,12 @@ interface NewsMapProps {
 const {width} = Dimensions.get('window')
 
 export function NewsMap({news, onMarkerPress}: NewsMapProps) {
+  const MapComponent = Platform.OS === 'web' ? WebMapView : MapView
+  const MarkerComponent = Platform.OS === 'web' ? WebMarker : Marker
+
   return (
     <View style={styles.container}>
-      <MapView
+      <MapComponent
         style={styles.map}
         initialRegion={{
           latitude: 42.6977, // Sofia's coordinates
@@ -22,18 +40,20 @@ export function NewsMap({news, onMarkerPress}: NewsMapProps) {
         }}
       >
         {news.map((item) => (
-          <Marker
+          <MarkerComponent
             key={item.id}
             coordinate={{
               latitude: item.location?.latitude ?? 42.6977,
               longitude: item.location?.longitude ?? 23.3219,
             }}
-            title={item.title}
-            description={item.description}
+            {...(Platform.OS !== 'web' && {
+              title: item.title,
+              description: item.description,
+            })}
             onPress={() => onMarkerPress?.(item)}
           />
         ))}
-      </MapView>
+      </MapComponent>
     </View>
   )
 }

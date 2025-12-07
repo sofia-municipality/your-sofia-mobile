@@ -9,9 +9,27 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  Platform,
 } from 'react-native'
-import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
+
+// Conditional imports for native vs web
+let MapView: any
+let Marker: any
+let PROVIDER_DEFAULT: any
+let WebMapView: any
+let WebMarker: any
+
+if (Platform.OS === 'web') {
+  const WebComponents = require('../../../components/WebMapView')
+  WebMapView = WebComponents.WebMapView
+  WebMarker = WebComponents.WebMarker
+} else {
+  const RNMaps = require('react-native-maps')
+  MapView = RNMaps.default
+  Marker = RNMaps.Marker
+  PROVIDER_DEFAULT = RNMaps.PROVIDER_DEFAULT
+}
 import {useTranslation} from 'react-i18next'
 import {useWasteContainers} from '../../../hooks/useWasteContainers'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
@@ -52,6 +70,12 @@ export default function WasteContainers() {
 
   useEffect(() => {
     ;(async () => {
+      // Skip geolocation on web (requires HTTPS)
+      if (Platform.OS === 'web') {
+        setLoading(false)
+        return
+      }
+
       // Request location permissions
       const {status} = await Location.requestForegroundPermissionsAsync()
       setPermissionStatus(status)
@@ -165,25 +189,28 @@ export default function WasteContainers() {
     )
   }
 
-  if (permissionStatus !== 'granted') {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.permissionTitle}>{t('map.permissions.title')}</Text>
-        <Text style={styles.permissionMessage}>{t('map.permissions.message')}</Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-          <Text style={styles.permissionButtonText}>{t('map.permissions.button')}</Text>
-        </TouchableOpacity>
-      </View>
-    )
-  }
+  // On web, skip permission check and use default Sofia location
+  if (Platform.OS !== 'web') {
+    if (permissionStatus !== 'granted') {
+      return (
+        <View style={styles.centerContainer}>
+          <Text style={styles.permissionTitle}>{t('map.permissions.title')}</Text>
+          <Text style={styles.permissionMessage}>{t('map.permissions.message')}</Text>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+            <Text style={styles.permissionButtonText}>{t('map.permissions.button')}</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
 
-  if (!location) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
-        <Text style={styles.loadingText}>{t('map.loading')}</Text>
-      </View>
-    )
+    if (!location) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#1E40AF" />
+          <Text style={styles.loadingText}>{t('map.loading')}</Text>
+        </View>
+      )
+    }
   }
 
   // Default to Sofia center if location is not available
@@ -194,44 +221,65 @@ export default function WasteContainers() {
     longitudeDelta: 0.05,
   }
 
+  // Render web map or native map based on platform
+  const MapComponent = Platform.OS === 'web' ? WebMapView : MapView
+  const MarkerComponent = Platform.OS === 'web' ? WebMarker : Marker
+
   return (
     <View style={styles.container}>
       {/* Map */}
-      <MapView
-        provider={PROVIDER_DEFAULT}
+      <MapComponent
+        {...(Platform.OS !== 'web' && {provider: PROVIDER_DEFAULT})}
         style={styles.map}
         initialRegion={region}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-        showsCompass={true}
+        {...(Platform.OS !== 'web' && {
+          showsUserLocation: true,
+          showsMyLocationButton: true,
+          showsCompass: true,
+        })}
       >
         {/* Current location marker */}
         {location && (
-          <Marker
+          <MarkerComponent
             coordinate={{
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
-            title={t('common.yourLocation') || 'Your Location'}
-            pinColor="#1E40AF"
-          />
+            {...(Platform.OS !== 'web' && {
+              title: t('common.yourLocation') || 'Your Location',
+              pinColor: '#1E40AF',
+            })}
+          >
+            {Platform.OS === 'web' && (
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  backgroundColor: '#1E40AF',
+                  border: '3px solid white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                }}
+              />
+            )}
+          </MarkerComponent>
         )}
 
         {/* Waste container markers */}
         {visibleContainers.map((container) => (
-          <Marker
+          <MarkerComponent
             key={container.id}
             coordinate={{
               latitude: container.location.latitude,
               longitude: container.location.longitude,
             }}
             onPress={() => handleContainerPress(container)}
-            tracksViewChanges={false}
+            {...(Platform.OS !== 'web' && {tracksViewChanges: false})}
           >
             <WasteContainerMarker color={getContainerPinColor(container)} />
-          </Marker>
+          </MarkerComponent>
         ))}
-      </MapView>
+      </MapComponent>
 
       {/* Filter chips - overlay */}
       <View style={styles.filtersContainer}>

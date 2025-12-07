@@ -1,7 +1,22 @@
 import React, {useState, useEffect} from 'react'
-import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker} from 'react-native-maps'
+import {View, StyleSheet, ActivityIndicator, Text, Platform} from 'react-native'
 import * as Location from 'expo-location'
+
+// Conditional imports for native vs web
+let MapView: any
+let Marker: any
+let WebMapView: any
+let WebMarker: any
+
+if (Platform.OS === 'web') {
+  const WebComponents = require('../../../components/WebMapView')
+  WebMapView = WebComponents.WebMapView
+  WebMarker = WebComponents.WebMarker
+} else {
+  const RNMaps = require('react-native-maps')
+  MapView = RNMaps.default
+  Marker = RNMaps.Marker
+}
 import {useTranslation} from 'react-i18next'
 import {useNews} from '../../../hooks/useNews'
 import {ImplementMeGithub} from '../../../components/ImplementMeGithub'
@@ -53,40 +68,63 @@ export default function NewsMap() {
     )
   }
 
+  // Render web map or native map based on platform
+  const MapComponent = Platform.OS === 'web' ? WebMapView : MapView
+  const MarkerComponent = Platform.OS === 'web' ? WebMarker : Marker
+
   return (
     <View style={styles.container}>
-      <MapView
+      <MapComponent
         style={styles.map}
         initialRegion={region}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-        showsCompass={true}
+        {...(Platform.OS !== 'web' && {
+          showsUserLocation: true,
+          showsMyLocationButton: true,
+          showsCompass: true,
+        })}
       >
         {/* User location marker - only show if location permission was denied */}
         {location && !locationError && (
-          <Marker
+          <MarkerComponent
             coordinate={{
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
-            title={t('common.yourLocation') || 'Your Location'}
-            pinColor="#1E40AF"
-          />
+            {...(Platform.OS !== 'web' && {
+              title: t('common.yourLocation') || 'Your Location',
+              pinColor: '#1E40AF',
+            })}
+          >
+            {Platform.OS === 'web' && (
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  backgroundColor: '#1E40AF',
+                  border: '3px solid white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                }}
+              />
+            )}
+          </MarkerComponent>
         )}
 
         {/* News markers */}
         {newsWithLocation.map((item) => (
-          <Marker
+          <MarkerComponent
             key={item.id}
             coordinate={{
               latitude: item.location?.latitude ?? 42.6977,
               longitude: item.location?.longitude ?? 23.3219,
             }}
-            title={item.title}
-            description={item.description}
+            {...(Platform.OS !== 'web' && {
+              title: item.title,
+              description: item.description,
+            })}
           />
         ))}
-      </MapView>
+      </MapComponent>
       <View style={styles.implementMeContainer}>
         <ImplementMeGithub
           extendedText={t('common.implementMeMessage')}

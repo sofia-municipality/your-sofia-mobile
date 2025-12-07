@@ -1,7 +1,7 @@
 import {useEffect} from 'react'
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
-import {Image} from 'react-native'
+import {Image, Platform} from 'react-native'
 import {useFrameworkReady} from '@/hooks/useFrameworkReady'
 import {LanguageSwitch} from '@/components/LanguageSwitch'
 import {useTranslation} from 'react-i18next'
@@ -9,6 +9,11 @@ import {initializeReporterId} from '@/lib/deviceId'
 import {EnvironmentProvider} from '@/contexts/EnvironmentContext'
 import {AuthProvider} from '@/contexts/AuthContext'
 import '../i18n'
+
+// Import MapLibre CSS for web
+if (Platform.OS === 'web') {
+  require('maplibre-gl/dist/maplibre-gl.css')
+}
 
 export default function RootLayout() {
   useFrameworkReady()
