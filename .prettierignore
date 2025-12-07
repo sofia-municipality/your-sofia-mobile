@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.expo/
+.expo-shared/
+
+# Cache
+.cache/
+*.log
