@@ -173,48 +173,24 @@ export async function fetchWasteContainers(options?: {
 
   const data = await response.json()
 
-  // Transform image URLs and get latest observation photo
+  // Transform image URLs only (observations loaded lazily)
   if (data.docs) {
-    data.docs = await Promise.all(
-      data.docs.map(async (container: any) => {
-        // Get latest observation with photo for this container
-        let lastCleanedPhoto
-        try {
-          const obsResponse = await fetch(
-            `${getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&sort=-cleanedAt&limit=1&depth=1`
-          )
-          if (obsResponse.ok) {
-            const obsData = await obsResponse.json()
-            if (obsData.docs && obsData.docs.length > 0 && obsData.docs[0].photo) {
-              lastCleanedPhoto = {
-                url: getMediaUrl(obsData.docs[0].photo),
-                alt: obsData.docs[0].photo.alt,
-              }
-            }
+    data.docs = data.docs.map((container: any) => ({
+      ...container,
+      image: container.image
+        ? {
+            ...container.image,
+            url: getMediaUrl(container.image),
           }
-        } catch (error) {
-          console.error('Error fetching observation photo:', error)
-        }
-
-        return {
-          ...container,
-          image: container.image
-            ? {
-                ...container.image,
-                url: getMediaUrl(container.image),
-              }
-            : undefined,
-          lastCleanedPhoto,
-        }
-      })
-    )
+        : undefined,
+    }))
   }
 
   return data
 }
 
 /**
- * Fetch a single waste container by ID
+ * Fetch a single waste container by ID with latest observation
  */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
   const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`)
@@ -231,6 +207,24 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
       ...container.image,
       url: getMediaUrl(container.image),
     }
+  }
+
+  // Fetch latest observation with photo for this container
+  try {
+    const obsResponse = await fetch(
+      `${getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&sort=-cleanedAt&limit=1&depth=1`
+    )
+    if (obsResponse.ok) {
+      const obsData = await obsResponse.json()
+      if (obsData.docs && obsData.docs.length > 0 && obsData.docs[0].photo) {
+        container.lastCleanedPhoto = {
+          url: getMediaUrl(obsData.docs[0].photo),
+          alt: obsData.docs[0].photo.alt,
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching observation photo:', error)
   }
 
   return container
