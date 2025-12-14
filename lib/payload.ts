@@ -248,11 +248,15 @@ export async function cleanContainer(
   const formData = new FormData()
 
   if (photo) {
+    // Append photo as a proper file object for React Native
     formData.append('photo', {
       uri: photo.uri,
       type: photo.type,
       name: photo.name,
     } as any)
+  } else {
+    // Add an empty placeholder to ensure FormData has content
+    formData.append('_empty', '')
   }
 
   if (notes) {
@@ -263,7 +267,7 @@ export async function cleanContainer(
     method: 'POST',
     headers: {
       Authorization: `Bearer ${authToken}`,
-      // Don't set Content-Type - let browser set it with boundary for multipart/form-data
+      // Don't set Content-Type - let fetch set it automatically with boundary
     },
     body: formData,
   })
