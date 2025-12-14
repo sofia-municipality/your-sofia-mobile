@@ -12,10 +12,6 @@
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/images/sofia-gerb.png",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/sofia-gerb.jpg",
-        "backgroundColor": "#ffffff"
-      },
       "bundleIdentifier": "bg.sofia.yoursofia",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
