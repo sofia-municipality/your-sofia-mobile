@@ -28,6 +28,4 @@ Closes #
 
 <!-- Describe the tests you've performed -->
 
-
-
 By submitting this PR, I confirm that my contribution is made under the terms of the EUPL-1.2 license.
