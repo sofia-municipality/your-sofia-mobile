@@ -171,6 +171,7 @@ export default {
     cleanDescription:
       'This action will mark all active signals as resolved and set the container status to active.',
     takePhoto: 'Take Photo',
+    skipPhoto: 'Skip Photo',
     retakePhoto: 'Retake Photo',
     photoOptional: 'Photo is optional',
     uploadingPhoto: 'Uploading photo...',

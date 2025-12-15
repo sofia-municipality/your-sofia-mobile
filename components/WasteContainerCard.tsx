@@ -42,9 +42,10 @@ export function WasteContainerCard({
   const router = useRouter()
   const {isContainerAdmin, token} = useAuth()
   const [isCleaning, setIsCleaning] = useState(false)
-  const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [notes, setNotes] = useState('')
+  const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const [showCleanForm, setShowCleanForm] = useState(false)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -75,7 +76,15 @@ export function WasteContainerCard({
     return true
   }
 
-  const takePhoto = async () => {
+  const handleCleanContainer = () => {
+    if (!token) {
+      Alert.alert(t('common.error'), t('auth.notAuthenticated'))
+      return
+    }
+    setShowCleanForm(true)
+  }
+
+  const handleTakePhoto = async () => {
     const hasPermission = await requestCameraPermission()
     if (!hasPermission) return
 
@@ -91,51 +100,47 @@ export function WasteContainerCard({
     }
   }
 
-  const handleCleanContainer = async () => {
-    if (!token) {
-      Alert.alert(t('common.error'), t('auth.notAuthenticated'))
-      return
-    }
+  const handleSubmitCleaning = async () => {
+    setIsCleaning(true)
+    try {
+      let photo
+      if (photoUri) {
+        photo = {
+          uri: photoUri,
+          type: 'image/jpeg',
+          name: `observation-${container.id}-${Date.now()}.jpg`,
+        }
+      }
 
-    Alert.alert(t('wasteContainers.cleanContainer'), t('wasteContainers.cleanDescription'), [
-      {
-        text: t('common.cancel'),
-        style: 'cancel',
-      },
-      {
-        text: t('common.confirm'),
-        style: 'destructive',
-        onPress: async () => {
-          setIsCleaning(true)
-          try {
-            let photo
-            if (photoUri) {
-              photo = {
-                uri: photoUri,
-                type: 'image/jpeg',
-                name: `observation-${container.id}-${Date.now()}.jpg`,
-              }
-            }
+      await cleanContainer(container.id, token!, photo, notes)
 
-            await cleanContainer(container.id, token, photo, notes)
-            Alert.alert(t('common.success'), t('wasteContainers.cleanSuccess'))
+      // Close form and reset state first
+      setShowCleanForm(false)
+      setPhotoUri(null)
+      setNotes('')
+
+      // Show success alert and execute callbacks only after user dismisses it
+      Alert.alert(t('common.success'), t('wasteContainers.cleanSuccess'), [
+        {
+          text: 'OK',
+          onPress: () => {
             if (onContainerCleaned) {
               onContainerCleaned()
             }
             if (onClose) {
               onClose()
             }
-          } catch (error) {
-            Alert.alert(
-              t('common.error'),
-              error instanceof Error ? error.message : t('wasteContainers.cleanError')
-            )
-          } finally {
-            setIsCleaning(false)
-          }
+          },
         },
-      },
-    ])
+      ])
+    } catch (error) {
+      Alert.alert(
+        t('common.error'),
+        error instanceof Error ? error.message : t('wasteContainers.cleanError')
+      )
+    } finally {
+      setIsCleaning(false)
+    }
   }
 
   const getCapacitySizeLabel = (size: string) => {
@@ -254,64 +259,12 @@ export function WasteContainerCard({
           <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
         </TouchableOpacity>
 
-        {/* Photo preview and notes for Container Admins */}
+        {/* Clean Container button for Container Admins */}
         {isContainerAdmin && (container.status !== 'active' || !container.lastCleaned) && (
-          <>
-            {photoUri && (
-              <View style={styles.photoPreview}>
-                <Image source={{uri: photoUri}} style={styles.previewImage} />
-                <TouchableOpacity
-                  style={styles.removePhotoButton}
-                  onPress={() => setPhotoUri(null)}
-                >
-                  <X size={20} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {photoUri && (
-              <View style={styles.notesInputContainer}>
-                <TextInput
-                  style={styles.notesInput}
-                  placeholder={t('wasteContainers.addNotes')}
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
-            )}
-
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={[styles.photoButton, photoUri && styles.photoButtonActive]}
-                onPress={takePhoto}
-                disabled={isCleaning}
-              >
-                <Camera size={20} color={photoUri ? '#10B981' : '#6B7280'} />
-                <Text style={styles.photoButtonText}>
-                  {photoUri ? t('wasteContainers.retakePhoto') : t('wasteContainers.takePhoto')}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.cleanButton, isCleaning && styles.cleanButtonDisabled]}
-                onPress={handleCleanContainer}
-                disabled={isCleaning}
-              >
-                {isCleaning ? (
-                  <ActivityIndicator color="#ffffff" size="small" />
-                ) : (
-                  <>
-                    <CheckCircle size={20} color="#ffffff" />
-                    <Text style={styles.cleanButtonText}>
-                      {t('wasteContainers.cleanContainer')}
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-          </>
+          <TouchableOpacity style={styles.cleanButton} onPress={handleCleanContainer}>
+            <CheckCircle size={20} color="#ffffff" />
+            <Text style={styles.cleanButtonText}>{t('wasteContainers.cleanContainer')}</Text>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -344,6 +297,99 @@ export function WasteContainerCard({
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Clean Container Form Modal */}
+      <Modal
+        visible={showCleanForm}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCleanForm(false)}
+      >
+        <View style={styles.formModalOverlay}>
+          <View style={styles.formModalContent}>
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>{t('wasteContainers.cleanContainer')}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowCleanForm(false)
+                  setPhotoUri(null)
+                  setNotes('')
+                }}
+                style={styles.formCloseButton}
+              >
+                <X size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.formDescription}>{t('wasteContainers.cleanDescription')}</Text>
+
+            {/* Photo Section */}
+            <View style={styles.formSection}>
+              <Text style={styles.formSectionLabel}>{t('wasteContainers.photoOptional')}</Text>
+              {photoUri ? (
+                <View style={styles.photoPreview}>
+                  <Image source={{uri: photoUri}} style={styles.previewImage} />
+                  <TouchableOpacity
+                    style={styles.removePhotoButton}
+                    onPress={() => setPhotoUri(null)}
+                  >
+                    <X size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.takePhotoButton} onPress={handleTakePhoto}>
+                  <Camera size={20} color="#1E40AF" />
+                  <Text style={styles.takePhotoButtonText}>{t('wasteContainers.takePhoto')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Notes Section */}
+            <View style={styles.formSection}>
+              <Text style={styles.formSectionLabel}>{t('wasteContainers.addNotes')}</Text>
+              <TextInput
+                style={styles.formNotesInput}
+                placeholder={t('wasteContainers.addNotes')}
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.formActions}>
+              <TouchableOpacity
+                style={styles.formCancelButton}
+                onPress={() => {
+                  setShowCleanForm(false)
+                  setPhotoUri(null)
+                  setNotes('')
+                }}
+                disabled={isCleaning}
+              >
+                <Text style={styles.formCancelButtonText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.formSubmitButton, isCleaning && styles.cleanButtonDisabled]}
+                onPress={handleSubmitCleaning}
+                disabled={isCleaning}
+              >
+                {isCleaning ? (
+                  <ActivityIndicator color="#ffffff" size="small" />
+                ) : (
+                  <>
+                    <CheckCircle size={20} color="#ffffff" />
+                    <Text style={styles.formSubmitButtonText}>{t('common.confirm')}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </View>
@@ -472,25 +518,6 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     lineHeight: 20,
   },
-  photoPreview: {
-    position: 'relative',
-    marginBottom: 12,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  previewImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  removePhotoButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 16,
-    padding: 8,
-  },
   notesInputContainer: {
     marginBottom: 12,
   },
@@ -503,30 +530,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     minHeight: 80,
   },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  photoButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#F3F4F6',
-    padding: 14,
-    borderRadius: 8,
-  },
-  photoButtonActive: {
-    backgroundColor: '#D1FAE5',
-  },
-  photoButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
   cleanButton: {
-    flex: 1,
     flexDirection: 'row',
     backgroundColor: '#10B981',
     padding: 14,
@@ -572,5 +576,122 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 20,
     padding: 8,
+  },
+  formModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  formModalContent: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '90%',
+  },
+  formHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  formCloseButton: {
+    padding: 4,
+  },
+  formDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  formSection: {
+    marginBottom: 20,
+  },
+  formSectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  takePhotoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#1E40AF',
+    borderStyle: 'dashed',
+    padding: 16,
+    borderRadius: 8,
+  },
+  takePhotoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E40AF',
+  },
+  photoPreview: {
+    position: 'relative',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 16,
+    padding: 8,
+  },
+  formNotesInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    minHeight: 100,
+  },
+  formActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  formCancelButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  formCancelButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  formSubmitButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#10B981',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  formSubmitButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 })
