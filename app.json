@@ -19,6 +19,8 @@
     },
     "android": {
       "package": "bg.sofia.yoursofia",
+      "minSdkVersion": 28,
+      "targetSdkVersion": 35,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/sofia-gerb.jpg",
         "backgroundColor": "#ffffff"

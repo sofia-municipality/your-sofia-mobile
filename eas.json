@@ -11,14 +11,15 @@
       "environment": "development",
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}",
-        "ANDROID_NDK_HOME": "$HOME/Library/Android/sdk/ndk/27.1.12297006"
+        "ANDROID_HOME": "$HOME/Library/Android/sdk/"
       }
     },
     "preview": {
       "distribution": "internal",
       "environment": "preview",
       "env": {
-        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
+        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}",
+        "ANDROID_HOME": "$HOME/Library/Android/sdk/"
       }
     },
     "production": {
