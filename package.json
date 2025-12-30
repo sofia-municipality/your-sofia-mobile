@@ -66,6 +66,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.0",
+    "baseline-browser-mapping": "^2.9.11",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
