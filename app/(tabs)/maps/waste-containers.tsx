@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  Platform,
 } from 'react-native'
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
@@ -25,7 +26,6 @@ export default function WasteContainers() {
   const {t} = useTranslation()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
-  const [loading, setLoading] = useState(true)
   const [selectedFilter, setSelectedFilter] = useState<ContainerFilter>('all')
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
@@ -57,7 +57,6 @@ export default function WasteContainers() {
       setPermissionStatus(status)
 
       if (status !== 'granted') {
-        setLoading(false)
         return
       }
 
@@ -70,8 +69,6 @@ export default function WasteContainers() {
       } catch (error) {
         console.error('Error getting location:', error)
         Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
-      } finally {
-        setLoading(false)
       }
     })()
   }, [t])
@@ -80,7 +77,6 @@ export default function WasteContainers() {
     const {status} = await Location.requestForegroundPermissionsAsync()
     setPermissionStatus(status)
     if (status === 'granted') {
-      setLoading(true)
       try {
         const currentLocation = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
@@ -88,8 +84,6 @@ export default function WasteContainers() {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-      } finally {
-        setLoading(false)
       }
     }
   }
@@ -166,15 +160,6 @@ export default function WasteContainers() {
     }
   }
 
-  if (loading) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
-        <Text style={styles.loadingText}>{t('map.loading')}</Text>
-      </View>
-    )
-  }
-
   if (permissionStatus !== 'granted') {
     return (
       <View style={styles.centerContainer}>
@@ -187,16 +172,7 @@ export default function WasteContainers() {
     )
   }
 
-  if (!location) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
-        <Text style={styles.loadingText}>{t('map.loading')}</Text>
-      </View>
-    )
-  }
-
-  // Default to Sofia center if location is not available
+  // Use user location if available, otherwise default to Sofia center
   const region = {
     latitude: location?.coords.latitude || 42.6977,
     longitude: location?.coords.longitude || 23.3219,
@@ -237,8 +213,14 @@ export default function WasteContainers() {
             }}
             onPress={() => handleContainerPress(container)}
             tracksViewChanges={false}
+            pinColor={getContainerPinColor(container)}
           >
-            <WasteContainerMarker color={getContainerPinColor(container)} />
+            {/* Use custom marker for iOS, default pin for Android until react-native-maps supports custom markers properly 
+                see: https://github.com/react-native-maps/react-native-maps/issues/5707
+            */}
+            {Platform.OS === 'ios' && (
+              <WasteContainerMarker color={getContainerPinColor(container)} />
+            )}
           </Marker>
         ))}
       </MapView>
@@ -301,10 +283,13 @@ export default function WasteContainers() {
 // Helper function to get pin color based on container status
 function getContainerPinColor(container: WasteContainer): string {
   const colorMap: Record<string, string> = {
-    active: '#10B981', // Green
-    full: '#EF4444', // Red
-    maintenance: '#F59E0B', // Orange
-    inactive: '#6B7280', // Gray
+    active: 'green', // Green
+    full: 'red', // Red
+    dirty: 'brown', // Brown
+    broken: 'black', // Black
+    'for-collection': 'blue', // Blue
+    maintenance: 'orange', // Orange
+    inactive: 'purple', // Gray
   }
   return colorMap[container.status] || '#10B981'
 }
