@@ -110,7 +110,40 @@ cd your-sofia
 
 ### 3. Set Up the Development Environment
 
-Follow the setup instructions in [README.md](README.md#getting-started).
+**Prerequisites:**
+
+- Node.js 18+ and pnpm 10+
+- Expo Go app on your mobile device (for quick testing)
+- Android Studio (for building Android apks) or Xcode (for iOS builds)
+
+**Setup:**
+
+```bash
+# Install dependencies
+pnpm install
+
+# Create environment file and edit it according to your setup
+cp .env.example .env.local
+
+# Start development server
+pnpm dev
+```
+
+**Running the app:**
+
+- Scan QR code with Expo Go app for physical device testing
+
+**For Local builds for iOS and Android**
+https://docs.expo.dev/guides/local-app-development/
+
+```bash
+# Configure Android SDK location (Android only)
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+# Build and run in emulator
+pnpm android
+pnpm ios
+```
 
 ### 4. Create a Branch
 

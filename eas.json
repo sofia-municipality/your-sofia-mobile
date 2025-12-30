@@ -10,16 +10,19 @@
       "distribution": "internal",
       "environment": "development",
       "env": {
-        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}",
-        "ANDROID_HOME": "$HOME/Library/Android/sdk/"
+        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
       }
     },
     "preview": {
       "distribution": "internal",
+      "developmentClient": true,
       "environment": "preview",
       "env": {
-        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}",
-        "ANDROID_HOME": "$HOME/Library/Android/sdk/"
+        "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
+      },
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       }
     },
     "production": {

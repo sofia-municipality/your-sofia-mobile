@@ -126,7 +126,40 @@ cd your-sofia
 
 ### 3. Настройте средата за разработка
 
-Следвайте инструкциите за настройка в [README.md](README.bg.md#начало-на-работа).
+**Предварителни изисквания:**
+
+- Node.js 18+ и pnpm 10+
+- Expo Go приложението на вашето мобилно устройство (за бързо тестване)
+- Android Studio (за Android компилации) или Xcode (за iOS компилации)
+
+**Настройка:**
+
+```bash
+# Инсталирайте зависимостите
+pnpm install
+
+# Създайте environment файл и го редактирайте според вашата настройка
+cp .env.example .env.local
+
+# Стартирайте development сървъра
+pnpm dev
+```
+
+**Стартиране на приложението:**
+
+- Сканирайте QR кода с Expo Go приложението за тестване на физическо устройство
+
+**За локални компилации за iOS и Android**
+https://docs.expo.dev/guides/local-app-development/
+
+```bash
+# Конфигурирайте локацията на Android SDK (само за Android)
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+# Компилиране и изпълнение в емулатор
+pnpm android
+pnpm ios
+```
 
 ### 4. Създайте branch
 
