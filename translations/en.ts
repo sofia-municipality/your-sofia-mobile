@@ -46,6 +46,8 @@ export default {
     cancel: 'Cancel',
     success: 'Success',
     confirm: 'Confirm',
+    back: 'Back',
+    news: 'News',
     implementMeMessage:
       'This is a demo feature. We would love your help implementing it on GitHub:',
   },

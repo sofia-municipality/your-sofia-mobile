@@ -46,7 +46,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: t('common.home'),
           tabBarLabel: t('common.home'),
