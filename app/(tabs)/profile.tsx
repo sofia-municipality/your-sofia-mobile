@@ -169,15 +169,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Notification Bar */}
-        <TouchableOpacity
-          style={styles.notificationBar}
-          onPress={() =>
-            Linking.openURL('https://github.com/sofia-municipality/your-sofia-mobile/')
-          }
-        >
-          <Text style={styles.notificationText}>{t('profile.staticScreenNotice')}</Text>
-          <GitHubIcon size={24} color="#1E40AF" />
-        </TouchableOpacity>
 
         <TouchableOpacity style={styles.notificationBar}>
           <Text style={styles.notificationText}>{t('profile.anonymity')}</Text>
@@ -214,14 +205,21 @@ export default function ProfileScreen() {
                   <Text style={styles.profileDetailText}>{user.email}</Text>
                 </View>
               )}
-              <View style={styles.profileDetailItem}>
-                <MapPin size={14} color="#6B7280" />
-                <Text style={styles.profileDetailText}>{t('cities.sofia')}</Text>
-              </View>
-              <View style={styles.profileDetailItem}>
-                <Fingerprint size={14} color="#6B7280" />
-                <Text style={styles.profileDetailText}>{deviceId}</Text>
-              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Quick Stats */}
+        <View style={styles.statsSection}>
+          <Text style={styles.sectionTitle}>{t('profile.stats.title')}</Text>
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{loadingStats ? '-' : signalStats.total}</Text>
+              <Text style={styles.statLabel}>{t('profile.stats.signalsCreated')}</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{loadingStats ? '-' : signalStats.active}</Text>
+              <Text style={styles.statLabel}>{t('profile.stats.signalsActive')}</Text>
             </View>
           </View>
         </View>
@@ -257,6 +255,16 @@ export default function ProfileScreen() {
         {/* Environment Switcher - Dev Only */}
         <EnvironmentSwitcher />
 
+        <TouchableOpacity
+          style={styles.notificationBar}
+          onPress={() =>
+            Linking.openURL('https://github.com/sofia-municipality/your-sofia-mobile/')
+          }
+        >
+          <Text style={styles.notificationText}>{t('profile.staticScreenNotice')}</Text>
+          <GitHubIcon size={24} color="#1E40AF" />
+        </TouchableOpacity>
+
         {/* Profile Sections */}
         {profileSections.map((section: ProfileSection) => (
           <View key={section.id} style={styles.section}>
@@ -282,21 +290,6 @@ export default function ProfileScreen() {
             </View>
           </View>
         ))}
-
-        {/* Quick Stats */}
-        <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>{t('profile.stats.title')}</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>{loadingStats ? '-' : signalStats.total}</Text>
-              <Text style={styles.statLabel}>{t('profile.stats.signalsCreated')}</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>{loadingStats ? '-' : signalStats.active}</Text>
-              <Text style={styles.statLabel}>{t('profile.stats.signalsActive')}</Text>
-            </View>
-          </View>
-        </View>
 
         {/* App Settings */}
         <View style={styles.section}>
