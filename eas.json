@@ -31,7 +31,6 @@
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
       }
-      
     }
   },
   "submit": {

@@ -47,6 +47,8 @@ export default {
     success: 'Success',
     confirm: 'Confirm',
     back: 'Back',
+    yes: 'Yes',
+    no: 'No',
     news: 'News',
     implementMeMessage:
       'This is a demo feature. We would love your help implementing it on GitHub:',
@@ -284,5 +286,18 @@ export default {
     containerAdmin: 'Container Admin',
     sessionExpired: 'Session Expired',
     sessionExpiredMessage: 'Your session has expired. Please log in again.',
+    forgetMe: 'Forget Me',
+    forgetMeTitle: 'Delete Account',
+    forgetMeMessage:
+      'This action will delete all information about your account, including personal data, signal history, and settings. This operation is irreversible and cannot be undone.\n\nAre you sure you want to continue?',
+    forgetMeConfirm: 'Yes, delete my account',
+    forgetMeCancel: 'No, keep my account',
+    forgetMeSuccess:
+      'Your personal data was deleted. The signals that you have submitted are not deleted but they are no longer associated with any personal information about you.',
+    forgetMeFailed: 'Error deleting account',
+    forgetMeInfo: 'Account deletion information',
+    forgetMeAreYouSure: 'Are you sure?',
+    forgetMeAreYouSureMessage:
+      'This action is irreversible. Do you really want to delete your account?',
   },
 }

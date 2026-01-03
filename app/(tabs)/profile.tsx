@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Linking,
+  Modal,
+  Alert,
 } from 'react-native'
 import {
   User,
@@ -19,11 +21,10 @@ import {
   ChevronRight,
   Phone,
   Mail,
-  MapPin,
-  Fingerprint,
   AlertCircle,
   LogIn as LogInIcon,
   UserPlus,
+  UserX,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useState, useEffect, useCallback} from 'react'
@@ -111,7 +112,7 @@ interface ProfileSection {
 export default function ProfileScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
-  const {user, isAuthenticated, isContainerAdmin, logout} = useAuth()
+  const {user, isAuthenticated, isContainerAdmin, logout, deleteAccount} = useAuth()
   const [deviceId, setDeviceId] = useState<string>('')
   const [signalStats, setSignalStats] = useState<{
     total: number
@@ -119,6 +120,8 @@ export default function ProfileScreen() {
   }>({total: 0, active: 0})
   const [loadingStats, setLoadingStats] = useState(true)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
+  const [showForgetMeModal, setShowForgetMeModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const loadSignalStats = useCallback(
     async (reporterId: string) => {
@@ -162,6 +165,56 @@ export default function ProfileScreen() {
       }
     }, [isFirstFocus, deviceId, loadSignalStats])
   )
+
+  const handleForgetMeConfirm = () => {
+    // Double confirmation before deletion
+    Alert.alert(t('auth.forgetMeAreYouSure'), t('auth.forgetMeAreYouSureMessage'), [
+      {
+        text: t('common.no'),
+        style: 'cancel',
+      },
+      {
+        text: t('common.yes'),
+        style: 'destructive',
+        onPress: handleForgetMe,
+      },
+    ])
+  }
+
+  const handleForgetMe = async () => {
+    // Final confirmation before deletion
+    Alert.alert(t('auth.forgetMeAreYouSure'), t('auth.forgetMeAreYouSureMessage'), [
+      {
+        text: t('common.no'),
+        style: 'cancel',
+      },
+      {
+        text: t('common.yes'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setIsDeleting(true)
+            await deleteAccount()
+            setShowForgetMeModal(false)
+            Alert.alert(t('common.success'), t('auth.forgetMeSuccess'), [
+              {
+                text: 'OK',
+                onPress: () => router.push('/(tabs)' as any),
+              },
+            ])
+          } catch (error) {
+            console.error('Error deleting account:', error)
+            Alert.alert(
+              t('common.error'),
+              `${t('auth.forgetMeFailed')}: ${(error as Error).message}`
+            )
+          } finally {
+            setIsDeleting(false)
+          }
+        },
+      },
+    ])
+  }
 
   const profileSections = getProfileSections(t)
 
@@ -246,11 +299,71 @@ export default function ProfileScreen() {
             </View>
           </View>
         ) : (
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <LogOut size={20} color="#EF4444" />
-            <Text style={styles.logoutButtonText}>{t('auth.logout')}</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+              <LogOut size={20} color="#EF4444" />
+              <Text style={styles.logoutButtonText}>{t('auth.logout')}</Text>
+            </TouchableOpacity>
+
+            {/* Forget Me Button */}
+            <TouchableOpacity
+              style={styles.forgetMeButton}
+              onPress={() => setShowForgetMeModal(true)}
+            >
+              <UserX size={20} color="#DC2626" />
+              <Text style={styles.forgetMeButtonText}>{t('auth.forgetMe')}</Text>
+            </TouchableOpacity>
+          </>
         )}
+
+        {/* Forget Me Modal */}
+        <Modal
+          visible={showForgetMeModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => !isDeleting && setShowForgetMeModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <UserX size={48} color="#DC2626" />
+                <Text style={styles.modalTitle}>{t('auth.forgetMeTitle')}</Text>
+              </View>
+              <Text style={styles.modalMessage}>{t('auth.forgetMeMessage')}</Text>
+
+              {/* Info Link */}
+              <TouchableOpacity
+                style={styles.modalInfoLink}
+                onPress={() => {
+                  setShowForgetMeModal(false)
+                  Linking.openURL('https://your.sofia.bg/forget-me')
+                }}
+                disabled={isDeleting}
+              >
+                <Text style={styles.modalInfoLinkText}>{t('auth.forgetMeInfo')}</Text>
+              </TouchableOpacity>
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalCancelButton, isDeleting && styles.modalButtonDisabled]}
+                  onPress={() => setShowForgetMeModal(false)}
+                  disabled={isDeleting}
+                >
+                  <Text style={styles.modalCancelButtonText}>{t('auth.forgetMeCancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalConfirmButton, isDeleting && styles.modalButtonDisabled]}
+                  onPress={handleForgetMe}
+                  disabled={isDeleting}
+                >
+                  <Text style={styles.modalConfirmButtonText}>
+                    {isDeleting ? t('common.loading') : t('auth.forgetMeConfirm')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         {/* Environment Switcher - Dev Only */}
         <EnvironmentSwitcher />
@@ -630,6 +743,105 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#EF4444',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  forgetMeButton: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+  },
+  forgetMeButtonText: {
+    color: '#DC2626',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 22,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalInfoLink: {
+    marginBottom: 16,
+    paddingVertical: 8,
+  },
+  modalInfoLinkText: {
+    fontSize: 14,
+    color: '#1E40AF',
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'column',
+    gap: 12,
+  },
+  modalButtonDisabled: {
+    opacity: 0.5,
+  },
+  modalCancelButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+  },
+  modalCancelButtonText: {
+    color: '#1F2937',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalConfirmButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    backgroundColor: '#DC2626',
+    alignItems: 'center',
+  },
+  modalConfirmButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
     fontWeight: '600',
   },
 })
