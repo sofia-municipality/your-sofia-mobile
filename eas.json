@@ -31,12 +31,17 @@
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
       }
+      
     }
   },
   "submit": {
     "production": {
       "ios": {
         "ascAppId": "6753916395"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }
