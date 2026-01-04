@@ -106,7 +106,6 @@ interface Service {
 }
 
 export default function HomeScreen() {
-  const router = useRouter()
   const {t} = useTranslation()
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
   const [isMapView, setIsMapView] = useState(false)
@@ -136,10 +135,12 @@ export default function HomeScreen() {
     }, 100)
   }, [])
 
-  // Register bell action when component mounts
-  useEffect(() => {
-    registerBellAction(handleBellPress)
-  }, [registerBellAction, handleBellPress])
+  // Register bell action when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      registerBellAction(handleBellPress)
+    }, [registerBellAction, handleBellPress])
+  )
 
   // Refresh news when tab comes into focus
   useFocusEffect(

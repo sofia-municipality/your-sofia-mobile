@@ -30,10 +30,12 @@ export default function SignalsScreen() {
     router.push('/(tabs)/signals/new' as any)
   }, [router])
 
-  // Register the Plus button action
-  useEffect(() => {
-    registerBellAction(handleCreateSignal)
-  }, [registerBellAction, handleCreateSignal])
+  // Register the Plus button action when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      registerBellAction(handleCreateSignal)
+    }, [registerBellAction, handleCreateSignal])
+  )
 
   const loadSignals = useCallback(
     async (isRefreshing = false) => {
