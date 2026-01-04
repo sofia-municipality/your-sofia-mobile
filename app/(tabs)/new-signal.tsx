@@ -159,11 +159,6 @@ export default function NewScreen() {
       return
     }
 
-    if (!description.trim()) {
-      Alert.alert(t('common.error'), t('newSignal.enterDescription'))
-      return
-    }
-
     if (!currentLocation) {
       Alert.alert(t('common.error'), t('signals.locationPermissionRequired'))
       return
@@ -234,23 +229,36 @@ export default function NewScreen() {
 
       console.log('[handleSubmit] Creating signal:', signalData)
 
-      // Create signal via API
+      // Prepare photos for upload
+      const photoFiles = photos.map((photo) => ({
+        uri: photo.uri,
+        type: 'image/jpeg',
+        name: `signal-photo-${photo.id}.jpg`,
+      }))
+
+      // Create signal via API with photos
       const newSignal = await createSignal(
         signalData,
-        t('common.header') === 'Твоята София' ? 'bg' : 'en'
+        t('common.header') === 'Твоята София' ? 'bg' : 'en',
+        photoFiles.length > 0 ? photoFiles : undefined
       )
 
       console.log('[handleSubmit] Signal created:', newSignal.id)
 
-      // TODO: Upload photos if any
-      // if (photos.length > 0) {
-      //   await uploadSignalPhotos(newSignal.id, photos)
-      // }
-
       Alert.alert(t('signals.success'), '', [
         {
           text: 'OK',
-          onPress: () => router.push('/(tabs)/signals'),
+          onPress: () => {
+            // Reset form state
+            setPhotos([])
+            setSelectedObject(null)
+            setSelectedObjectType(null)
+            setSelectedStates([])
+            setDescription('')
+
+            // Navigate to signals tab
+            router.push('/(tabs)/signals')
+          },
         },
       ])
     } catch (error) {
