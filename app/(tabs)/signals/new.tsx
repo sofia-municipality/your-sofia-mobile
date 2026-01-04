@@ -225,42 +225,50 @@ export default function NewSignalScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>{t('signals.form.containerState')} *</Text>
           <View style={styles.stateTagsContainer}>
-            {['full', 'dirty', 'damaged'].map((state) => {
-              const getStateColor = (state: string) => {
-                switch (state) {
-                  case 'full':
-                    return '#DC2626' // Red
-                  case 'dirty':
-                    return '#92400E' // Brown
-                  case 'damaged':
-                    return '#1F2937' // Black/Dark Gray
-                  default:
-                    return '#1E40AF' // Default Blue
+            {['full', 'dirty', 'damaged', 'for-collection', 'maintenance', 'fallen'].map(
+              (state) => {
+                const getStateColor = (state: string) => {
+                  switch (state) {
+                    case 'full':
+                      return '#DC2626' // Red
+                    case 'dirty':
+                      return '#92400E' // Brown
+                    case 'damaged':
+                      return '#1F2937' // Black/Dark Gray
+                    case 'for-collection':
+                      return '#3B82F6' // Blue
+                    case 'maintenance':
+                      return '#F97316' // Orange
+                    case 'fallen':
+                      return '#7C3AED' // Purple
+                    default:
+                      return '#1E40AF' // Default Blue
+                  }
                 }
+
+                const stateColor = getStateColor(state)
+                const isActive = selectedStates.includes(state)
+
+                return (
+                  <TouchableOpacity
+                    key={state}
+                    style={[
+                      styles.stateTag,
+                      isActive && {
+                        backgroundColor: stateColor,
+                        borderColor: stateColor,
+                      },
+                    ]}
+                    onPress={() => toggleState(state)}
+                    disabled={loading}
+                  >
+                    <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
+                      {t(`signals.containerStates.${state}`)}
+                    </Text>
+                  </TouchableOpacity>
+                )
               }
-
-              const stateColor = getStateColor(state)
-              const isActive = selectedStates.includes(state)
-
-              return (
-                <TouchableOpacity
-                  key={state}
-                  style={[
-                    styles.stateTag,
-                    isActive && {
-                      backgroundColor: stateColor,
-                      borderColor: stateColor,
-                    },
-                  ]}
-                  onPress={() => toggleState(state)}
-                  disabled={loading}
-                >
-                  <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
-                    {t(`signals.containerStates.${state}`)}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
+            )}
           </View>
         </View>
       )}
