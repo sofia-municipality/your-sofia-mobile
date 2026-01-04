@@ -381,19 +381,65 @@ export async function fetchSignalById(id: string, locale: 'bg' | 'en' = 'bg'): P
 }
 
 /**
- * Create a new signal
+ * Create a new signal with optional photos
  */
 export async function createSignal(
   signalData: CreateSignalInput,
-  locale: 'bg' | 'en' = 'bg'
+  locale: 'bg' | 'en' = 'bg',
+  photos?: {uri: string; type: string; name: string}[],
+  reporterUniqueId?: string
 ): Promise<Signal> {
-  const response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(signalData),
-  })
+  let response: Response
+
+  if (photos && photos.length > 0) {
+    // Upload photos first, then create signal with image references
+    const imageIds: string[] = []
+
+    for (const photo of photos) {
+      const formData = new FormData()
+      formData.append('file', {
+        uri: photo.uri,
+        type: photo.type,
+        name: photo.name,
+      } as any)
+
+      const uploadResponse = await fetch(`${getApiUrl()}/api/media`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (uploadResponse.ok) {
+        const uploadedImage = await uploadResponse.json()
+        imageIds.push(uploadedImage.doc.id)
+      } else {
+        const errorData = await uploadResponse.json().catch(() => ({}))
+        const errorMessage = errorData.message || `Failed to upload photo: ${photo.name}`
+        console.error('Photo upload failed:', errorMessage)
+        throw new Error(errorMessage)
+      }
+    }
+
+    // Create signal with uploaded image IDs
+    response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...signalData,
+        images: imageIds,
+      }),
+    })
+  } else {
+    // Create signal without photos
+    response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(signalData),
+    })
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
