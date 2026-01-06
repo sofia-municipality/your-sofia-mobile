@@ -2,6 +2,7 @@ import {useState, useEffect, useCallback} from 'react'
 import {useTranslation} from 'react-i18next'
 import {fetchNews, type PayloadNewsItem} from '@/lib/payload'
 import type {NewsItem, NewsTopicType} from '@/types/news'
+import {environmentManager} from '@/lib/environment'
 
 /**
  * Hook to fetch news from Payload CMS
@@ -40,8 +41,8 @@ export function useNews(topic?: NewsTopicType) {
             // Just an ID, skip it
             imageUrl = undefined
           } else if (item.image.url) {
-            // Populated object with URL
-            imageUrl = `${process.env.EXPO_PUBLIC_API_URL}${item.image.url}`
+            // Populated object with URL - use current environment's API URL
+            imageUrl = `${environmentManager.getApiUrl()}${item.image.url}`
           }
         }
 

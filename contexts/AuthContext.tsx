@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  deleteAccount: () => Promise<void>
   isAuthenticated: boolean
   isContainerAdmin: boolean
 }
@@ -141,6 +142,33 @@ export function AuthProvider({children}: {children: ReactNode}) {
     }
   }
 
+  const deleteAccount = async () => {
+    try {
+      if (!token) {
+        throw new Error('No authentication token found')
+      }
+
+      const response = await fetch(`${environmentManager.getApiUrl()}/api/users/delete-account`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `JWT ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || error.message || 'Failed to delete account')
+      }
+
+      // After successful deletion, logout
+      await logout()
+    } catch (error) {
+      console.error('Delete account error:', error)
+      throw error
+    }
+  }
+
   const value: AuthContextType = {
     user,
     token,
@@ -148,6 +176,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
     login,
     register,
     logout,
+    deleteAccount,
     isAuthenticated: !!user && !!token,
     isContainerAdmin: user?.role === 'containerAdmin' || user?.role === 'admin',
   }

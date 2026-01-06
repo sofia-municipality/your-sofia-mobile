@@ -1,4 +1,5 @@
-import {View, Text, StyleSheet, Image} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {useRouter} from 'expo-router'
 import type {NewsItem} from '../types/news'
 
 interface NewsCardProps {
@@ -6,9 +7,15 @@ interface NewsCardProps {
 }
 
 export function NewsCard({item}: NewsCardProps) {
+  const router = useRouter()
+
   return (
-    <View style={styles.container}>
-      {item.image && <Image source={{uri: item.image}} style={styles.image} resizeMode="cover" />}
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => router.push(`/(tabs)/home/${item.id}`)}
+      activeOpacity={0.7}
+    >
+      {item.image && <Image source={{uri: item.image}} style={styles.image} resizeMode="contain" />}
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
@@ -18,7 +25,7 @@ export function NewsCard({item}: NewsCardProps) {
         </Text>
         <Text style={styles.date}>{item.date}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
@@ -37,7 +44,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 160,
+    height: 332,
     backgroundColor: '#aedcedff',
   },
   content: {

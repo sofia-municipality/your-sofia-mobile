@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
 import {useFocusEffect} from '@react-navigation/native'
 import {
   View,
@@ -14,6 +14,7 @@ import {
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
+import {Navigation} from 'lucide-react-native'
 import {useWasteContainers} from '../../../hooks/useWasteContainers'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
@@ -24,6 +25,7 @@ type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-col
 
 export default function WasteContainers() {
   const {t} = useTranslation()
+  const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
   const [selectedFilter, setSelectedFilter] = useState<ContainerFilter>('all')
@@ -72,6 +74,21 @@ export default function WasteContainers() {
       }
     })()
   }, [t])
+
+  // Animate to user location when it becomes available
+  useEffect(() => {
+    if (location && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000
+      )
+    }
+  }, [location])
 
   const requestPermission = async () => {
     const {status} = await Location.requestForegroundPermissionsAsync()
@@ -160,6 +177,41 @@ export default function WasteContainers() {
     }
   }
 
+  const centerOnLocation = async () => {
+    if (location && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        500
+      )
+    } else if (!location) {
+      // Try to get current location if not available
+      try {
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        })
+        setLocation(currentLocation)
+        if (mapRef.current) {
+          mapRef.current.animateToRegion(
+            {
+              latitude: currentLocation.coords.latitude,
+              longitude: currentLocation.coords.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            },
+            500
+          )
+        }
+      } catch (error) {
+        Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
+      }
+    }
+  }
+
   if (permissionStatus !== 'granted') {
     return (
       <View style={styles.centerContainer}>
@@ -176,33 +228,20 @@ export default function WasteContainers() {
   const region = {
     latitude: location?.coords.latitude || 42.6977,
     longitude: location?.coords.longitude || 23.3219,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   }
 
   return (
     <View style={styles.container}>
       {/* Map */}
       <MapView
+        ref={mapRef}
         provider={PROVIDER_DEFAULT}
         style={styles.map}
         initialRegion={region}
         showsUserLocation={true}
-        showsMyLocationButton={true}
-        showsCompass={true}
       >
-        {/* Current location marker */}
-        {location && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title={t('common.yourLocation') || 'Your Location'}
-            pinColor="#1E40AF"
-          />
-        )}
-
         {/* Waste container markers */}
         {visibleContainers.map((container) => (
           <Marker
@@ -249,6 +288,11 @@ export default function WasteContainers() {
           })}
         </ScrollView>
       </View>
+
+      {/* Center on Location Button */}
+      <TouchableOpacity style={styles.centerButton} onPress={centerOnLocation}>
+        <Navigation size={24} color="#1E40AF" />
+      </TouchableOpacity>
 
       {/* Container Info Modal */}
       <Modal
@@ -416,5 +460,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  centerButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 16,
+    backgroundColor: '#ffffff',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 })

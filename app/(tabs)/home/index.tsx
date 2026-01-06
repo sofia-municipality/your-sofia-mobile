@@ -18,15 +18,15 @@ import {
 } from '@expo-google-fonts/inter'
 import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
-import {AirQualityCard} from '../../components/AirQualityCard'
-import {TopicFilter} from '../../components/TopicFilter'
-import {NewsCard} from '../../components/NewsCard'
-import {NewsMap} from '../../components/NewsMap'
-import {useNews} from '../../hooks/useNews'
-import {useNotifications} from '../../hooks/useNotifications'
-import {useBellAction} from '../../contexts/BellActionContext'
-import type {AirQualityData} from '../../types/airQuality'
-import type {NewsTopicType} from '../../types/news'
+import {AirQualityCard} from '../../../components/AirQualityCard'
+import {TopicFilter} from '../../../components/TopicFilter'
+import {NewsCard} from '../../../components/NewsCard'
+import {NewsMap} from '../../../components/NewsMap'
+import {useNews} from '../../../hooks/useNews'
+import {useNotifications} from '../../../hooks/useNotifications'
+import {useBellAction} from '../../../contexts/BellActionContext'
+import type {AirQualityData} from '../../../types/airQuality'
+import type {NewsTopicType} from '../../../types/news'
 
 const {width} = Dimensions.get('window')
 
@@ -106,7 +106,6 @@ interface Service {
 }
 
 export default function HomeScreen() {
-  const router = useRouter()
   const {t} = useTranslation()
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
   const [isMapView, setIsMapView] = useState(false)
@@ -136,10 +135,12 @@ export default function HomeScreen() {
     }, 100)
   }, [])
 
-  // Register bell action when component mounts
-  useEffect(() => {
-    registerBellAction(handleBellPress)
-  }, [registerBellAction, handleBellPress])
+  // Register bell action when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      registerBellAction(handleBellPress)
+    }, [registerBellAction, handleBellPress])
+  )
 
   // Refresh news when tab comes into focus
   useFocusEffect(

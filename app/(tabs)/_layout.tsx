@@ -8,6 +8,7 @@ import {
   Edit3,
   MapPin,
   AlertTriangle,
+  ImagePlus,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {BellActionProvider} from '../../contexts/BellActionContext'
@@ -46,7 +47,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: t('common.home'),
           tabBarLabel: t('common.home'),
@@ -61,6 +62,15 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           tabBarLabel: t('common.map'),
           tabBarIcon: ({color}) => <MapPin size={24} color={color} />,
           headerTitle: () => <TabHeader title={t('common.map')} />,
+        }}
+      />
+      <Tabs.Screen
+        name="new-signal"
+        options={{
+          title: t('common.new'),
+          tabBarLabel: t('common.new'),
+          tabBarIcon: ({color}) => <ImagePlus size={24} color={color} />,
+          headerTitle: () => <TabHeader title={t('common.newReport')} />,
         }}
       />
       <Tabs.Screen
