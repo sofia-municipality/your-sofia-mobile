@@ -156,7 +156,12 @@ export default function NewSignalScreen() {
         location: currentLocation || formData.location,
       }
 
-      await createSignal(submitData as CreateSignalInput, i18n.language as 'bg' | 'en')
+      await createSignal(
+        submitData as CreateSignalInput,
+        i18n.language as 'bg' | 'en',
+        undefined,
+        deviceId
+      )
       Alert.alert(t('signals.success'), '', [
         {
           text: 'OK',

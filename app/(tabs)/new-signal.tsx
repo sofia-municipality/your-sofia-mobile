@@ -240,7 +240,8 @@ export default function NewScreen() {
       const newSignal = await createSignal(
         signalData,
         t('common.header') === 'Твоята София' ? 'bg' : 'en',
-        photoFiles.length > 0 ? photoFiles : undefined
+        photoFiles.length > 0 ? photoFiles : undefined,
+        deviceId
       )
 
       console.log('[handleSubmit] Signal created:', newSignal.id)

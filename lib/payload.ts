@@ -403,6 +403,13 @@ export async function createSignal(
         name: photo.name,
       } as any)
 
+      formData.append(
+        '_payload',
+        JSON.stringify({
+          reporterUniqueId: reporterUniqueId || null,
+        })
+      )
+
       const uploadResponse = await fetch(`${getApiUrl()}/api/media`, {
         method: 'POST',
         body: formData,
