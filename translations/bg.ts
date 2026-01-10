@@ -311,6 +311,7 @@ export default {
     title: 'Нов сигнал',
     loading: 'Зареждане...',
     cameraPermissionRequired: 'Необходим е достъп до камерата',
+    galleryPermissionRequired: 'Необходим е достъп до галерията',
     allowAccess: 'Разреши достъп',
     photo: 'Снимка',
     nearbyObjects: 'Избери обекти в близост',
@@ -319,6 +320,9 @@ export default {
     noNearbyObjects: 'Няма близки обекти',
     objectType: 'Вид нов обект',
     objectState: 'Състояние на обекта',
+    metadataFound: 'Намерени метаданни',
+    metadataLocationUpdated: 'Местоположението е актуализирано от снимката',
+    metadataDateTimeUpdated: 'Датата и времето са актуализирани от снимката',
     objectTypes: {
       wasteContainer: 'Контейнер за отпадъци',
       streetLight: 'Улично осветление',

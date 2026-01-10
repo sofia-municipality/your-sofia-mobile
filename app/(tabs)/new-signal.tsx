@@ -9,14 +9,17 @@ import {
   TextInput,
   Alert,
   Dimensions,
+  Image,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useRouter} from 'expo-router'
+import {useRouter, useLocalSearchParams} from 'expo-router'
 import {CameraView, useCameraPermissions} from 'expo-camera'
+import * as ImagePicker from 'expo-image-picker'
 import * as Location from 'expo-location'
-import {X, MapPin as MapPinIcon} from 'lucide-react-native'
+import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import {createSignal} from '../../lib/payload'
 import {getUniqueReporterId} from '../../lib/deviceId'
+import {convertGPSToDecimal, parseExifDateTime} from '../../lib/exifUtils'
 import type {CreateSignalInput} from '../../types/signal'
 
 const {height} = Dimensions.get('window')
@@ -36,29 +39,58 @@ interface MapObject {
 export default function NewScreen() {
   const {t} = useTranslation()
   const router = useRouter()
+  const params = useLocalSearchParams()
   const cameraRef = useRef<CameraView>(null)
+
+  // Prepopulated data from container create a mapObject from params if available
+  const prefilledMapObject: MapObject | null = React.useMemo(
+    () =>
+      params.containerPublicNumber
+        ? {
+            id: params.containerPublicNumber as string,
+            name: params.containerName as string,
+            type: params.prefilledObjectType as string,
+            distance: 0,
+          }
+        : null,
+    [params.containerPublicNumber, params.containerName, params.prefilledObjectType]
+  )
+
+  const containerLocation = React.useMemo(
+    () => (params.containerLocation ? JSON.parse(params.containerLocation as string) : undefined),
+    [params.containerLocation]
+  )
+  const prefilledObjectType = (params.prefilledObjectType as string) || null
 
   const [permission, requestPermission] = useCameraPermissions()
   const [photos, setPhotos] = useState<PhotoFile[]>([])
-  const [selectedObject, setSelectedObject] = useState<MapObject | null>(null)
-  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(null)
+
+  // Mock nearby objects
+  // TODO: replace with actual API call
+  const mockNearbyObjects: MapObject[] = React.useMemo(
+    () =>
+      prefilledMapObject
+        ? [prefilledMapObject]
+        : [
+            {id: '1', name: 'Контейнер #123', type: 'waste-container', distance: 15},
+            {id: '2', name: 'Контейнер #124', type: 'waste-container', distance: 28},
+          ],
+    [prefilledMapObject]
+  )
+
+  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>(mockNearbyObjects)
+
+  const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
+  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(prefilledObjectType)
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [description, setDescription] = useState('')
-  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>([])
   const [loading, setLoading] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')
   const [currentLocation, setCurrentLocation] = useState<{
     latitude: number
     longitude: number
-  } | null>(null)
+  } | null>(containerLocation || null)
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
-
-  // Mock nearby objects
-  // TODO: replace with actual API call
-  const mockNearbyObjects: MapObject[] = [
-    {id: '1', name: 'Контейнер #123', type: 'waste-container', distance: 15},
-    {id: '2', name: 'Контейнер #124', type: 'waste-container', distance: 28},
-  ]
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -76,7 +108,27 @@ export default function NewScreen() {
   // Request location and load nearby objects
   React.useEffect(() => {
     loadNearbyObjects()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Update form when params change (e.g., user selects different container)
+  React.useEffect(() => {
+    if (prefilledMapObject) {
+      setSelectedObject(prefilledMapObject)
+      setSelectedObjectType(prefilledObjectType)
+      setNearbyObjects([prefilledMapObject])
+      if (containerLocation) {
+        setCurrentLocation(containerLocation)
+      }
+    }
+  }, [
+    params.containerPublicNumber,
+    params.containerName,
+    params.containerLocation,
+    prefilledMapObject,
+    prefilledObjectType,
+    containerLocation,
+  ])
 
   // Get device unique ID from secure storage
   React.useEffect(() => {
@@ -109,7 +161,10 @@ export default function NewScreen() {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       })
-      // TODO: Fetch nearby objects from API based on location
+      // Only update nearby objects if we don't have a prefilled object
+      if (!prefilledMapObject) {
+        setNearbyObjects(mockNearbyObjects)
+      }
       setNearbyObjects(mockNearbyObjects)
     } catch (error) {
       console.error('Error loading nearby objects:', error)
@@ -139,6 +194,70 @@ export default function NewScreen() {
 
   const removePhoto = (id: string) => {
     setPhotos(photos.filter((p) => p.id !== id))
+  }
+
+  const pickImageFromGallery = async () => {
+    try {
+      // Request permission
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+      if (!permissionResult.granted) {
+        Alert.alert(t('common.error'), t('newSignal.galleryPermissionRequired'))
+        return
+      }
+
+      // Pick image with EXIF data
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 0.8,
+        exif: true, // Request EXIF data
+      })
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0]
+
+        // Add photo to list
+        const newPhoto: PhotoFile = {
+          uri: asset.uri,
+          id: Date.now().toString(),
+        }
+        setPhotos([...photos, newPhoto])
+
+        // Extract and update location from EXIF if available
+        if (asset.exif) {
+          const {GPSLatitude, GPSLongitude, GPSLatitudeRef, GPSLongitudeRef} = asset.exif
+
+          if (GPSLatitude && GPSLongitude) {
+            // Convert GPS coordinates to decimal degrees
+            const lat = convertGPSToDecimal(GPSLatitude, GPSLatitudeRef)
+            const lon = convertGPSToDecimal(GPSLongitude, GPSLongitudeRef)
+
+            if (lat && lon) {
+              setCurrentLocation({
+                latitude: lat,
+                longitude: lon,
+              })
+              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataLocationUpdated'))
+            }
+          }
+
+          // Extract and update datetime from EXIF if available
+          const dateTimeOriginal = asset.exif.DateTimeOriginal || asset.exif.DateTime
+          if (dateTimeOriginal) {
+            // Parse EXIF datetime format: "YYYY:MM:DD HH:MM:SS"
+            const parsedDate = parseExifDateTime(dateTimeOriginal)
+            if (parsedDate) {
+              setCurrentDateTime(parsedDate)
+              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataDateTimeUpdated'))
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error picking image:', error)
+      Alert.alert(t('common.error'), t('newSignal.photoError'))
+    }
   }
 
   const toggleState = (state: string) => {
@@ -338,9 +457,15 @@ export default function NewScreen() {
               </Text>
             </View>
             <View style={styles.cameraOverlay}>
-              <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
-                <View style={styles.captureButtonInner} />
-              </TouchableOpacity>
+              <View style={styles.cameraButtonsContainer}>
+                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                  <Upload size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+                  <View style={styles.captureButtonInner} />
+                </TouchableOpacity>
+                <View style={styles.uploadButtonPlaceholder} />
+              </View>
             </View>
           </CameraView>
         </View>
@@ -556,6 +681,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 30,
   },
+  cameraButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 40,
+  },
   captureButton: {
     width: 70,
     height: 70,
@@ -569,6 +701,18 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: '#fff',
+  },
+  uploadButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(30, 64, 175, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadButtonPlaceholder: {
+    width: 50,
+    height: 50,
   },
   photosContainer: {
     paddingHorizontal: 16,
@@ -670,10 +814,12 @@ const styles = StyleSheet.create({
   typeChip: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: '#F3F4F6',
     borderWidth: 2,
     borderColor: '#E5E7EB',
+    minWidth: 100,
+    alignItems: 'center',
   },
   typeChipSelected: {
     backgroundColor: '#EFF6FF',
@@ -690,18 +836,20 @@ const styles = StyleSheet.create({
   stateTagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
   stateTag: {
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
     backgroundColor: '#ffffff',
     borderWidth: 2,
     borderColor: '#D1D5DB',
+    minWidth: 100,
+    alignItems: 'center',
   },
   stateTagText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#6B7280',
     fontWeight: '600',
   },

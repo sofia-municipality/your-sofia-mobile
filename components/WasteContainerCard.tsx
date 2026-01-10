@@ -55,11 +55,12 @@ export function WasteContainerCard({
 
     // Navigate to signal creation form with prepopulated container data
     router.push({
-      pathname: '/(tabs)/signals/new',
+      pathname: '/(tabs)/new-signal',
       params: {
         containerPublicNumber: container.publicNumber,
+        containerName: container.publicNumber,
         containerLocation: JSON.stringify(container.location),
-        prefilledCategory: 'waste-container',
+        prefilledObjectType: 'waste-container',
       },
     } as any)
   }
