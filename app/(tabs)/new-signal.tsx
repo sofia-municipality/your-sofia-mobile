@@ -43,6 +43,7 @@ export default function NewScreen() {
   const router = useRouter()
   const params = useLocalSearchParams()
   const cameraRef = useRef<CameraView>(null)
+  const scrollViewRef = useRef<ScrollView>(null)
 
   // Prepopulated data from container create a mapObject from params if available
   const prefilledMapObject: MapObject | null = React.useMemo(
@@ -96,11 +97,15 @@ export default function NewScreen() {
     {id: 'other', label: t('newSignal.objectTypes.other')},
   ]
 
-  // Request location and load nearby objects
+  // Load nearby containers when selectedObject becomes null
   React.useEffect(() => {
-    loadNearbyObjects()
+    console.log('[useEffect] selectedObject changed:', selectedObject?.name)
+    console.log('[useEffect] prefilledMapObject:', prefilledMapObject?.name)
+    if (!selectedObject && !prefilledMapObject) {
+      loadNearbyObjects()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedObject, prefilledMapObject])
 
   // Update form when params change (e.g., user selects different container)
   React.useEffect(() => {
@@ -152,11 +157,20 @@ export default function NewScreen() {
         setSelectedStates([])
         setDescription('')
         setCurrentLocation(null)
+        // Reload nearby containers
+        loadNearbyObjects()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.containerPublicNumber])
   )
 
   const loadNearbyObjects = async () => {
+    // Don't load if a container is currently selected
+    if (selectedObject) {
+      console.log('[loadNearbyObjects] Skipping load - container already selected')
+      return
+    }
+
     try {
       const {status} = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
@@ -185,7 +199,8 @@ export default function NewScreen() {
       // Load nearby containers using PostGIS endpoint with 200m radius
       const containers = await loadNearbyContainers(
         searchLocation,
-        200 // 200 meter radius
+        200, // 200 meter radius,
+        {limit: 3}
       )
 
       // Transform containers to MapObject format
@@ -423,13 +438,38 @@ export default function NewScreen() {
     }
   }
 
+  const resetForm = () => {
+    setPhotos([])
+    setNearbyObjects([])
+    setSelectedObject(null)
+    setSelectedObjectType(null)
+    setSelectedStates([])
+    setDescription('')
+    // Clear URL params
+    router.setParams({
+      containerPublicNumber: undefined,
+      containerName: undefined,
+      containerLocation: undefined,
+      prefilledObjectType: undefined,
+    })
+    // Scroll to top
+    scrollViewRef.current?.scrollTo({y: 0, animated: true})
+  }
+
   const handleCancel = () => {
     if (photos.length > 0 || description.trim() || selectedObject) {
       Alert.alert(t('common.confirm'), t('newSignal.cancelConfirm'), [
         {text: t('common.no'), style: 'cancel'},
-        {text: t('common.yes'), onPress: () => router.back()},
+        {
+          text: t('common.yes'),
+          onPress: () => {
+            resetForm()
+            router.back()
+          },
+        },
       ])
     } else {
+      resetForm()
       router.back()
     }
   }
@@ -459,7 +499,11 @@ export default function NewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
           <CameraView ref={cameraRef} style={styles.camera} facing="back">

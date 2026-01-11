@@ -18,6 +18,7 @@ export async function loadNearbyContainers(
   options?: {
     status?: 'active' | 'full' | 'maintenance' | 'inactive'
     wasteType?: string
+    limit?: number
   }
 ): Promise<(WasteContainer & {distance: number})[]> {
   // Import dynamically to avoid circular dependency
