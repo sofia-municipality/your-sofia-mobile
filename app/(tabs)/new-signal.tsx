@@ -374,13 +374,13 @@ export default function NewScreen() {
             </View>
             <View style={styles.cameraOverlay}>
               <View style={styles.cameraButtonsContainer}>
-                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
-                  <Upload size={24} color="#fff" />
-                </TouchableOpacity>
+                <View style={styles.uploadButtonPlaceholder} />
                 <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
                   <View style={styles.captureButtonInner} />
                 </TouchableOpacity>
-                <View style={styles.uploadButtonPlaceholder} />
+                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                  <Upload size={24} color="#fff" />
+                </TouchableOpacity>
               </View>
             </View>
           </CameraView>
