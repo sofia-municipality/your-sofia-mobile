@@ -19,6 +19,7 @@ import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
+import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import type {WasteContainer} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-collection'
@@ -35,9 +36,36 @@ export default function WasteContainers() {
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
+  const [mapDelta, setMapDelta] = useState<{latitudeDelta: number; longitudeDelta: number}>({
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  })
+  const loadingRef = useRef(false)
+  const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
+  const isMountedRef = useRef(true)
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+      loadingRef.current = false
+    }
+  }, [])
 
   // Load nearby containers based on map center position
   const loadContainers = useCallback(async () => {
+    // Prevent concurrent loading requests
+    if (loadingRef.current) {
+      console.log('[loadContainers] Already loading, skipping')
+      return
+    }
+
+    // Don't load if component is unmounted
+    if (!isMountedRef.current) {
+      return
+    }
+
     const searchLocation =
       mapCenter ||
       (location
@@ -49,19 +77,47 @@ export default function WasteContainers() {
 
     if (!searchLocation) return
 
+    // Check if we've moved significantly since last load (>250 meters)
+    // This creates a buffer zone so markers don't disappear on small movements
+    if (lastLoadLocationRef.current) {
+      const distance = getDistanceFromLatLonInMeters(
+        lastLoadLocationRef.current.latitude,
+        lastLoadLocationRef.current.longitude,
+        searchLocation.latitude,
+        searchLocation.longitude
+      )
+      if (distance < 500) {
+        console.log('[loadContainers] Moved only', distance, 'meters, skipping reload')
+        return
+      }
+    }
+
     try {
+      loadingRef.current = true
       setContainersLoading(true)
       console.log('[loadContainers] Loading from position:', searchLocation)
-      const nearbyContainers = await loadNearbyContainers(
-        searchLocation,
-        500 // 300 meter radius
-      )
-      setContainers(nearbyContainers)
+
+      const radiusMeters = 1000
+
+      const nearbyContainers = await loadNearbyContainers(searchLocation, radiusMeters)
+
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setContainers(nearbyContainers)
+        lastLoadLocationRef.current = searchLocation
+      }
     } catch (error) {
       console.error('Error loading nearby containers:', error)
-      Alert.alert(t('common.error'), t('containers.loadError'))
+      if (isMountedRef.current) {
+        Alert.alert(t('common.error'), t('containers.loadError'))
+      }
     } finally {
-      setContainersLoading(false)
+      if (isMountedRef.current) {
+        loadingRef.current = false
+        setContainersLoading(false)
+      } else {
+        loadingRef.current = false
+      }
     }
   }, [mapCenter, location, t])
 
@@ -161,6 +217,19 @@ export default function WasteContainers() {
     if (selectedFilter === 'all') return containers
     return containers.filter((container) => container.status === selectedFilter)
   }, [containers, selectedFilter])
+
+  // Memoize container markers to prevent re-renders during map movement
+  const containerMarkers = React.useMemo(() => {
+    return visibleContainers.map((container) => ({
+      id: container.id,
+      coordinate: {
+        latitude: container.location.latitude,
+        longitude: container.location.longitude,
+      },
+      pinColor: getContainerPinColor(container),
+      container,
+    }))
+  }, [visibleContainers])
 
   const handleFilterChange = useCallback((filter: ContainerFilter) => {
     // Force immediate state update without batching
@@ -276,6 +345,10 @@ export default function WasteContainers() {
             latitude: region.latitude,
             longitude: region.longitude,
           })
+          setMapDelta({
+            latitudeDelta: region.latitudeDelta,
+            longitudeDelta: region.longitudeDelta,
+          })
         }}
         provider={PROVIDER_DEFAULT}
         style={styles.map}
@@ -283,23 +356,18 @@ export default function WasteContainers() {
         showsUserLocation={true}
       >
         {/* Waste container markers */}
-        {visibleContainers.map((container) => (
+        {containerMarkers.map((marker) => (
           <Marker
-            key={container.id}
-            coordinate={{
-              latitude: container.location.latitude,
-              longitude: container.location.longitude,
-            }}
-            onPress={() => handleContainerPress(container)}
+            key={marker.id}
+            coordinate={marker.coordinate}
+            onPress={() => handleContainerPress(marker.container)}
             tracksViewChanges={false}
-            pinColor={getContainerPinColor(container)}
+            pinColor={marker.pinColor}
           >
             {/* Use custom marker for iOS, default pin for Android until react-native-maps supports custom markers properly 
                 see: https://github.com/react-native-maps/react-native-maps/issues/5707
             */}
-            {Platform.OS === 'ios' && (
-              <WasteContainerMarker color={getContainerPinColor(container)} />
-            )}
+            {Platform.OS === 'ios' && <WasteContainerMarker color={marker.pinColor} />}
           </Marker>
         ))}
       </MapView>
