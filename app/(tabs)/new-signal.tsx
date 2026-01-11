@@ -9,27 +9,21 @@ import {
   TextInput,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useFocusEffect} from '@react-navigation/native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
-import * as ImagePicker from 'expo-image-picker'
-import * as Location from 'expo-location'
 import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import {createSignal} from '../../lib/payload'
 import {getUniqueReporterId} from '../../lib/deviceId'
-import {convertGPSToDecimal, parseExifDateTime} from '../../lib/exifUtils'
-import {loadNearbyContainers} from '../../lib/containerUtils'
 import type {CreateSignalInput} from '../../types/signal'
 import {CONTAINER_STATES, getStateColor} from '../../types/containerState'
+import {useNearbyObjects} from '../../hooks/useNearbyObjects'
+import {useSignalForm} from '../../hooks/useSignalForm'
 
 const {height} = Dimensions.get('window')
-
-interface PhotoFile {
-  uri: string
-  id: string
-}
 
 interface MapObject {
   id: string
@@ -66,23 +60,58 @@ export default function NewScreen() {
   const prefilledObjectType = (params.prefilledObjectType as string) || null
 
   const [permission, requestPermission] = useCameraPermissions()
-  const [photos, setPhotos] = useState<PhotoFile[]>([])
-
-  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>(
-    prefilledMapObject ? [prefilledMapObject] : []
-  )
-
-  const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
-  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(prefilledObjectType)
-  const [selectedStates, setSelectedStates] = useState<string[]>([])
-  const [description, setDescription] = useState('')
-  const [loading, setLoading] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')
-  const [currentLocation, setCurrentLocation] = useState<{
-    latitude: number
-    longitude: number
-  } | null>(containerLocation || null)
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
+  const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
+
+  // Use nearby objects hook
+  const {
+    nearbyObjects,
+    setNearbyObjects,
+    loadingNearbyObjects,
+    currentLocation,
+    setCurrentLocation,
+    loadNearbyObjects: loadNearbyObjectsCallback,
+  } = useNearbyObjects({
+    selectedObject,
+    containerLocation,
+  })
+
+  // Use signal form hook
+  const {
+    photos,
+    selectedObjectType,
+    setSelectedObjectType,
+    selectedStates,
+    description,
+    setDescription,
+    loading,
+    setLoading,
+    takePhoto: takePhotoAction,
+    removePhoto,
+    pickImageFromGallery,
+    toggleState,
+    resetFormState: resetFormStateAction,
+    handleCancel: handleCancelAction,
+  } = useSignalForm({
+    prefilledMapObject,
+    prefilledObjectType,
+    scrollViewRef,
+    setCurrentLocation,
+    setCurrentDateTime,
+    setNearbyObjects,
+  })
+
+  // Wrapper for resetFormState to also reset selectedObject
+  const resetFormState = useCallback(() => {
+    setSelectedObject(null)
+    resetFormStateAction()
+  }, [resetFormStateAction])
+
+  // Wrapper for handleCancel to pass selectedObject
+  const handleCancel = useCallback(() => {
+    handleCancelAction(selectedObject)
+  }, [handleCancelAction, selectedObject])
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -102,10 +131,9 @@ export default function NewScreen() {
     console.log('[useEffect] selectedObject changed:', selectedObject?.name)
     console.log('[useEffect] prefilledMapObject:', prefilledMapObject?.name)
     if (!selectedObject && !prefilledMapObject) {
-      loadNearbyObjects()
+      loadNearbyObjectsCallback()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedObject, prefilledMapObject])
+  }, [selectedObject, prefilledMapObject, loadNearbyObjectsCallback])
 
   // Update form when params change (e.g., user selects different container)
   React.useEffect(() => {
@@ -124,6 +152,9 @@ export default function NewScreen() {
     prefilledMapObject,
     prefilledObjectType,
     containerLocation,
+    setNearbyObjects,
+    setCurrentLocation,
+    setSelectedObjectType,
   ])
 
   // Get device unique ID from secure storage
@@ -145,6 +176,11 @@ export default function NewScreen() {
     return () => clearInterval(interval)
   }, [])
 
+  // Wrapper for takePhoto to pass cameraRef
+  const takePhoto = async () => {
+    await takePhotoAction(cameraRef)
+  }
+
   // Reset form when tab is focused/clicked
   useFocusEffect(
     useCallback(() => {
@@ -152,159 +188,10 @@ export default function NewScreen() {
       if (!params.containerPublicNumber) {
         resetFormState()
         // Reload nearby containers
-        loadNearbyObjects()
+        loadNearbyObjectsCallback()
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.containerPublicNumber])
+    }, [params.containerPublicNumber, resetFormState, loadNearbyObjectsCallback])
   )
-
-  const loadNearbyObjects = async () => {
-    // Don't load if a container is currently selected
-    if (selectedObject) {
-      console.log('[loadNearbyObjects] Skipping load - container already selected')
-      return
-    }
-
-    try {
-      const {status} = await Location.requestForegroundPermissionsAsync()
-      if (status !== 'granted') {
-        return
-      }
-
-      // For testing: use containerLocation if available, otherwise use current location
-      let searchLocation
-      if (containerLocation) {
-        searchLocation = containerLocation
-        setCurrentLocation(containerLocation)
-        console.log(
-          '[loadNearbyObjects] Using prefilled container location for search:',
-          containerLocation
-        )
-      } else {
-        const location = await Location.getCurrentPositionAsync({})
-        searchLocation = {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        }
-        setCurrentLocation(searchLocation)
-        console.log('[loadNearbyObjects] Using current GPS location for search:', searchLocation)
-      }
-
-      // Load nearby containers using PostGIS endpoint with 200m radius
-      const containers = await loadNearbyContainers(
-        searchLocation,
-        200, // 200 meter radius,
-        {limit: 3}
-      )
-
-      // Transform containers to MapObject format
-      const nearbyMapObjects: MapObject[] = containers.map((container) => ({
-        id: container.publicNumber,
-        name: `${t('newSignal.objectTypes.wasteContainer')} #${container.publicNumber}`,
-        type: 'waste-container',
-        distance: container.distance,
-      }))
-
-      setNearbyObjects(nearbyMapObjects)
-    } catch (error) {
-      console.error('Error loading nearby objects:', error)
-    }
-  }
-
-  const takePhoto = async () => {
-    if (!cameraRef.current) return
-
-    try {
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-      })
-
-      if (photo) {
-        const newPhoto: PhotoFile = {
-          uri: photo.uri,
-          id: Date.now().toString(),
-        }
-        setPhotos([...photos, newPhoto])
-      }
-    } catch (error) {
-      console.error('Error taking photo:', error)
-      Alert.alert(t('common.error'), t('newSignal.photoError'))
-    }
-  }
-
-  const removePhoto = (id: string) => {
-    setPhotos(photos.filter((p) => p.id !== id))
-  }
-
-  const pickImageFromGallery = async () => {
-    try {
-      // Request permission
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
-
-      if (!permissionResult.granted) {
-        Alert.alert(t('common.error'), t('newSignal.galleryPermissionRequired'))
-        return
-      }
-
-      // Pick image with EXIF data
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: false,
-        quality: 0.8,
-        exif: true, // Request EXIF data
-      })
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0]
-
-        // Add photo to list
-        const newPhoto: PhotoFile = {
-          uri: asset.uri,
-          id: Date.now().toString(),
-        }
-        setPhotos([...photos, newPhoto])
-
-        // Extract and update location from EXIF if available
-        if (asset.exif) {
-          const {GPSLatitude, GPSLongitude, GPSLatitudeRef, GPSLongitudeRef} = asset.exif
-
-          if (GPSLatitude && GPSLongitude) {
-            // Convert GPS coordinates to decimal degrees
-            const lat = convertGPSToDecimal(GPSLatitude, GPSLatitudeRef)
-            const lon = convertGPSToDecimal(GPSLongitude, GPSLongitudeRef)
-
-            if (lat && lon) {
-              setCurrentLocation({
-                latitude: lat,
-                longitude: lon,
-              })
-              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataLocationUpdated'))
-            }
-          }
-
-          // Extract and update datetime from EXIF if available
-          const dateTimeOriginal = asset.exif.DateTimeOriginal || asset.exif.DateTime
-          if (dateTimeOriginal) {
-            // Parse EXIF datetime format: "YYYY:MM:DD HH:MM:SS"
-            const parsedDate = parseExifDateTime(dateTimeOriginal)
-            if (parsedDate) {
-              setCurrentDateTime(parsedDate)
-              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataDateTimeUpdated'))
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error picking image:', error)
-      Alert.alert(t('common.error'), t('newSignal.photoError'))
-    }
-  }
-
-  const toggleState = (state: string) => {
-    setSelectedStates((prev) =>
-      prev.includes(state) ? prev.filter((s) => s !== state) : [...prev, state]
-    )
-  }
 
   const handleSubmit = async () => {
     if (!selectedObjectType) {
@@ -428,45 +315,6 @@ export default function NewScreen() {
     }
   }
 
-  // Centralized function to reset all form state
-  const resetFormState = () => {
-    setPhotos([])
-    setNearbyObjects([])
-    setSelectedObject(null)
-    setSelectedObjectType(null)
-    setSelectedStates([])
-    setDescription('')
-    setCurrentLocation(null)
-
-    // Clear URL params
-    router.setParams({
-      containerPublicNumber: undefined,
-      containerName: undefined,
-      containerLocation: undefined,
-      prefilledObjectType: undefined,
-    })
-    // Scroll to top
-    scrollViewRef.current?.scrollTo({y: 0, animated: true})
-  }
-
-  const handleCancel = () => {
-    if (photos.length > 0 || description.trim() || selectedObject) {
-      Alert.alert(t('common.confirm'), t('newSignal.cancelConfirm'), [
-        {text: t('common.no'), style: 'cancel'},
-        {
-          text: t('common.yes'),
-          onPress: () => {
-            resetFormState()
-            router.back()
-          },
-        },
-      ])
-    } else {
-      resetFormState()
-      router.back()
-    }
-  }
-
   if (!permission) {
     return (
       <SafeAreaView style={styles.container}>
@@ -572,7 +420,12 @@ export default function NewScreen() {
           </TouchableOpacity>
 
           {/* Nearby Objects List */}
-          {nearbyObjects.length > 0 ? (
+          {loadingNearbyObjects ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#1E40AF" />
+              <Text style={styles.loadingText}>{t('newSignal.loadingNearbyObjects')}</Text>
+            </View>
+          ) : nearbyObjects.length > 0 ? (
             nearbyObjects.map((obj) => (
               <TouchableOpacity
                 key={obj.id}
@@ -852,6 +705,17 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  loadingContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6B7280',
   },
   typeChipsContainer: {
     flexDirection: 'row',

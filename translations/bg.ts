@@ -310,6 +310,7 @@ export default {
   newSignal: {
     title: 'Нов сигнал',
     loading: 'Зареждане...',
+    loadingNearbyObjects: 'Търсене на близки обекти...',
     cameraPermissionRequired: 'Необходим е достъп до камерата',
     galleryPermissionRequired: 'Необходим е достъп до галерията',
     allowAccess: 'Разреши достъп',

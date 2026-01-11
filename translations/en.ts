@@ -308,6 +308,7 @@ export default {
   newSignal: {
     title: 'New Signal',
     loading: 'Loading...',
+    loadingNearbyObjects: 'Searching for nearby objects...',
     cameraPermissionRequired: 'Camera access is required',
     galleryPermissionRequired: 'Gallery access is required',
     allowAccess: 'Allow Access',
