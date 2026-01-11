@@ -40,8 +40,22 @@ class EnvironmentManager {
 
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEY)
+      console.log('[EnvironmentManager] Loaded stored environment:', stored)
       if (stored && this.isValidEnvironment(stored)) {
         this.currentEnv = stored as Environment
+        console.log(
+          '[EnvironmentManager] Using stored environment:',
+          this.currentEnv,
+          'API URL:',
+          this.getApiUrl()
+        )
+      } else {
+        console.log(
+          '[EnvironmentManager] Using default environment:',
+          this.currentEnv,
+          'API URL:',
+          this.getApiUrl()
+        )
       }
     } catch (error) {
       console.warn('Failed to load environment from storage:', error)
@@ -75,6 +89,12 @@ class EnvironmentManager {
 
     try {
       await AsyncStorage.setItem(STORAGE_KEY, env)
+      console.log(
+        '[EnvironmentManager] Saved environment to storage:',
+        env,
+        'API URL:',
+        this.getApiUrl()
+      )
     } catch (error) {
       console.error('Failed to save environment to storage:', error)
       throw error

@@ -309,6 +309,7 @@ export default {
     title: 'New Signal',
     loading: 'Loading...',
     cameraPermissionRequired: 'Camera access is required',
+    galleryPermissionRequired: 'Gallery access is required',
     allowAccess: 'Allow Access',
     photo: 'Photo',
     nearbyObjects: 'Choose nearby Objects',
@@ -317,6 +318,9 @@ export default {
     noNearbyObjects: 'No nearby objects',
     objectType: 'New Object Type',
     objectState: 'Object State',
+    metadataFound: 'Metadata Found',
+    metadataLocationUpdated: 'Location updated from photo',
+    metadataDateTimeUpdated: 'Date and time updated from photo',
     objectTypes: {
       wasteContainer: 'Waste Container',
       streetLight: 'Street Light',

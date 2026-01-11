@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useCallback} from 'react'
 import {
   View,
   Text,
@@ -11,13 +11,18 @@ import {
   Dimensions,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useRouter} from 'expo-router'
+import {useRouter, useLocalSearchParams} from 'expo-router'
+import {useFocusEffect} from '@react-navigation/native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
+import * as ImagePicker from 'expo-image-picker'
 import * as Location from 'expo-location'
-import {X, MapPin as MapPinIcon} from 'lucide-react-native'
+import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import {createSignal} from '../../lib/payload'
 import {getUniqueReporterId} from '../../lib/deviceId'
+import {convertGPSToDecimal, parseExifDateTime} from '../../lib/exifUtils'
+import {loadNearbyContainers} from '../../lib/containerUtils'
 import type {CreateSignalInput} from '../../types/signal'
+import {CONTAINER_STATES, getStateColor} from '../../types/containerState'
 
 const {height} = Dimensions.get('window')
 
@@ -36,29 +41,48 @@ interface MapObject {
 export default function NewScreen() {
   const {t} = useTranslation()
   const router = useRouter()
+  const params = useLocalSearchParams()
   const cameraRef = useRef<CameraView>(null)
+  const scrollViewRef = useRef<ScrollView>(null)
+
+  // Prepopulated data from container create a mapObject from params if available
+  const prefilledMapObject: MapObject | null = React.useMemo(
+    () =>
+      params.containerPublicNumber
+        ? {
+            id: params.containerPublicNumber as string,
+            name: params.containerName as string,
+            type: params.prefilledObjectType as string,
+            distance: 0,
+          }
+        : null,
+    [params.containerPublicNumber, params.containerName, params.prefilledObjectType]
+  )
+
+  const containerLocation = React.useMemo(
+    () => (params.containerLocation ? JSON.parse(params.containerLocation as string) : undefined),
+    [params.containerLocation]
+  )
+  const prefilledObjectType = (params.prefilledObjectType as string) || null
 
   const [permission, requestPermission] = useCameraPermissions()
   const [photos, setPhotos] = useState<PhotoFile[]>([])
-  const [selectedObject, setSelectedObject] = useState<MapObject | null>(null)
-  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(null)
+
+  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>(
+    prefilledMapObject ? [prefilledMapObject] : []
+  )
+
+  const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
+  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(prefilledObjectType)
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [description, setDescription] = useState('')
-  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>([])
   const [loading, setLoading] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')
   const [currentLocation, setCurrentLocation] = useState<{
     latitude: number
     longitude: number
-  } | null>(null)
+  } | null>(containerLocation || null)
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
-
-  // Mock nearby objects
-  // TODO: replace with actual API call
-  const mockNearbyObjects: MapObject[] = [
-    {id: '1', name: 'Контейнер #123', type: 'waste-container', distance: 15},
-    {id: '2', name: 'Контейнер #124', type: 'waste-container', distance: 28},
-  ]
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -73,10 +97,34 @@ export default function NewScreen() {
     {id: 'other', label: t('newSignal.objectTypes.other')},
   ]
 
-  // Request location and load nearby objects
+  // Load nearby containers when selectedObject becomes null
   React.useEffect(() => {
-    loadNearbyObjects()
-  }, [])
+    console.log('[useEffect] selectedObject changed:', selectedObject?.name)
+    console.log('[useEffect] prefilledMapObject:', prefilledMapObject?.name)
+    if (!selectedObject && !prefilledMapObject) {
+      loadNearbyObjects()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedObject, prefilledMapObject])
+
+  // Update form when params change (e.g., user selects different container)
+  React.useEffect(() => {
+    if (prefilledMapObject) {
+      setSelectedObject(prefilledMapObject)
+      setSelectedObjectType(prefilledObjectType)
+      setNearbyObjects([prefilledMapObject])
+      if (containerLocation) {
+        setCurrentLocation(containerLocation)
+      }
+    }
+  }, [
+    params.containerPublicNumber,
+    params.containerName,
+    params.containerLocation,
+    prefilledMapObject,
+    prefilledObjectType,
+    containerLocation,
+  ])
 
   // Get device unique ID from secure storage
   React.useEffect(() => {
@@ -97,20 +145,73 @@ export default function NewScreen() {
     return () => clearInterval(interval)
   }, [])
 
+  // Reset form when tab is focused/clicked
+  useFocusEffect(
+    useCallback(() => {
+      // Only reset if there are no prefilled params
+      if (!params.containerPublicNumber) {
+        setPhotos([])
+        setNearbyObjects([])
+        setSelectedObject(null)
+        setSelectedObjectType(null)
+        setSelectedStates([])
+        setDescription('')
+        setCurrentLocation(null)
+        // Reload nearby containers
+        loadNearbyObjects()
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [params.containerPublicNumber])
+  )
+
   const loadNearbyObjects = async () => {
+    // Don't load if a container is currently selected
+    if (selectedObject) {
+      console.log('[loadNearbyObjects] Skipping load - container already selected')
+      return
+    }
+
     try {
       const {status} = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         return
       }
 
-      const location = await Location.getCurrentPositionAsync({})
-      setCurrentLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      })
-      // TODO: Fetch nearby objects from API based on location
-      setNearbyObjects(mockNearbyObjects)
+      // For testing: use containerLocation if available, otherwise use current location
+      let searchLocation
+      if (containerLocation) {
+        searchLocation = containerLocation
+        setCurrentLocation(containerLocation)
+        console.log(
+          '[loadNearbyObjects] Using prefilled container location for search:',
+          containerLocation
+        )
+      } else {
+        const location = await Location.getCurrentPositionAsync({})
+        searchLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        }
+        setCurrentLocation(searchLocation)
+        console.log('[loadNearbyObjects] Using current GPS location for search:', searchLocation)
+      }
+
+      // Load nearby containers using PostGIS endpoint with 200m radius
+      const containers = await loadNearbyContainers(
+        searchLocation,
+        200, // 200 meter radius,
+        {limit: 3}
+      )
+
+      // Transform containers to MapObject format
+      const nearbyMapObjects: MapObject[] = containers.map((container) => ({
+        id: container.publicNumber,
+        name: `${t('newSignal.objectTypes.wasteContainer')} #${container.publicNumber}`,
+        type: 'waste-container',
+        distance: container.distance,
+      }))
+
+      setNearbyObjects(nearbyMapObjects)
     } catch (error) {
       console.error('Error loading nearby objects:', error)
     }
@@ -139,6 +240,70 @@ export default function NewScreen() {
 
   const removePhoto = (id: string) => {
     setPhotos(photos.filter((p) => p.id !== id))
+  }
+
+  const pickImageFromGallery = async () => {
+    try {
+      // Request permission
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+      if (!permissionResult.granted) {
+        Alert.alert(t('common.error'), t('newSignal.galleryPermissionRequired'))
+        return
+      }
+
+      // Pick image with EXIF data
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 0.8,
+        exif: true, // Request EXIF data
+      })
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0]
+
+        // Add photo to list
+        const newPhoto: PhotoFile = {
+          uri: asset.uri,
+          id: Date.now().toString(),
+        }
+        setPhotos([...photos, newPhoto])
+
+        // Extract and update location from EXIF if available
+        if (asset.exif) {
+          const {GPSLatitude, GPSLongitude, GPSLatitudeRef, GPSLongitudeRef} = asset.exif
+
+          if (GPSLatitude && GPSLongitude) {
+            // Convert GPS coordinates to decimal degrees
+            const lat = convertGPSToDecimal(GPSLatitude, GPSLatitudeRef)
+            const lon = convertGPSToDecimal(GPSLongitude, GPSLongitudeRef)
+
+            if (lat && lon) {
+              setCurrentLocation({
+                latitude: lat,
+                longitude: lon,
+              })
+              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataLocationUpdated'))
+            }
+          }
+
+          // Extract and update datetime from EXIF if available
+          const dateTimeOriginal = asset.exif.DateTimeOriginal || asset.exif.DateTime
+          if (dateTimeOriginal) {
+            // Parse EXIF datetime format: "YYYY:MM:DD HH:MM:SS"
+            const parsedDate = parseExifDateTime(dateTimeOriginal)
+            if (parsedDate) {
+              setCurrentDateTime(parsedDate)
+              Alert.alert(t('newSignal.metadataFound'), t('newSignal.metadataDateTimeUpdated'))
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error picking image:', error)
+      Alert.alert(t('common.error'), t('newSignal.photoError'))
+    }
   }
 
   const toggleState = (state: string) => {
@@ -240,7 +405,8 @@ export default function NewScreen() {
       const newSignal = await createSignal(
         signalData,
         t('common.header') === 'Твоята София' ? 'bg' : 'en',
-        photoFiles.length > 0 ? photoFiles : undefined
+        photoFiles.length > 0 ? photoFiles : undefined,
+        deviceId
       )
 
       console.log('[handleSubmit] Signal created:', newSignal.id)
@@ -272,13 +438,38 @@ export default function NewScreen() {
     }
   }
 
+  const resetForm = () => {
+    setPhotos([])
+    setNearbyObjects([])
+    setSelectedObject(null)
+    setSelectedObjectType(null)
+    setSelectedStates([])
+    setDescription('')
+    // Clear URL params
+    router.setParams({
+      containerPublicNumber: undefined,
+      containerName: undefined,
+      containerLocation: undefined,
+      prefilledObjectType: undefined,
+    })
+    // Scroll to top
+    scrollViewRef.current?.scrollTo({y: 0, animated: true})
+  }
+
   const handleCancel = () => {
     if (photos.length > 0 || description.trim() || selectedObject) {
       Alert.alert(t('common.confirm'), t('newSignal.cancelConfirm'), [
         {text: t('common.no'), style: 'cancel'},
-        {text: t('common.yes'), onPress: () => router.back()},
+        {
+          text: t('common.yes'),
+          onPress: () => {
+            resetForm()
+            router.back()
+          },
+        },
       ])
     } else {
+      resetForm()
       router.back()
     }
   }
@@ -308,7 +499,11 @@ export default function NewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
           <CameraView ref={cameraRef} style={styles.camera} facing="back">
@@ -337,9 +532,15 @@ export default function NewScreen() {
               </Text>
             </View>
             <View style={styles.cameraOverlay}>
-              <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
-                <View style={styles.captureButtonInner} />
-              </TouchableOpacity>
+              <View style={styles.cameraButtonsContainer}>
+                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                  <Upload size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+                  <View style={styles.captureButtonInner} />
+                </TouchableOpacity>
+                <View style={styles.uploadButtonPlaceholder} />
+              </View>
             </View>
           </CameraView>
         </View>
@@ -433,50 +634,29 @@ export default function NewScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.objectState')} *</Text>
           <View style={styles.stateTagsContainer}>
-            {['full', 'dirty', 'damaged', 'for-collection', 'maintenance', 'fallen'].map(
-              (state) => {
-                const getStateColor = (state: string) => {
-                  switch (state) {
-                    case 'full':
-                      return '#DC2626' // Red
-                    case 'dirty':
-                      return '#92400E' // Brown
-                    case 'damaged':
-                      return '#1F2937' // Black/Dark Gray
-                    case 'for-collection':
-                      return '#3B82F6' // Blue
-                    case 'maintenance':
-                      return '#F97316' // Orange
-                    case 'fallen':
-                      return '#7C3AED' // Purple
-                    default:
-                      return '#1E40AF' // Default Blue
-                  }
-                }
+            {CONTAINER_STATES.map((state) => {
+              const stateColor = getStateColor(state)
+              const isActive = selectedStates.includes(state)
 
-                const stateColor = getStateColor(state)
-                const isActive = selectedStates.includes(state)
-
-                return (
-                  <TouchableOpacity
-                    key={state}
-                    style={[
-                      styles.stateTag,
-                      isActive && {
-                        backgroundColor: stateColor,
-                        borderColor: stateColor,
-                      },
-                    ]}
-                    onPress={() => toggleState(state)}
-                    disabled={loading}
-                  >
-                    <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
-                      {t(`signals.containerStates.${state}`)}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              }
-            )}
+              return (
+                <TouchableOpacity
+                  key={state}
+                  style={[
+                    styles.stateTag,
+                    isActive && {
+                      backgroundColor: stateColor,
+                      borderColor: stateColor,
+                    },
+                  ]}
+                  onPress={() => toggleState(state)}
+                  disabled={loading}
+                >
+                  <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
+                    {t(`signals.containerStates.${state}`)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 
@@ -555,6 +735,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 30,
   },
+  cameraButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 40,
+  },
   captureButton: {
     width: 70,
     height: 70,
@@ -568,6 +755,18 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: '#fff',
+  },
+  uploadButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(30, 64, 175, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadButtonPlaceholder: {
+    width: 50,
+    height: 50,
   },
   photosContainer: {
     paddingHorizontal: 16,
@@ -669,10 +868,12 @@ const styles = StyleSheet.create({
   typeChip: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: '#F3F4F6',
     borderWidth: 2,
     borderColor: '#E5E7EB',
+    minWidth: 100,
+    alignItems: 'center',
   },
   typeChipSelected: {
     backgroundColor: '#EFF6FF',
@@ -689,18 +890,20 @@ const styles = StyleSheet.create({
   stateTagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
   stateTag: {
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
     backgroundColor: '#ffffff',
     borderWidth: 2,
     borderColor: '#D1D5DB',
+    minWidth: 100,
+    alignItems: 'center',
   },
   stateTagText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#6B7280',
     fontWeight: '600',
   },
