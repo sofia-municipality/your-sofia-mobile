@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useCallback} from 'react'
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
   TextInput,
   Alert,
   Dimensions,
-  Image,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
+import {useFocusEffect} from '@react-navigation/native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
 import * as Location from 'expo-location'
@@ -20,7 +20,9 @@ import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import {createSignal} from '../../lib/payload'
 import {getUniqueReporterId} from '../../lib/deviceId'
 import {convertGPSToDecimal, parseExifDateTime} from '../../lib/exifUtils'
+import {loadNearbyContainers} from '../../lib/containerUtils'
 import type {CreateSignalInput} from '../../types/signal'
+import {CONTAINER_STATES, getStateColor, type ContainerState} from '../../types/containerState'
 
 const {height} = Dimensions.get('window')
 
@@ -65,20 +67,9 @@ export default function NewScreen() {
   const [permission, requestPermission] = useCameraPermissions()
   const [photos, setPhotos] = useState<PhotoFile[]>([])
 
-  // Mock nearby objects
-  // TODO: replace with actual API call
-  const mockNearbyObjects: MapObject[] = React.useMemo(
-    () =>
-      prefilledMapObject
-        ? [prefilledMapObject]
-        : [
-            {id: '1', name: 'Контейнер #123', type: 'waste-container', distance: 15},
-            {id: '2', name: 'Контейнер #124', type: 'waste-container', distance: 28},
-          ],
-    [prefilledMapObject]
+  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>(
+    prefilledMapObject ? [prefilledMapObject] : []
   )
-
-  const [nearbyObjects, setNearbyObjects] = useState<MapObject[]>(mockNearbyObjects)
 
   const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
   const [selectedObjectType, setSelectedObjectType] = useState<string | null>(prefilledObjectType)
@@ -149,6 +140,22 @@ export default function NewScreen() {
     return () => clearInterval(interval)
   }, [])
 
+  // Reset form when tab is focused/clicked
+  useFocusEffect(
+    useCallback(() => {
+      // Only reset if there are no prefilled params
+      if (!params.containerPublicNumber) {
+        setPhotos([])
+        setNearbyObjects([])
+        setSelectedObject(null)
+        setSelectedObjectType(null)
+        setSelectedStates([])
+        setDescription('')
+        setCurrentLocation(null)
+      }
+    }, [params.containerPublicNumber])
+  )
+
   const loadNearbyObjects = async () => {
     try {
       const {status} = await Location.requestForegroundPermissionsAsync()
@@ -156,16 +163,40 @@ export default function NewScreen() {
         return
       }
 
-      const location = await Location.getCurrentPositionAsync({})
-      setCurrentLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      })
-      // Only update nearby objects if we don't have a prefilled object
-      if (!prefilledMapObject) {
-        setNearbyObjects(mockNearbyObjects)
+      // For testing: use containerLocation if available, otherwise use current location
+      let searchLocation
+      if (containerLocation) {
+        searchLocation = containerLocation
+        setCurrentLocation(containerLocation)
+        console.log(
+          '[loadNearbyObjects] Using prefilled container location for search:',
+          containerLocation
+        )
+      } else {
+        const location = await Location.getCurrentPositionAsync({})
+        searchLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        }
+        setCurrentLocation(searchLocation)
+        console.log('[loadNearbyObjects] Using current GPS location for search:', searchLocation)
       }
-      setNearbyObjects(mockNearbyObjects)
+
+      // Load nearby containers using PostGIS endpoint with 200m radius
+      const containers = await loadNearbyContainers(
+        searchLocation,
+        200 // 200 meter radius
+      )
+
+      // Transform containers to MapObject format
+      const nearbyMapObjects: MapObject[] = containers.map((container) => ({
+        id: container.publicNumber,
+        name: `${t('newSignal.objectTypes.wasteContainer')} #${container.publicNumber}`,
+        type: 'waste-container',
+        distance: container.distance,
+      }))
+
+      setNearbyObjects(nearbyMapObjects)
     } catch (error) {
       console.error('Error loading nearby objects:', error)
     }
@@ -559,50 +590,29 @@ export default function NewScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.objectState')} *</Text>
           <View style={styles.stateTagsContainer}>
-            {['full', 'dirty', 'damaged', 'for-collection', 'maintenance', 'fallen'].map(
-              (state) => {
-                const getStateColor = (state: string) => {
-                  switch (state) {
-                    case 'full':
-                      return '#DC2626' // Red
-                    case 'dirty':
-                      return '#92400E' // Brown
-                    case 'damaged':
-                      return '#1F2937' // Black/Dark Gray
-                    case 'for-collection':
-                      return '#3B82F6' // Blue
-                    case 'maintenance':
-                      return '#F97316' // Orange
-                    case 'fallen':
-                      return '#7C3AED' // Purple
-                    default:
-                      return '#1E40AF' // Default Blue
-                  }
-                }
+            {CONTAINER_STATES.map((state) => {
+              const stateColor = getStateColor(state)
+              const isActive = selectedStates.includes(state)
 
-                const stateColor = getStateColor(state)
-                const isActive = selectedStates.includes(state)
-
-                return (
-                  <TouchableOpacity
-                    key={state}
-                    style={[
-                      styles.stateTag,
-                      isActive && {
-                        backgroundColor: stateColor,
-                        borderColor: stateColor,
-                      },
-                    ]}
-                    onPress={() => toggleState(state)}
-                    disabled={loading}
-                  >
-                    <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
-                      {t(`signals.containerStates.${state}`)}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              }
-            )}
+              return (
+                <TouchableOpacity
+                  key={state}
+                  style={[
+                    styles.stateTag,
+                    isActive && {
+                      backgroundColor: stateColor,
+                      borderColor: stateColor,
+                    },
+                  ]}
+                  onPress={() => toggleState(state)}
+                  disabled={loading}
+                >
+                  <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
+                    {t(`signals.containerStates.${state}`)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 

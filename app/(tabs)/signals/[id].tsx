@@ -26,6 +26,7 @@ import {
 import {fetchSignalById, updateSignal} from '../../../lib/payload'
 import {getUniqueReporterId} from '../../../lib/deviceId'
 import type {Signal} from '../../../types/signal'
+import {getStateColor, type ContainerState} from '../../../types/containerState'
 
 export default function SignalDetailsScreen() {
   const {t, i18n} = useTranslation()
@@ -104,19 +105,6 @@ export default function SignalDetailsScreen() {
     )
   }
 
-  const getStateColor = (state: string): string => {
-    switch (state) {
-      case 'full':
-        return '#DC2626' // red
-      case 'dirty':
-        return '#92400E' // brown
-      case 'damaged':
-        return '#1F2937' // black
-      default:
-        return '#6B7280' // gray
-    }
-  }
-
   const handleSave = async () => {
     if (!signal || !deviceId) return
 
@@ -132,7 +120,7 @@ export default function SignalDetailsScreen() {
       const updateData = {
         title: editedTitle.trim(),
         description: editedDescription.trim(),
-        containerState: selectedStates as ('full' | 'dirty' | 'damaged')[],
+        containerState: selectedStates as ContainerState[],
         reporterUniqueId: deviceId, // Send for server-side verification
       }
 

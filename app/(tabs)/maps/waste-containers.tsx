@@ -15,10 +15,10 @@ import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {Navigation} from 'lucide-react-native'
-import {useWasteContainers} from '../../../hooks/useWasteContainers'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
+import {loadNearbyContainers} from '../../../lib/containerUtils'
 import type {WasteContainer} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-collection'
@@ -32,14 +32,45 @@ export default function WasteContainers() {
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
+  const [containers, setContainers] = useState<WasteContainer[]>([])
+  const [containersLoading, setContainersLoading] = useState(false)
+  const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
 
-  // Fetch waste containers
-  const {
-    containers,
-    setContainers,
-    loading: containersLoading,
-    refresh: refreshContainers,
-  } = useWasteContainers()
+  // Load nearby containers based on map center position
+  const loadContainers = useCallback(async () => {
+    const searchLocation =
+      mapCenter ||
+      (location
+        ? {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }
+        : null)
+
+    if (!searchLocation) return
+
+    try {
+      setContainersLoading(true)
+      console.log('[loadContainers] Loading from position:', searchLocation)
+      const nearbyContainers = await loadNearbyContainers(
+        searchLocation,
+        500 // 300 meter radius
+      )
+      setContainers(nearbyContainers)
+    } catch (error) {
+      console.error('Error loading nearby containers:', error)
+      Alert.alert(t('common.error'), t('containers.loadError'))
+    } finally {
+      setContainersLoading(false)
+    }
+  }, [mapCenter, location, t])
+
+  // Load containers when map center changes or location is available
+  useEffect(() => {
+    if (mapCenter || location) {
+      loadContainers()
+    }
+  }, [mapCenter, location, loadContainers])
 
   // Refresh containers when tab comes into focus
   useFocusEffect(
@@ -48,8 +79,8 @@ export default function WasteContainers() {
         setIsFirstFocus(false)
         return
       }
-      refreshContainers()
-    }, [isFirstFocus, refreshContainers])
+      loadContainers()
+    }, [isFirstFocus, loadContainers])
   )
 
   useEffect(() => {
@@ -173,7 +204,7 @@ export default function WasteContainers() {
     } catch (error) {
       console.error('Error refreshing container:', error)
       // Fallback to full refresh if single container fetch fails
-      refreshContainers()
+      loadContainers()
     }
   }
 
@@ -237,6 +268,12 @@ export default function WasteContainers() {
       {/* Map */}
       <MapView
         ref={mapRef}
+        onRegionChangeComplete={(region) => {
+          setMapCenter({
+            latitude: region.latitude,
+            longitude: region.longitude,
+          })
+        }}
         provider={PROVIDER_DEFAULT}
         style={styles.map}
         initialRegion={region}

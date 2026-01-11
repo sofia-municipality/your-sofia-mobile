@@ -190,6 +190,76 @@ export async function fetchWasteContainers(options?: {
 }
 
 /**
+ * Fetch nearby waste containers using PostGIS geospatial query
+ * @param location User's current location {latitude, longitude}
+ * @param radiusMeters Search radius in meters (default: 500m)
+ * @param options Optional filters for status and wasteType
+ * @returns Promise with array of nearby containers sorted by distance
+ */
+export async function fetchNearbyWasteContainers(
+  location: {latitude: number; longitude: number},
+  radiusMeters: number = 500,
+  options?: {
+    status?: 'active' | 'full' | 'maintenance' | 'inactive'
+    wasteType?: string
+    limit?: number
+  }
+): Promise<PayloadResponse<WasteContainer & {distance: number}>> {
+  const {status, wasteType, limit = 500} = options || {}
+
+  // Build query parameters
+  const params = new URLSearchParams({
+    latitude: location.latitude.toString(),
+    longitude: location.longitude.toString(),
+    radius: radiusMeters.toString(),
+    limit: limit.toString(),
+  })
+
+  // Add optional filters
+  if (status) {
+    params.append('status', status)
+  }
+
+  if (wasteType) {
+    params.append('wasteType', wasteType)
+  }
+
+  const url = `${getApiUrl()}/api/waste-containers/nearby?${params}`
+  console.log('[fetchNearbyWasteContainers] Request URL:', url)
+
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error('[fetchNearbyWasteContainers] Error response:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    })
+    throw new Error(
+      `Failed to fetch nearby waste containers: ${response.statusText} - ${errorText}`
+    )
+  }
+
+  const data = await response.json()
+
+  // Transform image URLs if present
+  if (data.docs) {
+    data.docs = data.docs.map((container: any) => ({
+      ...container,
+      image: container.image
+        ? {
+            ...container.image,
+            url: getMediaUrl(container.image),
+          }
+        : undefined,
+    }))
+  }
+
+  return data
+}
+
+/**
  * Fetch a single waste container by ID with latest observation
  */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
