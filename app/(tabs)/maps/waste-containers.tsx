@@ -70,7 +70,8 @@ export default function WasteContainers() {
     if (mapCenter || location) {
       loadContainers()
     }
-  }, [mapCenter, location, loadContainers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapCenter, location])
 
   // Refresh containers when tab comes into focus
   useFocusEffect(
@@ -80,7 +81,8 @@ export default function WasteContainers() {
         return
       }
       loadContainers()
-    }, [isFirstFocus, loadContainers])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isFirstFocus])
   )
 
   useEffect(() => {
@@ -238,6 +240,7 @@ export default function WasteContainers() {
           )
         }
       } catch (error) {
+        console.error('Error getting location:', error)
         Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
       }
     }
