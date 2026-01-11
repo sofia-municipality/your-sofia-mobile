@@ -14,7 +14,8 @@ import {
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {Navigation} from 'lucide-react-native'
+import {Navigation, Plus} from 'lucide-react-native'
+import {useRouter} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
@@ -26,6 +27,7 @@ type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-col
 
 export default function WasteContainers() {
   const {t} = useTranslation()
+  const router = useRouter()
   const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
@@ -389,10 +391,18 @@ export default function WasteContainers() {
         </ScrollView>
       </View>
 
-      {/* Center on Location Button */}
-      <TouchableOpacity style={styles.centerButton} onPress={centerOnLocation}>
-        <Navigation size={24} color="#1E40AF" />
-      </TouchableOpacity>
+      {/* Action Buttons */}
+      <View style={styles.actionButtonsContainer}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push('/(tabs)/new-signal' as any)}
+        >
+          <Plus size={28} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={centerOnLocation}>
+          <Navigation size={24} />
+        </TouchableOpacity>
+      </View>
 
       {/* Container Info Modal */}
       <Modal
@@ -561,11 +571,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  centerButton: {
+  actionButtonsContainer: {
     position: 'absolute',
     bottom: 20,
     right: 16,
-    backgroundColor: '#ffffff',
+    gap: 12,
+  },
+  actionButton: {
+    color: '#6B7280',
+    backgroundColor: '#F3F4F6',
     width: 48,
     height: 48,
     borderRadius: 24,
