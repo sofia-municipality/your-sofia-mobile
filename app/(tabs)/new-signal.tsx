@@ -22,7 +22,7 @@ import {getUniqueReporterId} from '../../lib/deviceId'
 import {convertGPSToDecimal, parseExifDateTime} from '../../lib/exifUtils'
 import {loadNearbyContainers} from '../../lib/containerUtils'
 import type {CreateSignalInput} from '../../types/signal'
-import {CONTAINER_STATES, getStateColor, type ContainerState} from '../../types/containerState'
+import {CONTAINER_STATES, getStateColor} from '../../types/containerState'
 
 const {height} = Dimensions.get('window')
 

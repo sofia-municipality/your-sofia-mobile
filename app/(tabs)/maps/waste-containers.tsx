@@ -36,10 +36,6 @@ export default function WasteContainers() {
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
-  const [mapDelta, setMapDelta] = useState<{latitudeDelta: number; longitudeDelta: number}>({
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  })
   const loadingRef = useRef(false)
   const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
   const isMountedRef = useRef(true)
@@ -344,10 +340,6 @@ export default function WasteContainers() {
           setMapCenter({
             latitude: region.latitude,
             longitude: region.longitude,
-          })
-          setMapDelta({
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta,
           })
         }}
         provider={PROVIDER_DEFAULT}
