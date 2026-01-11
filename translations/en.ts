@@ -211,6 +211,8 @@ export default {
       titlePlaceholder: 'Brief description of the problem',
       description: 'Detailed Description',
       descriptionPlaceholder: 'Detailed description of the problem',
+      noDescription: 'No description',
+      photos: 'Photos',
       category: 'Category',
       containerState: 'Container State',
       reporterName: 'Your name (optional)',

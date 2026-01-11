@@ -213,6 +213,8 @@ export default {
       titlePlaceholder: 'Кратко описание на проблема',
       description: 'Подробно описание',
       descriptionPlaceholder: 'Подробно описание на проблема',
+      noDescription: 'Няма описание',
+      photos: 'Снимки',
       category: 'Категория',
       containerState: 'Състояние на контейнера',
       reporterName: 'Вашето име (по избор)',

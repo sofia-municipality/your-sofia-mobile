@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  Image,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
@@ -277,10 +278,29 @@ export default function SignalDetailsScreen() {
           <Text style={styles.title}>{signal.title}</Text>
         )}
 
-        {/* Description */}
-        {isEditing ? (
+        {/* Images */}
+        {!isEditing && signal.images && signal.images.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('signals.form.description')}</Text>
+            <Text style={styles.sectionLabel}>{t('signals.form.photos')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.imagesContainer}>
+                {signal.images.map((image, index) => (
+                  <Image
+                    key={image.id || index}
+                    source={{uri: image.url}}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Description */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>{t('signals.form.description')}</Text>
+          {isEditing ? (
             <TextInput
               style={[styles.input, styles.textArea]}
               value={editedDescription}
@@ -291,10 +311,12 @@ export default function SignalDetailsScreen() {
               textAlignVertical="top"
               editable={!saving}
             />
-          </View>
-        ) : signal.description ? (
-          <Text style={styles.description}>{signal.description}</Text>
-        ) : null}
+          ) : (
+            <Text style={styles.descriptionText}>
+              {signal.description || t('signals.form.noDescription')}
+            </Text>
+          )}
+        </View>
 
         {/* Container State */}
         {signal.category === 'waste-container' && (
@@ -517,11 +539,20 @@ const styles = StyleSheet.create({
     marginTop: 16,
     lineHeight: 32,
   },
-  description: {
+  imagesContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingRight: 16,
+  },
+  image: {
+    width: 200,
+    height: 150,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+  },
+  descriptionText: {
     fontSize: 16,
     color: '#4B5563',
-    paddingHorizontal: 16,
-    marginTop: 12,
     lineHeight: 24,
   },
   section: {
