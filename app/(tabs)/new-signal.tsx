@@ -150,13 +150,7 @@ export default function NewScreen() {
     useCallback(() => {
       // Only reset if there are no prefilled params
       if (!params.containerPublicNumber) {
-        setPhotos([])
-        setNearbyObjects([])
-        setSelectedObject(null)
-        setSelectedObjectType(null)
-        setSelectedStates([])
-        setDescription('')
-        setCurrentLocation(null)
+        resetFormState()
         // Reload nearby containers
         loadNearbyObjects()
       }
@@ -416,11 +410,7 @@ export default function NewScreen() {
           text: 'OK',
           onPress: () => {
             // Reset form state
-            setPhotos([])
-            setSelectedObject(null)
-            setSelectedObjectType(null)
-            setSelectedStates([])
-            setDescription('')
+            resetFormState()
 
             // Navigate to signals tab
             router.push('/(tabs)/signals')
@@ -438,13 +428,16 @@ export default function NewScreen() {
     }
   }
 
-  const resetForm = () => {
+  // Centralized function to reset all form state
+  const resetFormState = () => {
     setPhotos([])
     setNearbyObjects([])
     setSelectedObject(null)
     setSelectedObjectType(null)
     setSelectedStates([])
     setDescription('')
+    setCurrentLocation(null)
+
     // Clear URL params
     router.setParams({
       containerPublicNumber: undefined,
@@ -463,13 +456,13 @@ export default function NewScreen() {
         {
           text: t('common.yes'),
           onPress: () => {
-            resetForm()
+            resetFormState()
             router.back()
           },
         },
       ])
     } else {
-      resetForm()
+      resetFormState()
       router.back()
     }
   }
