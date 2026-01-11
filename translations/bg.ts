@@ -239,9 +239,11 @@ export default {
       full: 'Пълен',
       dirty: 'Мръсен',
       damaged: 'Повреден',
-      'for-collection': 'За извозване',
+      empty: 'Празен',
+      forCollection: 'За извозване',
       maintenance: 'Поддръжка',
       fallen: 'Паднал',
+      bulkyWaste: 'Едри отпадъци',
     },
     status: {
       pending: 'В очакване',

@@ -237,9 +237,11 @@ export default {
       full: 'Full',
       dirty: 'Dirty',
       damaged: 'Damaged',
-      'for-collection': 'For Collection',
+      empty: 'Empty',
+      forCollection: 'For Collection',
       maintenance: 'Maintenance',
       fallen: 'Fallen',
+      bulkyWaste: 'Bulky Waste',
     },
     status: {
       pending: 'Pending',
