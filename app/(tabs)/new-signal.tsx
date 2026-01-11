@@ -126,6 +126,13 @@ export default function NewScreen() {
     {id: 'other', label: t('newSignal.objectTypes.other')},
   ]
 
+  // Set default object type to waste-container
+  React.useEffect(() => {
+    if (!prefilledObjectType && !selectedObjectType) {
+      setSelectedObjectType('waste-container')
+    }
+  }, [prefilledObjectType, selectedObjectType, setSelectedObjectType])
+
   // Load nearby containers when selectedObject becomes null
   React.useEffect(() => {
     console.log('[useEffect] selectedObject changed:', selectedObject?.name)
@@ -460,13 +467,16 @@ export default function NewScreen() {
                   style={[
                     styles.typeChip,
                     selectedObjectType === type.id && styles.typeChipSelected,
+                    type.id !== 'waste-container' && styles.typeChipDisabled,
                   ]}
                   onPress={() => setSelectedObjectType(type.id)}
+                  disabled={type.id !== 'waste-container'}
                 >
                   <Text
                     style={[
                       styles.typeChipText,
                       selectedObjectType === type.id && styles.typeChipTextSelected,
+                      type.id !== 'waste-container' && styles.typeChipTextDisabled,
                     ]}
                   >
                     {type.label}
@@ -736,6 +746,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#EFF6FF',
     borderColor: '#1E40AF',
   },
+  typeChipDisabled: {
+    opacity: 0.4,
+    backgroundColor: '#F9FAFB',
+  },
   typeChipText: {
     fontSize: 14,
     fontWeight: '600',
@@ -743,6 +757,9 @@ const styles = StyleSheet.create({
   },
   typeChipTextSelected: {
     color: '#1E40AF',
+  },
+  typeChipTextDisabled: {
+    color: '#9CA3AF',
   },
   stateTagsContainer: {
     flexDirection: 'row',
