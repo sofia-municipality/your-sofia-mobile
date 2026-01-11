@@ -1,3 +1,5 @@
+import type {ContainerState} from './containerState'
+
 export interface WasteContainer {
   id: string
   publicNumber: string
@@ -16,6 +18,7 @@ export interface WasteContainer {
   servicedBy?: string
   wasteType: 'general' | 'recyclables' | 'organic' | 'glass' | 'paper' | 'plastic' | 'metal'
   status: 'active' | 'full' | 'maintenance' | 'inactive'
+  state?: ContainerState[]
   notes?: string
   lastCleaned?: string
   lastCleanedPhoto?: {

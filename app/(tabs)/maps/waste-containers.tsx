@@ -22,8 +22,9 @@ import {fetchWasteContainerById} from '../../../lib/payload'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import type {WasteContainer} from '../../../types/wasteContainer'
+import type {ContainerState} from '../../../types/containerState'
 
-type ContainerFilter = 'all' | 'full' | 'dirty' | 'broken' | 'active' | 'for-collection'
+type ContainerFilter = 'all' | ContainerState
 
 export default function WasteContainers() {
   const {t} = useTranslation()
@@ -196,7 +197,9 @@ export default function WasteContainers() {
   const getFilterCount = useCallback(
     (filterKey: ContainerFilter): number => {
       if (filterKey === 'all') return containers.length
-      return containers.filter((container) => container.status === filterKey).length
+      return containers.filter((container) => {
+        return container.state?.includes(filterKey) ?? false
+      }).length
     },
     [containers]
   )
@@ -205,15 +208,18 @@ export default function WasteContainers() {
     {key: 'all', label: t('wasteContainers.filters.all')},
     {key: 'full', label: t('wasteContainers.filters.full')},
     {key: 'dirty', label: t('wasteContainers.filters.dirty')},
-    {key: 'broken', label: t('wasteContainers.filters.broken')},
-    {key: 'active', label: t('wasteContainers.filters.empty')},
-    {key: 'for-collection', label: t('wasteContainers.filters.forCollection')},
+    {key: 'damaged', label: t('wasteContainers.filters.damaged')},
+    {key: 'empty', label: t('wasteContainers.filters.empty')},
+    {key: 'maintenance', label: t('wasteContainers.filters.maintenance')},
+    {key: 'forCollection', label: t('wasteContainers.filters.forCollection')},
+    {key: 'fallen', label: t('wasteContainers.filters.fallen')},
+    {key: 'bulkyWaste', label: t('wasteContainers.filters.bulkyWaste')},
   ]
 
   // Filter containers based on selected filter - use useMemo to avoid recalculating on every render
   const visibleContainers = React.useMemo(() => {
     if (selectedFilter === 'all') return containers
-    return containers.filter((container) => container.status === selectedFilter)
+    return containers.filter((container) => container.state?.includes(selectedFilter) ?? false)
   }, [containers, selectedFilter])
 
   // Memoize container markers to prevent re-renders during map movement
@@ -437,13 +443,14 @@ export default function WasteContainers() {
 // Helper function to get pin color based on container status
 function getContainerPinColor(container: WasteContainer): string {
   const colorMap: Record<string, string> = {
-    active: 'green', // Green
+    empty: 'green', // Green
     full: 'red', // Red
     dirty: 'brown', // Brown
-    broken: 'black', // Black
-    'for-collection': 'blue', // Blue
+    damaged: 'black', // Black
+    forCollection: 'blue', // Blue
     maintenance: 'orange', // Orange
-    inactive: 'purple', // Gray
+    fallen: 'purple', // Purple
+    bulkyWaste: 'yellow', // Yellow
   }
   return colorMap[container.status] || '#10B981'
 }
