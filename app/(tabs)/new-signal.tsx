@@ -244,6 +244,8 @@ export default function NewScreen() {
         cityObject = {
           type: selectedObjectType as any,
           name: selectedObject ? selectedObject.name : undefined,
+          // Include referenceId if a specific object was selected
+          referenceId: selectedObject ? selectedObject.id : undefined,
         }
 
         // Generate signal title from object type and states
