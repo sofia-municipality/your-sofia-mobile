@@ -11,6 +11,7 @@ import {
   ImagePlus,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {BellActionProvider} from '../../contexts/BellActionContext'
 import {TabHeader} from '../../components/TabHeader'
 
@@ -25,6 +26,8 @@ export default function TabLayout() {
 }
 
 function TabLayoutContent({t}: {t: (key: string) => string}) {
+  const insets = useSafeAreaInsets()
+
   return (
     <Tabs
       screenOptions={{
@@ -34,9 +37,9 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#e5e7eb',
-          paddingBottom: 8,
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
-          height: 80,
+          height: 64 + Math.max(insets.bottom, 8),
         },
         tabBarActiveTintColor: '#1E40AF',
         tabBarInactiveTintColor: '#6B7280',
