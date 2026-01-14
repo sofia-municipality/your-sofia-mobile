@@ -61,6 +61,7 @@ export function WasteContainerCard({
     router.push({
       pathname: '/(tabs)/new-signal',
       params: {
+        containerId: container.id,
         containerPublicNumber: container.publicNumber,
         containerName: container.publicNumber,
         containerLocation: JSON.stringify(container.location),

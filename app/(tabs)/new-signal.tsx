@@ -308,7 +308,21 @@ export default function NewScreen() {
           onPress: () => {
             // Reset form state
             resetFormState()
-            router.back()
+
+            // Navigate back with containerId if available
+            const returnTo = params.returnTo as string | undefined
+            const containerId = params.containerId as string | undefined
+
+            if (returnTo && containerId) {
+              router.push({
+                pathname: returnTo as any,
+                params: {refreshContainerId: containerId},
+              })
+            } else if (returnTo) {
+              router.push(returnTo as any)
+            } else {
+              router.back()
+            }
           },
         },
       ])

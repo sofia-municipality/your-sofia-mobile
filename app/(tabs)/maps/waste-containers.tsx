@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react'
-import {useFocusEffect} from '@react-navigation/native'
 import {
   View,
   Text,
@@ -15,7 +14,7 @@ import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {Navigation, Plus} from 'lucide-react-native'
-import {useRouter} from 'expo-router'
+import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
@@ -29,13 +28,13 @@ type ContainerFilter = 'all' | ContainerState
 export default function WasteContainers() {
   const {t} = useTranslation()
   const router = useRouter()
+  const params = useLocalSearchParams()
   const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
   const [selectedFilter, setSelectedFilter] = useState<ContainerFilter>('all')
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
-  const [isFirstFocus, setIsFirstFocus] = useState(true)
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
@@ -249,35 +248,42 @@ export default function WasteContainers() {
     setShowContainerCard(false)
   }
 
-  const handleContainerUpdated = useCallback(async () => {
-    if (!selectedContainer) return
+  const handleContainerUpdated = useCallback(
+    async (containerId?: string) => {
+      const idToFetch = containerId || selectedContainer?.id
+      if (!idToFetch) return
 
-    try {
-      // Fetch the updated container from the API
-      const updatedContainer = await fetchWasteContainerById(selectedContainer.id)
+      try {
+        // Fetch the updated container from the API
+        const updatedContainer = await fetchWasteContainerById(idToFetch)
 
-      // Update the container in the containers array
-      setContainers((prevContainers) =>
-        prevContainers.map((c) => (c.id === updatedContainer.id ? updatedContainer : c))
-      )
+        // Update the container in the containers array
+        setContainers((prevContainers) =>
+          prevContainers.map((c) => (c.id === updatedContainer.id ? updatedContainer : c))
+        )
 
-      // Update the selected container to reflect the new status in the card
-      setSelectedContainer(updatedContainer)
-    } catch (error) {
-      console.error('Error refreshing container:', error)
-      // Fallback to full refresh if single container fetch fails
-      loadContainers()
-    }
-  }, [selectedContainer, loadContainers])
-
-  // Refresh containers when tab comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      if (selectedContainer) {
-        handleContainerUpdated()
+        // Update the selected container to reflect the new status in the card
+        setSelectedContainer(updatedContainer)
+      } catch (error) {
+        console.error('Error refreshing container:', error)
+        // Fallback to full refresh if single container fetch fails
+        loadContainers()
       }
-    }, [handleContainerUpdated, selectedContainer])
+    },
+    [selectedContainer, loadContainers]
   )
+
+  // Handle refreshContainerId param from navigation
+  useEffect(() => {
+    const refreshContainerId = params.refreshContainerId as string | undefined
+    if (refreshContainerId) {
+      // Clear the param
+      router.setParams({refreshContainerId: undefined})
+
+      // Use handleContainerUpdated to fetch and show the container
+      handleContainerUpdated(refreshContainerId)
+    }
+  }, [params.refreshContainerId, router, handleContainerUpdated])
 
   const centerOnLocation = async () => {
     if (location && mapRef.current) {

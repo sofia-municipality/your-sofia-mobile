@@ -56,7 +56,10 @@ export function useNearbyObjects({selectedObject, containerLocation}: UseNearbyO
               longitude: location.coords.longitude,
             }
             setCurrentLocation(searchLocation)
-            console.log('[loadNearbyObjects] Using current GPS location for search:', searchLocation)
+            console.log(
+              '[loadNearbyObjects] Using current GPS location for search:',
+              searchLocation
+            )
           }
 
           // Load nearby containers using PostGIS endpoint with 200m radius
