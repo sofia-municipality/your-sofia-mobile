@@ -162,7 +162,7 @@ export function useSignalForm({
   }, [])
 
   const handleCancel = useCallback(
-    (selectedObject: MapObject | null) => {
+    (selectedObject: MapObject | null, returnTo?: string) => {
       if (photos.length > 0 || description.trim() || selectedObject) {
         Alert.alert(t('common.confirm'), t('newSignal.cancelConfirm'), [
           {text: t('common.no'), style: 'cancel'},
@@ -170,13 +170,21 @@ export function useSignalForm({
             text: t('common.yes'),
             onPress: () => {
               resetFormState()
-              router.back()
+              if (returnTo) {
+                router.push(returnTo as any)
+              } else {
+                router.back()
+              }
             },
           },
         ])
       } else {
         resetFormState()
-        router.back()
+        if (returnTo) {
+          router.push(returnTo as any)
+        } else {
+          router.back()
+        }
       }
     },
     [photos, description, t, resetFormState, router]

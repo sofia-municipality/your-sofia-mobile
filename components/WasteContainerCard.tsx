@@ -65,6 +65,7 @@ export function WasteContainerCard({
         containerName: container.publicNumber,
         containerLocation: JSON.stringify(container.location),
         prefilledObjectType: 'waste-container',
+        returnTo: '/(tabs)/maps/waste-containers',
       },
     } as any)
   }

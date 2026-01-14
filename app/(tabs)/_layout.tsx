@@ -73,7 +73,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           title: t('common.new'),
           tabBarLabel: t('common.new'),
           tabBarIcon: ({color}) => <ImagePlus size={24} color={color} />,
-          headerTitle: () => <TabHeader title={t('common.newReport')} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen

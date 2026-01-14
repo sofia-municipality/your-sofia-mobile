@@ -108,10 +108,11 @@ export default function NewScreen() {
     resetFormStateAction()
   }, [resetFormStateAction])
 
-  // Wrapper for handleCancel to pass selectedObject
+  // Wrapper for handleCancel to pass selectedObject and returnTo
   const handleCancel = useCallback(() => {
-    handleCancelAction(selectedObject)
-  }, [handleCancelAction, selectedObject])
+    const returnTo = params.returnTo as string | undefined
+    handleCancelAction(selectedObject, returnTo)
+  }, [handleCancelAction, selectedObject, params.returnTo])
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -348,6 +349,13 @@ export default function NewScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header with Close Button */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('newSignal.title')}</Text>
+        <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
+          <X size={24} color="#1F2937" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}
