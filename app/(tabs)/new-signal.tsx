@@ -139,7 +139,7 @@ export default function NewScreen() {
     console.log('[useEffect] selectedObject changed:', selectedObject?.name)
     console.log('[useEffect] prefilledMapObject:', prefilledMapObject?.name)
     if (!selectedObject && !prefilledMapObject) {
-      loadNearbyObjectsCallback()
+      loadNearbyObjectsCallback(selectedObject)
     }
   }, [selectedObject, prefilledMapObject, loadNearbyObjectsCallback])
 
@@ -196,7 +196,7 @@ export default function NewScreen() {
       if (!params.containerPublicNumber) {
         resetFormState()
         // Reload nearby containers
-        loadNearbyObjectsCallback()
+        loadNearbyObjectsCallback(null)
       }
     }, [params.containerPublicNumber, resetFormState, loadNearbyObjectsCallback])
   )
@@ -445,7 +445,10 @@ export default function NewScreen() {
             nearbyObjects.map((obj) => (
               <TouchableOpacity
                 key={obj.id}
-                style={[styles.objectCard, selectedObject === obj && styles.objectCardSelected]}
+                style={[
+                  styles.objectCard,
+                  selectedObject?.id === obj.id && styles.objectCardSelected,
+                ]}
                 onPress={() => setSelectedObject(obj)}
               >
                 <View style={styles.objectInfo}>
