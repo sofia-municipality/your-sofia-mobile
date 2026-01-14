@@ -1,17 +1,33 @@
 import React from 'react'
 import {View, StyleSheet} from 'react-native'
-import {Trash2} from 'lucide-react-native'
+import {Trash2, Recycle, Shapes} from 'lucide-react-native'
+import type {WasteType} from '../types/wasteContainer'
+import type {ContainerState} from '../types/containerState'
 
 interface WasteContainerMarkerProps {
   color: string
   size?: number
+  wasteType?: WasteType
+  state?: ContainerState[]
 }
 
-export function WasteContainerMarker({color, size = 32}: WasteContainerMarkerProps) {
+export function WasteContainerMarker({
+  color,
+  size = 32,
+  wasteType,
+  state,
+}: WasteContainerMarkerProps) {
+  // Priority: bulkyWaste > recyclables > default trash
+  const Icon = state?.includes('bulkyWaste')
+    ? Shapes
+    : wasteType === 'recyclables'
+      ? Recycle
+      : Trash2
+
   return (
     <View style={[styles.container, {width: size, height: size}]}>
       <View style={[styles.iconContainer, {backgroundColor: color}]}>
-        <Trash2 size={size * 0.64} color="#ffffff" strokeWidth={2} />
+        <Icon size={size * 0.64} color="#ffffff" strokeWidth={2} />
       </View>
       <View style={[styles.pointer, {borderTopColor: color}]} />
     </View>

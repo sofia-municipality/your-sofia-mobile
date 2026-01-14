@@ -128,18 +128,6 @@ export default function WasteContainers() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapCenter, location])
 
-  // Refresh containers when tab comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      if (isFirstFocus) {
-        setIsFirstFocus(false)
-        return
-      }
-      loadContainers()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFirstFocus])
-  )
-
   useEffect(() => {
     ;(async () => {
       // Request location permissions
@@ -259,10 +247,9 @@ export default function WasteContainers() {
 
   const handleCloseCard = () => {
     setShowContainerCard(false)
-    setSelectedContainer(null)
   }
 
-  const handleContainerCleaned = async () => {
+  const handleContainerUpdated = useCallback(async () => {
     if (!selectedContainer) return
 
     try {
@@ -281,7 +268,16 @@ export default function WasteContainers() {
       // Fallback to full refresh if single container fetch fails
       loadContainers()
     }
-  }
+  }, [selectedContainer, loadContainers])
+
+  // Refresh containers when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedContainer) {
+        handleContainerUpdated()
+      }
+    }, [handleContainerUpdated, selectedContainer])
+  )
 
   const centerOnLocation = async () => {
     if (location && mapRef.current) {
@@ -367,7 +363,13 @@ export default function WasteContainers() {
             {/* Use custom marker for iOS, default pin for Android until react-native-maps supports custom markers properly 
                 see: https://github.com/react-native-maps/react-native-maps/issues/5707
             */}
-            {Platform.OS === 'ios' && <WasteContainerMarker color={marker.pinColor} />}
+            {Platform.OS === 'ios' && (
+              <WasteContainerMarker
+                color={marker.pinColor}
+                wasteType={marker.container.wasteType}
+                state={marker.container.state}
+              />
+            )}
           </Marker>
         ))}
       </MapView>
@@ -423,7 +425,7 @@ export default function WasteContainers() {
               <WasteContainerCard
                 container={selectedContainer}
                 onClose={handleCloseCard}
-                onContainerCleaned={handleContainerCleaned}
+                onContainerUpdated={handleContainerUpdated}
               />
             )}
           </View>

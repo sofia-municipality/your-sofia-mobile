@@ -1,5 +1,14 @@
 import type {ContainerState} from './containerState'
 
+export type WasteType =
+  | 'general'
+  | 'recyclables'
+  | 'organic'
+  | 'glass'
+  | 'paper'
+  | 'plastic'
+  | 'metal'
+
 export interface WasteContainer {
   id: string
   publicNumber: string
@@ -16,7 +25,7 @@ export interface WasteContainer {
   capacitySize: 'tiny' | 'small' | 'standard' | 'big' | 'industrial'
   serviceInterval?: string
   servicedBy?: string
-  wasteType: 'general' | 'recyclables' | 'organic' | 'glass' | 'paper' | 'plastic' | 'metal'
+  wasteType: WasteType
   status: 'active' | 'full' | 'maintenance' | 'inactive'
   state?: ContainerState[]
   notes?: string

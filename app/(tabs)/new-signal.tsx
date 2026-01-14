@@ -307,9 +307,7 @@ export default function NewScreen() {
           onPress: () => {
             // Reset form state
             resetFormState()
-
-            // Navigate to signals tab
-            router.push('/(tabs)/signals')
+            router.back()
           },
         },
       ])
@@ -349,6 +347,7 @@ export default function NewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header with Close Button */}
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}
@@ -832,5 +831,25 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#fff',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
   },
 })

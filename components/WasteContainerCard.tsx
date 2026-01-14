@@ -22,6 +22,9 @@ import {
   CheckCircle,
   Camera,
   X,
+  ChevronDown,
+  ChevronUp,
+  Info,
 } from 'lucide-react-native'
 import {useAuth} from '../contexts/AuthContext'
 import {cleanContainer} from '../lib/payload'
@@ -30,13 +33,13 @@ import * as ImagePicker from 'expo-image-picker'
 interface WasteContainerCardProps {
   container: WasteContainer
   onClose?: () => void
-  onContainerCleaned?: () => void
+  onContainerUpdated?: () => void
 }
 
 export function WasteContainerCard({
   container,
   onClose,
-  onContainerCleaned,
+  onContainerUpdated,
 }: WasteContainerCardProps) {
   const {t} = useTranslation()
   const router = useRouter()
@@ -46,6 +49,7 @@ export function WasteContainerCard({
   const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [showPhotoModal, setShowPhotoModal] = useState(false)
   const [showCleanForm, setShowCleanForm] = useState(false)
+  const [showFullInfo, setShowFullInfo] = useState(false)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -125,8 +129,8 @@ export function WasteContainerCard({
         {
           text: 'OK',
           onPress: () => {
-            if (onContainerCleaned) {
-              onContainerCleaned()
+            if (onContainerUpdated) {
+              onContainerUpdated()
             }
             if (onClose) {
               onClose()
@@ -252,6 +256,125 @@ export function WasteContainerCard({
           <View style={styles.notesContainer}>
             <Text style={styles.notesLabel}>{t('wasteContainers.notes') || 'Notes'}:</Text>
             <Text style={styles.notesText}>{container.notes}</Text>
+          </View>
+        )}
+
+        {/* Full Info Toggle Button */}
+        <TouchableOpacity
+          onPress={() => setShowFullInfo(!showFullInfo)}
+          style={styles.fullInfoButton}
+        >
+          <Info size={16} color="#1E40AF" />
+          <Text style={styles.fullInfoButtonText}>{t('wasteContainers.fullDetails')}</Text>
+          {showFullInfo ? (
+            <ChevronUp size={16} color="#1E40AF" />
+          ) : (
+            <ChevronDown size={16} color="#1E40AF" />
+          )}
+        </TouchableOpacity>
+
+        {/* Extended Info Section */}
+        {showFullInfo && (
+          <View style={styles.extendedInfoContainer}>
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.publicNumber')}:</Text>
+              <Text style={styles.extendedInfoValue}>{container.publicNumber}</Text>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.wasteType')}:</Text>
+              <Text style={styles.extendedInfoValue}>{getWasteTypeLabel(container.wasteType)}</Text>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.capacitySize')}:</Text>
+              <Text style={styles.extendedInfoValue}>
+                {getCapacitySizeLabel(container.capacitySize)}
+              </Text>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.capacityVolume')}:</Text>
+              <Text style={styles.extendedInfoValue}>{container.capacityVolume}m³</Text>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.status')}:</Text>
+              <View style={styles.extendedStatusBadge}>
+                <View
+                  style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]}
+                />
+                <Text style={styles.extendedInfoValue}>{container.status.toUpperCase()}</Text>
+              </View>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.coordinates')}:</Text>
+              <Text style={styles.extendedInfoValue}>
+                {container.location.latitude.toFixed(6)}, {container.location.longitude.toFixed(6)}
+              </Text>
+            </View>
+
+            {container.location.address && (
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>{t('wasteContainers.address')}:</Text>
+                <Text style={styles.extendedInfoValue}>{container.location.address}</Text>
+              </View>
+            )}
+
+            {
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>
+                  {t('wasteContainers.serviceInterval')}:
+                </Text>
+                <Text style={styles.extendedInfoValue}>{container.serviceInterval}</Text>
+              </View>
+            }
+
+            {
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>{t('wasteContainers.servicedBy')}:</Text>
+                <Text style={styles.extendedInfoValue}>{container.servicedBy}</Text>
+              </View>
+            }
+
+            {container.lastCleaned && (
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>{t('wasteContainers.lastCleaned')}:</Text>
+                <Text style={styles.extendedInfoValue}>
+                  {new Date(container.lastCleaned).toLocaleString()}
+                </Text>
+              </View>
+            )}
+
+            {container.state && container.state.length > 0 && (
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>
+                  {t('wasteContainers.containerStates')}:
+                </Text>
+                <View style={styles.statesContainer}>
+                  {container.state.map((state, index) => (
+                    <Text key={index} style={styles.stateItem}>
+                      • {state}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.createdAt')}:</Text>
+              <Text style={styles.extendedInfoValue}>
+                {new Date(container.createdAt).toLocaleString()}
+              </Text>
+            </View>
+
+            <View style={styles.extendedInfoRow}>
+              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.updatedAt')}:</Text>
+              <Text style={styles.extendedInfoValue}>
+                {new Date(container.updatedAt).toLocaleString()}
+              </Text>
+            </View>
           </View>
         )}
 
@@ -694,5 +817,63 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  fullInfoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
+  },
+  fullInfoButtonText: {
+    color: '#1E40AF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  extendedInfoContainer: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+    gap: 12,
+  },
+  extendedInfoTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  extendedInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  extendedInfoLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6B7280',
+    flex: 1,
+  },
+  extendedInfoValue: {
+    fontSize: 13,
+    color: '#1F2937',
+    flex: 1,
+    textAlign: 'right',
+  },
+  extendedStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 6,
+    flex: 1,
+  },
+  statesContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  stateItem: {
+    fontSize: 13,
+    color: '#1F2937',
+    textAlign: 'right',
   },
 })
