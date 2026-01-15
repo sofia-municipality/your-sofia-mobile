@@ -188,6 +188,7 @@ export default {
     photoOptional: 'Снимката е по желание',
     uploadingPhoto: 'Качване на снимка...',
     photoUploaded: 'Снимката е качена успешно',
+    noPhotoUploaded: 'Няма качена снимка',
     addNotes: 'Добави бележки (по желание)',
     permissionDenied: 'Достъпът е отказан',
     cameraPermissionRequired:

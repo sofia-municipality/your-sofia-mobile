@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
   Modal,
+  ScrollView,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
@@ -25,6 +26,7 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  History,
 } from 'lucide-react-native'
 import {useAuth} from '../contexts/AuthContext'
 import {cleanContainer} from '../lib/payload'
@@ -48,8 +50,12 @@ export function WasteContainerCard({
   const [notes, setNotes] = useState('')
   const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null)
   const [showCleanForm, setShowCleanForm] = useState(false)
   const [showFullInfo, setShowFullInfo] = useState(false)
+  const [showObservations, setShowObservations] = useState(false)
+  const [observations, setObservations] = useState<any[]>([])
+  const [loadingObservations, setLoadingObservations] = useState(false)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -69,6 +75,39 @@ export function WasteContainerCard({
         returnTo: '/(tabs)/maps/waste-containers',
       },
     } as any)
+  }
+
+  const handleShowObservations = async () => {
+    setShowObservations(true)
+    setLoadingObservations(true)
+    try {
+      // Fetch observations for this container
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/waste-container-observations?where[container][equals]=${container.id}&depth=2&sort=-cleanedAt&limit=5`
+      )
+      const data = await response.json()
+      console.log('Fetched observations:', data)
+
+      // Transform photo URLs to include API URL
+      const transformedObservations = (data.docs || []).map((obs: any) => ({
+        ...obs,
+        photo: obs.photo
+          ? {
+              ...obs.photo,
+              url: obs.photo.url?.startsWith('http')
+                ? obs.photo.url
+                : `${process.env.EXPO_PUBLIC_API_URL}${obs.photo.url}`,
+            }
+          : undefined,
+      }))
+
+      setObservations(transformedObservations)
+    } catch (error) {
+      console.error('Error fetching observations:', error)
+      Alert.alert(t('common.error'), 'Failed to load observations')
+    } finally {
+      setLoadingObservations(false)
+    }
   }
 
   const requestCameraPermission = async () => {
@@ -196,11 +235,17 @@ export function WasteContainerCard({
             <Text style={styles.statusText}>{container.status.toUpperCase()}</Text>
           </View>
           <View style={styles.lastCleanedContainer}>
-            <CheckCircle size={14} color="#10B981" />
-            <Text style={styles.lastCleanedText}>
-              {t('wasteContainers.lastCleaned')}:{' '}
-              {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
-            </Text>
+            <TouchableOpacity
+              onPress={handleShowObservations}
+              disabled={!container.lastCleaned}
+              style={styles.lastCleanedButton}
+            >
+              <History size={16} color="#10B981" />
+              <Text style={[styles.lastCleanedText, styles.lastCleanedLink]}>
+                {t('wasteContainers.lastCleaned')}:{' '}
+                {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
+              </Text>
+            </TouchableOpacity>
             {container.lastCleanedPhoto && (
               <TouchableOpacity
                 onPress={() => setShowPhotoModal(true)}
@@ -399,30 +444,106 @@ export function WasteContainerCard({
         visible={showPhotoModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowPhotoModal(false)}
+        onRequestClose={() => {
+          setShowPhotoModal(false)
+          setSelectedPhotoUrl(null)
+        }}
       >
         <View style={styles.modalOverlay}>
           <TouchableOpacity
             style={styles.modalCloseArea}
             activeOpacity={1}
-            onPress={() => setShowPhotoModal(false)}
+            onPress={() => {
+              setShowPhotoModal(false)
+              setSelectedPhotoUrl(null)
+            }}
           >
             <View style={styles.modalContent}>
-              {container.lastCleanedPhoto && (
+              {(selectedPhotoUrl || container.lastCleanedPhoto) && (
                 <Image
-                  source={{uri: container.lastCleanedPhoto.url}}
+                  source={{uri: selectedPhotoUrl || container.lastCleanedPhoto?.url}}
                   style={styles.modalImage}
                   resizeMode="contain"
                 />
               )}
               <TouchableOpacity
                 style={styles.modalCloseButton}
-                onPress={() => setShowPhotoModal(false)}
+                onPress={() => {
+                  setShowPhotoModal(false)
+                  setSelectedPhotoUrl(null)
+                }}
               >
                 <X size={24} color="#fff" />
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Observations History Modal */}
+      <Modal
+        visible={showObservations}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowObservations(false)}
+      >
+        <View style={styles.formModalOverlay}>
+          <View style={styles.formModalContent}>
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>{t('wasteContainers.cleaningHistory')}</Text>
+              <TouchableOpacity onPress={() => setShowObservations(false)}>
+                <X size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {loadingObservations ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#1E40AF" />
+              </View>
+            ) : observations.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>{t('wasteContainers.noHistory')}</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.observationsList}>
+                {observations.map((observation: any, index: number) => (
+                  <View key={observation.id} style={styles.observationItem}>
+                    <View style={styles.observationRow}>
+                      <View style={styles.observationHeader}>
+                        <Calendar size={16} color="#666" />
+                        <Text style={styles.observationDate}>
+                          {new Date(observation.cleanedAt).toLocaleString()}
+                        </Text>
+                      </View>
+                      {observation.photo ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            // Show photo in full screen
+                            setSelectedPhotoUrl(observation.photo.url)
+                            setShowObservations(false)
+                            setShowPhotoModal(true)
+                          }}
+                        >
+                          <Image
+                            source={{uri: observation.photo.url}}
+                            style={styles.observationThumbnail}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <View style={styles.noPhotoContainer}>
+                          <Camera size={14} color="#9CA3AF" />
+                          <Text style={styles.noPhotoText}>
+                            {t('wasteContainers.noPhotoUploaded')}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
         </View>
       </Modal>
 
@@ -565,8 +686,14 @@ const styles = StyleSheet.create({
   lastCleanedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     gap: 4,
     marginTop: 4,
+  },
+  lastCleanedButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   lastCleanedText: {
     fontSize: 12,
@@ -823,7 +950,7 @@ const styles = StyleSheet.create({
   fullInfoButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
     gap: 8,
   },
   fullInfoButtonText: {
@@ -877,5 +1004,86 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#1F2937',
     textAlign: 'right',
+  },
+  lastCleanedLink: {
+    color: '#1e69af',
+    textDecorationLine: 'underline',
+  },
+  observationsList: {
+    paddingVertical: 8,
+  },
+  observationItem: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  observationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+  observationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  observationDate: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+    flexShrink: 1,
+  },
+  observationDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  observationText: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  observationNotes: {
+    fontSize: 13,
+    color: '#4B5563',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  observationPhoto: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginTop: 8,
+  },
+  observationThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
+  noPhotoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  noPhotoText: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
   },
 })

@@ -187,6 +187,7 @@ export default {
     photoOptional: 'Photo is optional',
     uploadingPhoto: 'Uploading photo...',
     photoUploaded: 'Photo uploaded successfully',
+    noPhotoUploaded: 'No photo uploaded',
     addNotes: 'Add notes (optional)',
     permissionDenied: 'Permission Denied',
     cameraPermissionRequired: 'The app needs camera access to take photos of containers.',
