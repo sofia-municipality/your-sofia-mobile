@@ -196,9 +196,9 @@ export default function WasteContainers() {
     {key: 'full', label: t('wasteContainers.filters.full')},
     {key: 'dirty', label: t('wasteContainers.filters.dirty')},
     {key: 'damaged', label: t('wasteContainers.filters.damaged')},
-    {key: 'empty', label: t('wasteContainers.filters.empty')},
+    {key: 'leaves', label: t('wasteContainers.filters.leaves')},
     {key: 'maintenance', label: t('wasteContainers.filters.maintenance')},
-    {key: 'forCollection', label: t('wasteContainers.filters.forCollection')},
+    {key: 'bagged', label: t('wasteContainers.filters.bagged')},
     {key: 'fallen', label: t('wasteContainers.filters.fallen')},
     {key: 'bulkyWaste', label: t('wasteContainers.filters.bulkyWaste')},
   ]
@@ -455,7 +455,8 @@ function getContainerPinColor(container: WasteContainer): string {
     full: 'red', // Red
     dirty: 'brown', // Brown
     damaged: 'black', // Black
-    forCollection: 'blue', // Blue
+    leaves: 'wheat', // Green
+    bagged: 'black', // Black
     maintenance: 'orange', // Orange
     fallen: 'purple', // Purple
     bulkyWaste: 'yellow', // Yellow
@@ -508,9 +509,8 @@ const styles = StyleSheet.create({
   filtersContainer: {
     position: 'absolute',
     top: 4,
-    left: 260,
     right: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
     borderRadius: 12,
     padding: 2,
     shadowColor: '#000',
@@ -524,10 +524,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   filterChip: {
+    alignSelf: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 4,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: '#F3F4F6',
     borderWidth: 1,

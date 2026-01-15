@@ -2,9 +2,9 @@ export type ContainerState =
   | 'full'
   | 'dirty'
   | 'damaged'
-  | 'empty'
+  | 'leaves'
   | 'maintenance'
-  | 'forCollection'
+  | 'bagged'
   | 'fallen'
   | 'bulkyWaste'
 
@@ -12,9 +12,9 @@ export const CONTAINER_STATES: ContainerState[] = [
   'full',
   'dirty',
   'damaged',
-  'empty',
+  'leaves',
   'maintenance',
-  'forCollection',
+  'bagged',
   'fallen',
   'bulkyWaste',
 ]
@@ -27,10 +27,10 @@ export function getStateColor(state: ContainerState | string): string {
       return '#92400E' // Brown
     case 'damaged':
       return '#1F2937' // Black/Dark Gray
-    case 'empty':
+    case 'leaves':
       return '#10B981' // Green
-    case 'forCollection':
-      return '#3B82F6' // Blue
+    case 'bagged':
+      return '#1F2937' // Black
     case 'maintenance':
       return '#F97316' // Orange
     case 'fallen':
