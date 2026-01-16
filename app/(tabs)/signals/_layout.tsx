@@ -25,7 +25,7 @@ export default function SignalsLayout() {
         name="[id]"
         options={{
           title: t('signals.form.headerView'),
-          headerShown: true,
+          headerShown: false, // TODO: Use true when edit is implemented in standard header
           headerTitleAlign: 'left',
           presentation: 'card',
         }}
