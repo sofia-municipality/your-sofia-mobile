@@ -8,30 +8,35 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
 import {Images, Upload, CheckCircle, AlertCircle} from 'lucide-react-native'
 import * as ImagePicker from 'expo-image-picker'
+import {MediaTypeOptions} from 'expo-image-picker'
+import {useAuth} from '../../../contexts/AuthContext'
+import {
+  type PhotoWithMetadata,
+  groupPhotosByProximity,
+  createSignalsFromPhotos,
+  closeSignalsWithPhotos,
+  createObjectsFromPhotos,
+} from '../../../lib/bulkPhotoUtils'
+import {getUniqueReporterId} from '../../../lib/deviceId'
 
 type ProcessingMode = 'create-signals' | 'close-signals' | 'create-objects'
 
-interface PhotoWithMetadata {
-  uri: string
-  id: string
-  timestamp?: Date
-  latitude?: number
-  longitude?: number
-}
-
 export default function BulkPhotoUploadScreen() {
-  const {t} = useTranslation()
+  const {t, i18n} = useTranslation()
   const router = useRouter()
+  const {user, token} = useAuth()
 
   const [photos, setPhotos] = useState<PhotoWithMetadata[]>([])
   const [mode, setMode] = useState<ProcessingMode>('create-signals')
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [processProgress, setProcessProgress] = useState({current: 0, total: 0})
 
   const handleSelectPhotos = async () => {
     const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
@@ -43,19 +48,29 @@ export default function BulkPhotoUploadScreen() {
     setLoading(true)
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         quality: 0.8,
         exif: true,
       })
 
-      if (!result.canceled && result.assets.length > 0) {
+      // log the result for debugging purposes with expanded exif for each asset
+      if (result.assets) {
+        for (const asset of result.assets) {
+          console.log('[BulkPhotoUpload] Selected photo EXIF:', asset.exif)
+        }
+      }
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
         const newPhotos: PhotoWithMetadata[] = result.assets.map((asset, index) => ({
           uri: asset.uri,
           id: `${Date.now()}-${index}`,
-          timestamp: asset.exif?.DateTimeOriginal
-            ? new Date(asset.exif.DateTimeOriginal)
-            : undefined,
+          timestamp:
+            asset.exif?.GPSDateStamp && asset.exif?.GPSTimeStamp
+              ? new Date(
+                  `${asset.exif.GPSDateStamp.replace(/:/g, '-')}T${asset.exif.GPSTimeStamp}Z`
+                )
+              : undefined,
           latitude: asset.exif?.GPSLatitude,
           longitude: asset.exif?.GPSLongitude,
         }))
@@ -70,13 +85,24 @@ export default function BulkPhotoUploadScreen() {
     }
   }
 
+  //log the selected photos and their metadata
+  console.log('[BulkPhotoUpload] Selected photos:', photos)
+
   const handleProcess = async () => {
     if (photos.length === 0) {
       Alert.alert(t('common.error'), t('bulkPhotoUpload.noPhotosSelected'))
       return
     }
 
+    // Check authentication for modes that require it
+    if ((mode === 'close-signals' || mode === 'create-objects') && (!user || !token)) {
+      Alert.alert(t('common.error'), t('bulkPhotoUpload.authRequired'))
+      return
+    }
+
     setProcessing(true)
+    setProcessProgress({current: 0, total: 0})
+
     try {
       // Filter photos with coordinates and timestamp
       const validPhotos = photos.filter(
@@ -92,35 +118,92 @@ export default function BulkPhotoUploadScreen() {
       console.log('[BulkPhotoUpload] Processing mode:', mode)
       console.log('[BulkPhotoUpload] Valid photos:', validPhotos.length)
 
-      // TODO: Implement API calls based on mode
-      switch (mode) {
-        case 'create-signals':
-          // Create signals from photos with geolocation
-          break
-        case 'close-signals':
-          // Close nearby signals with these photos
-          break
-        case 'create-objects':
-          // Create new city objects from photos
-          break
+      // Group photos by proximity (10m radius)
+      const photoGroups = groupPhotosByProximity(validPhotos, 10)
+      console.log('[BulkPhotoUpload] Photo groups:', photoGroups.length)
+
+      setProcessProgress({current: 0, total: photoGroups.length})
+
+      const reporterUniqueId = await getUniqueReporterId()
+      const locale = i18n.language as 'bg' | 'en'
+
+      const handleResult = (result: any, mode: ProcessingMode) => {
+        let messageKey = ''
+        let params: any = {}
+        switch (mode) {
+          case 'create-signals':
+            messageKey = 'bulkPhotoUpload.createSignalsSuccess'
+            params = {
+              created: result.created || 0,
+              failed: result.failed || 0,
+              total: photoGroups.length,
+            }
+            break
+          case 'close-signals':
+            messageKey = 'bulkPhotoUpload.closeSignalsSuccess'
+            params = {
+              closedSignals: result.closedSignals || 0,
+              cleanedContainers: result.cleanedContainers || 0,
+              failed: result.failed || 0,
+              total: photoGroups.length,
+            }
+            break
+          case 'create-objects':
+            messageKey = 'bulkPhotoUpload.createObjectsSuccess'
+            params = {
+              createdObjects: result.createdObjects || 0,
+              closedSignals: result.closedSignals || 0,
+              failed: result.failed || 0,
+              total: photoGroups.length,
+            }
+            break
+        }
+        if (result.failed && result.failed > 0) {
+          Alert.alert(
+            t('common.error'),
+            t('bulkPhotoUpload.processError') + '\n' + t(messageKey, params)
+          )
+        } else {
+          Alert.alert(t('common.success'), String(t(messageKey, params)), [
+            {
+              text: 'OK',
+              onPress: () => {
+                setPhotos([])
+                router.back()
+              },
+            },
+          ])
+        }
       }
 
-      Alert.alert(
-        t('common.success'),
-        t('bulkPhotoUpload.processSuccess', {
-          count: validPhotos.length,
-          total: photos.length,
-        }),
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setPhotos([])
-              router.back()
-            },
-          },
-        ]
-      )
+      let result: any
+      switch (mode) {
+        case 'create-signals':
+          result = await createSignalsFromPhotos(
+            photoGroups,
+            reporterUniqueId,
+            locale,
+            (current, total) => setProcessProgress({current, total})
+          )
+          handleResult(result, mode)
+          break
+        case 'close-signals':
+          result = await closeSignalsWithPhotos(photoGroups, token!, (current, total) =>
+            setProcessProgress({current, total})
+          )
+          handleResult(result, mode)
+          break
+        case 'create-objects':
+          result = await createObjectsFromPhotos(
+            photoGroups,
+            token!,
+            reporterUniqueId,
+            locale,
+            (current, total) => setProcessProgress({current, total})
+          )
+          handleResult(result, mode)
+          break
+      }
     } catch (error) {
       console.error('Error processing photos:', error)
       Alert.alert(
@@ -129,6 +212,7 @@ export default function BulkPhotoUploadScreen() {
       )
     } finally {
       setProcessing(false)
+      setProcessProgress({current: 0, total: 0})
     }
   }
 
@@ -155,7 +239,7 @@ export default function BulkPhotoUploadScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Images size={32} color="#1E40AF" />
+          <Images size={24} color="#1E40AF" />
           <Text style={styles.headerTitle}>{t('bulkPhotoUpload.title')}</Text>
         </View>
 
@@ -230,23 +314,47 @@ export default function BulkPhotoUploadScreen() {
 
         {/* Photos Summary */}
         {photos.length > 0 && (
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryRow}>
-              <CheckCircle size={20} color="#10B981" />
-              <Text style={styles.summaryText}>
-                {t('bulkPhotoUpload.photosSelected', {count: photos.length})}
-              </Text>
+          <>
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryRow}>
+                <CheckCircle size={20} color="#10B981" />
+                <Text style={styles.summaryText}>
+                  {t('bulkPhotoUpload.photosSelected', {count: photos.length})}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <AlertCircle size={20} color="#F59E0B" />
+                <Text style={styles.summaryText}>
+                  {t('bulkPhotoUpload.validPhotos', {count: validPhotosCount})}
+                </Text>
+              </View>
+              {validPhotosCount < photos.length && (
+                <Text style={styles.warningText}>
+                  {t('bulkPhotoUpload.missingMetadataWarning')}
+                </Text>
+              )}
             </View>
-            <View style={styles.summaryRow}>
-              <AlertCircle size={20} color="#F59E0B" />
-              <Text style={styles.summaryText}>
-                {t('bulkPhotoUpload.validPhotos', {count: validPhotosCount})}
-              </Text>
-            </View>
-            {validPhotosCount < photos.length && (
-              <Text style={styles.warningText}>{t('bulkPhotoUpload.missingMetadataWarning')}</Text>
-            )}
-          </View>
+            {/* Thumbnails List */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.thumbnailsScroll}
+              contentContainerStyle={styles.thumbnailsContainer}
+            >
+              {photos.map((photo) => (
+                <View key={photo.id} style={styles.thumbnailWrapper}>
+                  <Image style={styles.thumbnail} source={{uri: photo.uri}} />
+                  <TouchableOpacity
+                    style={styles.removeThumbnailButton}
+                    onPress={() => setPhotos((prev) => prev.filter((p) => p.id !== photo.id))}
+                    hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+                  >
+                    <Text style={styles.removeThumbnailButtonText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          </>
         )}
 
         {/* Action Buttons */}
@@ -267,7 +375,14 @@ export default function BulkPhotoUploadScreen() {
             disabled={processing || photos.length === 0}
           >
             {processing ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <View style={styles.processingContainer}>
+                <ActivityIndicator size="small" color="#fff" />
+                {processProgress.total > 0 && (
+                  <Text style={styles.primaryButtonText}>
+                    {processProgress.current}/{processProgress.total}
+                  </Text>
+                )}
+              </View>
             ) : (
               <Text style={styles.primaryButtonText}>{t('bulkPhotoUpload.process')}</Text>
             )}
@@ -288,23 +403,75 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  thumbnailsScroll: {
+    marginTop: 4,
+    marginBottom: 8,
+    minHeight: 84,
+    maxHeight: 84,
+    backgroundColor: 'transparent',
+  },
+  thumbnailsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    gap: 8,
+  },
+  thumbnailWrapper: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    width: 72,
+    height: 72,
+    backgroundColor: '#fff',
+    marginRight: 8,
+    position: 'relative',
+  },
+  removeThumbnailButton: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(30,64,175,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  removeThumbnailButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: -1,
+  },
+  thumbnail: {
+    width: 72,
+    height: 72,
+    resizeMode: 'cover',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1F2937',
   },
   instructionsContainer: {
     backgroundColor: '#EFF6FF',
-    padding: 16,
+    padding: 8,
     marginTop: 8,
     borderLeftWidth: 4,
     borderLeftColor: '#1E40AF',
@@ -441,6 +608,11 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.5,
+  },
+  processingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   bottomSpacer: {
     height: 20,
