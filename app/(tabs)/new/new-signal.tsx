@@ -10,18 +10,20 @@ import {
   Alert,
   Dimensions,
   ActivityIndicator,
+  Image,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useFocusEffect} from '@react-navigation/native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
-import {createSignal} from '../../lib/payload'
-import {getUniqueReporterId} from '../../lib/deviceId'
-import type {CreateSignalInput} from '../../types/signal'
-import {CONTAINER_STATES, getStateColor} from '../../types/containerState'
-import {useNearbyObjects} from '../../hooks/useNearbyObjects'
-import {useSignalForm} from '../../hooks/useSignalForm'
+import {createSignal} from '../../../lib/payload'
+import {getUniqueReporterId} from '../../../lib/deviceId'
+import type {CreateSignalInput} from '../../../types/signal'
+import {CONTAINER_STATES, getStateColor} from '../../../types/wasteContainer'
+import {useNearbyObjects} from '../../../hooks/useNearbyObjects'
+import {useSignalForm} from '../../../hooks/useSignalForm'
+import {FullScreenPhotoViewer} from '../../../components/FullScreenPhotoViewer'
 
 const {height} = Dimensions.get('window')
 
@@ -63,6 +65,12 @@ export default function NewScreen() {
   const [deviceId, setDeviceId] = useState<string>('')
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
   const [selectedObject, setSelectedObject] = useState<MapObject | null>(prefilledMapObject)
+  const [uploadProgress, setUploadProgress] = useState<{
+    stage: 'creating' | 'uploading' | null
+    current: number
+    total: number
+  }>({stage: null, current: 0, total: 0})
+  const [viewingPhoto, setViewingPhoto] = useState<string | null>(null)
 
   // Use nearby objects hook
   const {
@@ -110,9 +118,8 @@ export default function NewScreen() {
 
   // Wrapper for handleCancel to pass selectedObject and returnTo
   const handleCancel = useCallback(() => {
-    const returnTo = params.returnTo as string | undefined
-    handleCancelAction(selectedObject, returnTo)
-  }, [handleCancelAction, selectedObject, params.returnTo])
+    router.back()
+  }, [router])
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -219,6 +226,7 @@ export default function NewScreen() {
     }
 
     setLoading(true)
+    setUploadProgress({stage: 'creating', current: 0, total: photos.length})
     try {
       // Determine category from selected object or object type
       let category: CreateSignalInput['category'] = 'other'
@@ -297,7 +305,10 @@ export default function NewScreen() {
         signalData,
         t('common.header') === 'Твоята София' ? 'bg' : 'en',
         photoFiles.length > 0 ? photoFiles : undefined,
-        deviceId
+        deviceId,
+        (current, total) => {
+          setUploadProgress({stage: 'uploading', current, total})
+        }
       )
 
       console.log('[handleSubmit] Signal created:', newSignal.id)
@@ -328,12 +339,14 @@ export default function NewScreen() {
       ])
     } catch (error) {
       console.error('Error creating signal:', error)
+      setUploadProgress({stage: null, current: 0, total: 0})
       Alert.alert(
         t('signals.error'),
         error instanceof Error ? error.message : t('newSignal.submitError')
       )
     } finally {
       setLoading(false)
+      setUploadProgress({stage: null, current: 0, total: 0})
     }
   }
 
@@ -422,11 +435,17 @@ export default function NewScreen() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {photos.map((photo) => (
                 <View key={photo.id} style={styles.photoChip}>
-                  <Text style={styles.photoChipText} numberOfLines={1}>
-                    {t('newSignal.photo')} {photos.indexOf(photo) + 1}
-                  </Text>
-                  <TouchableOpacity onPress={() => removePhoto(photo.id)}>
-                    <X size={16} color="#6B7280" />
+                  <TouchableOpacity
+                    onPress={() => setViewingPhoto(photo.uri)}
+                    style={styles.photoThumbnailContainer}
+                  >
+                    <Image source={{uri: photo.uri}} style={styles.photoThumbnail} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => removePhoto(photo.id)}
+                    style={styles.photoRemoveButton}
+                  >
+                    <X size={18} color="#EF4444" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -463,7 +482,10 @@ export default function NewScreen() {
                   styles.objectCard,
                   selectedObject?.id === obj.id && styles.objectCardSelected,
                 ]}
-                onPress={() => setSelectedObject(obj)}
+                onPress={() => {
+                  setSelectedObject(obj)
+                  setSelectedObjectType(obj.type)
+                }}
               >
                 <View style={styles.objectInfo}>
                   <MapPinIcon size={20} color="#6B7280" />
@@ -557,6 +579,30 @@ export default function NewScreen() {
           />
         </View>
 
+        {/* Upload Progress */}
+        {uploadProgress.stage && (
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>
+              {uploadProgress.stage === 'creating'
+                ? t('newSignal.creatingSignal')
+                : `${t('newSignal.uploadingPhotos')} ${uploadProgress.current}/${uploadProgress.total}`}
+            </Text>
+            <View style={styles.progressBarContainer}>
+              <View
+                style={[
+                  styles.progressBar,
+                  {
+                    width:
+                      uploadProgress.stage === 'creating'
+                        ? '50%'
+                        : `${(uploadProgress.current / uploadProgress.total) * 100}%`,
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        )}
+
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
@@ -579,6 +625,13 @@ export default function NewScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Full-Screen Photo Viewer */}
+      <FullScreenPhotoViewer
+        visible={viewingPhoto !== null}
+        photoUri={viewingPhoto}
+        onClose={() => setViewingPhoto(null)}
+      />
     </SafeAreaView>
   )
 }
@@ -656,14 +709,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   photoChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: 'relative',
+    marginRight: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
     backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
-    gap: 8,
+  },
+  photoThumbnailContainer: {
+    width: 80,
+    height: 80,
+  },
+  photoThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  photoRemoveButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    padding: 4,
   },
   photoChipText: {
     fontSize: 14,
@@ -819,6 +885,31 @@ const styles = StyleSheet.create({
     minHeight: 120,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+  },
+  progressContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#1E40AF',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  progressBarContainer: {
+    height: 6,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#1E40AF',
+    borderRadius: 3,
   },
   actionsContainer: {
     flexDirection: 'row',

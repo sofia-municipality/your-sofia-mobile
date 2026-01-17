@@ -6,7 +6,7 @@ import {useTranslation} from 'react-i18next'
 import {MapPin, Calendar, FileText, Tag, AlertCircle} from 'lucide-react-native'
 import {signalFormSchema, type SignalFormData, type SignalFormProps} from './schema'
 import {styles} from './signal.styles'
-import {CONTAINER_STATES, getStateColor} from '../../types/containerState'
+import {CONTAINER_STATES, getStateColor} from '../../types/wasteContainer'
 import type {Signal} from '../../types/signal'
 
 export const SignalForm = forwardRef<any, SignalFormProps>(
