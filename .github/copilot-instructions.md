@@ -92,12 +92,31 @@ File-based routing in `app/` directory:
 - Colors: Primary blue `#1E40AF`, text `#1F2937`, borders `#e5e7eb`
 - Header pattern: Sofia coat of arms (left) + LanguageSwitch component (right)
 
+### Code Formatting
+
+- **CRITICAL**: Always read `.prettierrc` before generating new code
+- Follow Prettier configuration:
+  - No semicolons (`semi: false`)
+  - Single quotes (`singleQuote: true`)
+  - 2 space indentation (`tabWidth: 2`)
+  - No bracket spacing (`bracketSpacing: false`)
+  - ES5 trailing commas (`trailingComma: "es5"`)
+  - 100 character line width (`printWidth: 100`)
+- All generated code must conform to these formatting rules
+- When creating new files, ensure they follow the Prettier configuration
+- Run `pnpm format` if unsure about formatting
+
 ### Component Patterns
 
 - Icons from `lucide-react-native` (NOT @expo/vector-icons for custom icons)
 - Location: `expo-location` for geolocation features
 - Maps: `react-native-maps` for map views
 - Images: Sofia coat of arms at `assets/images/sofia-gerb.png`
+- **Modals**: Always create modals as reusable components in `components/` folder
+  - Extract modal logic and UI into standalone components
+  - Accept `visible`, `onClose`, and relevant data props
+  - Example: `FullScreenPhotoViewer.tsx` instead of inline `<Modal>` usage
+  - Promotes reusability and cleaner code organization
 
 ### Database Schema (Payload CMS)
 
