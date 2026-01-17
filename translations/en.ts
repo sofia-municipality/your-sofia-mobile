@@ -199,6 +199,7 @@ export default {
     wasteType: 'Waste Type',
     capacitySize: 'Capacity Size',
     capacityVolume: 'Volume',
+    binCount: 'Number of Bins',
     status: 'Status',
     coordinates: 'Coordinates',
     address: 'Address',

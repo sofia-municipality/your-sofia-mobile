@@ -23,6 +23,7 @@ export interface WasteContainer {
   }
   capacityVolume: number
   capacitySize: 'tiny' | 'small' | 'standard' | 'big' | 'industrial'
+  binCount?: number
   serviceInterval?: string
   servicedBy?: string
   wasteType: WasteType

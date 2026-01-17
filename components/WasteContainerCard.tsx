@@ -345,6 +345,13 @@ export function WasteContainerCard({
               <Text style={styles.extendedInfoValue}>{container.capacityVolume}m³</Text>
             </View>
 
+            {container.binCount && container.binCount > 1 && (
+              <View style={styles.extendedInfoRow}>
+                <Text style={styles.extendedInfoLabel}>{t('wasteContainers.binCount')}:</Text>
+                <Text style={styles.extendedInfoValue}>{container.binCount}</Text>
+              </View>
+            )}
+
             <View style={styles.extendedInfoRow}>
               <Text style={styles.extendedInfoLabel}>{t('wasteContainers.status')}:</Text>
               <View style={styles.extendedStatusBadge}>

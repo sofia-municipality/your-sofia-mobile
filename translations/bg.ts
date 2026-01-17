@@ -201,6 +201,7 @@ export default {
     wasteType: 'Вид отпадък',
     capacitySize: 'Размер',
     capacityVolume: 'Обем',
+    binCount: 'Брой кофи',
     status: 'Статус',
     coordinates: 'Координати',
     address: 'Адрес',
