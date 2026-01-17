@@ -1,0 +1,210 @@
+import {StyleSheet} from 'react-native'
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
+  },
+  retryButton: {
+    backgroundColor: '#1E40AF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginLeft: 12,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerButton: {
+    padding: 8,
+  },
+  saveButton: {
+    backgroundColor: '#1E40AF',
+    borderRadius: 8,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  statusContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
+  categoryText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+    paddingHorizontal: 16,
+    marginTop: 16,
+    lineHeight: 32,
+  },
+  imagesContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingRight: 16,
+  },
+  image: {
+    width: 200,
+    height: 150,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: '#4B5563',
+    lineHeight: 24,
+  },
+  section: {
+    paddingHorizontal: 16,
+    marginTop: 20,
+  },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: '#1F2937',
+  },
+  inputError: {
+    borderColor: '#EF4444',
+  },
+  textArea: {
+    minHeight: 100,
+    paddingTop: 12,
+  },
+  stateTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  stateTag: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#ffffff',
+  },
+  stateTagText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  stateTagTextSelected: {
+    color: '#ffffff',
+  },
+  metaText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  adminNotesContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 12,
+    backgroundColor: '#EFF6FF',
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#1E40AF',
+  },
+  adminNotesText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1E40AF',
+    lineHeight: 20,
+  },
+  infoBox: {
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 32,
+    padding: 16,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#F59E0B',
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#92400E',
+    lineHeight: 20,
+  },
+})

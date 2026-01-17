@@ -23,11 +23,14 @@ export default function SignalsLayout() {
       />
       <Stack.Screen
         name="[id]"
-        options={{
-          title: t('signals.form.headerView'),
-          headerShown: false, // TODO: Use true when edit is implemented in standard header
-          headerTitleAlign: 'left',
-          presentation: 'card',
+        options={({route}) => {
+          const params = route.params as {id?: string}
+          return {
+            title: t('signals.form.headerView') + (params?.id ? ` #${params.id}` : ''),
+            headerShown: true,
+            headerTitleAlign: 'left',
+            presentation: 'card',
+          }
         }}
       />
     </Stack>
