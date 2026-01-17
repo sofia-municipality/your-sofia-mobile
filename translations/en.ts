@@ -410,7 +410,7 @@ export default {
   bulkPhotoUpload: {
     title: 'Bulk Photo Upload',
     instructions:
-      'Select photos to update city object status. Selected photos will be processed and those containing coordinates and timestamp will be attached to the signal.',
+      'Selected photos will be processed and those containing coordinates and timestamp will be attached to the signal.',
     mode: 'Processing Mode',
     createSignals: 'Create Signals',
     createSignalsDescription: 'Create new signals from photos with geolocation',
@@ -430,5 +430,12 @@ export default {
     mediaLibraryPermissionRequired: 'The app needs gallery access',
     selectError: 'Error selecting photos',
     cancelConfirm: 'Are you sure you want to cancel? Selected photos will be lost.',
+    authRequired: 'This mode requires login',
+    createSignalsSuccess:
+      'Created {{created}} signals. Failed: {{failed}}. Total groups: {{total}}',
+    closeSignalsSuccess:
+      'Closed {{closedSignals}} signals. Cleaned {{cleanedContainers}} containers. Failed: {{failed}}. Total groups: {{total}}',
+    createObjectsSuccess:
+      'Created {{createdObjects}} objects. Closed {{closedSignals}} signals. Failed: {{failed}}. Total groups: {{total}}',
   },
 }

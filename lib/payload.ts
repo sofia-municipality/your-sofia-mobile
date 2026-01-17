@@ -607,7 +607,7 @@ export async function fetchSignalStats(
  */
 export async function updateSignal(
   id: string,
-  signalData: Partial<CreateSignalInput>,
+  signalData: Partial<Signal>,
   locale: 'bg' | 'en' = 'bg'
 ): Promise<Signal> {
   const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}`, {

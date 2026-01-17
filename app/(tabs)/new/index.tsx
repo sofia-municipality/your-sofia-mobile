@@ -44,19 +44,14 @@ export default function NewScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, styles.buttonDisabled]}
+              style={styles.button}
               onPress={() => router.push('../(tabs)/new/bulk-photo-upload')}
-              disabled={true}
             >
               <View style={styles.iconContainer}>
-                <Images size={36} color="#9CA3AF" />
+                <Images size={36} color="#1E40AF" />
               </View>
-              <Text style={[styles.buttonTitle, styles.buttonTitleDisabled]}>
-                {t('new.bulkPhotoUpload')}
-              </Text>
-              <Text style={[styles.buttonDescription, styles.buttonDescriptionDisabled]}>
-                {t('new.bulkPhotoUploadDescription')}
-              </Text>
+              <Text style={styles.buttonTitle}>{t('new.bulkPhotoUpload')}</Text>
+              <Text style={styles.buttonDescription}>{t('new.bulkPhotoUploadDescription')}</Text>
             </TouchableOpacity>
           </View>
         </View>
