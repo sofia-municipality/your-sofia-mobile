@@ -7,7 +7,7 @@ import {Edit3, Save, X} from 'lucide-react-native'
 import {fetchSignalById, updateSignal} from '../../../lib/payload'
 import {getUniqueReporterId} from '../../../lib/deviceId'
 import type {Signal} from '../../../types/signal'
-import {type ContainerState} from '../../../types/containerState'
+import {type ContainerState} from '../../../types/wasteContainer'
 import {SignalForm, type SignalFormData, styles} from '../../../forms/signal'
 
 export default function SignalDetailsScreen() {

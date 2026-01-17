@@ -457,7 +457,8 @@ export async function createSignal(
   signalData: CreateSignalInput,
   locale: 'bg' | 'en' = 'bg',
   photos?: {uri: string; type: string; name: string}[],
-  reporterUniqueId?: string
+  reporterUniqueId?: string,
+  onUploadProgress?: (current: number, total: number) => void
 ): Promise<Signal> {
   let response: Response
 
@@ -465,7 +466,14 @@ export async function createSignal(
     // Upload photos first, then create signal with image references
     const imageIds: string[] = []
 
-    for (const photo of photos) {
+    for (let i = 0; i < photos.length; i++) {
+      const photo = photos[i]
+
+      // Call progress callback
+      if (onUploadProgress) {
+        onUploadProgress(i + 1, photos.length)
+      }
+
       const formData = new FormData()
       formData.append('file', {
         uri: photo.uri,

@@ -1,4 +1,4 @@
-import type {ContainerState} from './containerState'
+import type {ContainerState} from './wasteContainer'
 
 export interface Signal {
   id: string

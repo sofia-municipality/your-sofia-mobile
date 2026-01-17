@@ -30,6 +30,8 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
 
   return (
     <Tabs
+      initialRouteName="home"
+      backBehavior="history"
       screenOptions={{
         headerShown: true,
         headerTitleAlign: 'left',
@@ -68,7 +70,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
         }}
       />
       <Tabs.Screen
-        name="new-signal"
+        name="new"
         options={{
           title: t('common.new'),
           tabBarLabel: t('common.new'),

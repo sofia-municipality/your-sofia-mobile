@@ -20,8 +20,7 @@ import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
-import type {WasteContainer} from '../../../types/wasteContainer'
-import type {ContainerState} from '../../../types/containerState'
+import type {WasteContainer, ContainerState} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | ContainerState
 
@@ -409,7 +408,12 @@ export default function WasteContainers() {
       <View style={styles.actionButtonsContainer}>
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => router.push('/(tabs)/new-signal' as any)}
+          onPress={() =>
+            router.push({
+              pathname: '/(tabs)/new/new-signal' as any,
+              params: {returnTo: '/(tabs)/maps'},
+            })
+          }
         >
           <Plus size={28} />
         </TouchableOpacity>
