@@ -12,9 +12,6 @@ export default function NewScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <Text style={styles.title}>{t('new.title')}</Text>
-          <Text style={styles.subtitle}>{t('new.subtitle')}</Text>
-
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={styles.button}

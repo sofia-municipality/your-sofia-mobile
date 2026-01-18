@@ -379,7 +379,6 @@ export default {
   },
   new: {
     title: 'Създай',
-    subtitle: 'Изберете какво искате да създадете',
     newSignal: 'Нов сигнал',
     newSignalDescription: 'Сигнализирайте за проблем в градската среда',
     newCityObject: 'Нов градски обект',
