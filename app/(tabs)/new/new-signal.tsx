@@ -375,14 +375,6 @@ export default function NewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with Close Button */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('newSignal.title')}</Text>
-        <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
-          <X size={24} color="#1F2937" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}

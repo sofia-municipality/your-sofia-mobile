@@ -16,7 +16,6 @@ export default {
     home: 'Home',
     map: 'Map',
     new: 'Create',
-    newReport: 'New Report',
     signals: 'Signals',
     goodMorning: 'Good morning!',
     cityServices: 'This is your Sofia!',
