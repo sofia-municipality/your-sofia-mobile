@@ -1,8 +1,7 @@
 import React from 'react'
 import {View, StyleSheet} from 'react-native'
 import {Trash2, Recycle, Shapes} from 'lucide-react-native'
-import type {WasteType} from '../types/wasteContainer'
-import type {ContainerState} from '../types/wasteContainer'
+import type {WasteType, ContainerState} from '../types/wasteContainer'
 
 interface WasteContainerMarkerProps {
   color: string
