@@ -377,7 +377,6 @@ export default {
   },
   new: {
     title: 'New',
-    subtitle: 'Choose what you want to create',
     newSignal: 'New Signal',
     newSignalDescription: 'Report a problem in the urban environment',
     newCityObject: 'New City Object',
