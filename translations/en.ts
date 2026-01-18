@@ -437,4 +437,8 @@ export default {
     createObjectsSuccess:
       'Created {{createdObjects}} objects. Closed {{closedSignals}} signals. Failed: {{failed}}. Total groups: {{total}}',
   },
+  metrics: {
+    title: 'Metrics',
+    comingSoon: 'Statistics and charts for Sofia coming soon.',
+  },
 }

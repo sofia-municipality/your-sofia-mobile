@@ -9,6 +9,7 @@ import {
   MapPin,
   AlertTriangle,
   ImagePlus,
+  BarChart3,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -114,11 +115,21 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       <Tabs.Screen
         name="profile"
         options={{
+          href: null, // Hide from tab bar
           title: t('common.profile'),
           tabBarIcon: ({color}) => <User size={24} color={color} />,
           headerTitle: () => (
             <TabHeader title={t('common.profile')} showActionIcon={true} ActionIcon={Edit3} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="metrics"
+        options={{
+          title: t('metrics.title'),
+          tabBarLabel: t('metrics.title'),
+          tabBarIcon: ({color}) => <BarChart3 size={24} color={color} />,
+          headerTitle: () => <TabHeader title={t('metrics.title')} />,
         }}
       />
     </Tabs>
