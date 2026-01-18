@@ -16,7 +16,6 @@ export default {
     home: 'Начало',
     map: 'Карта',
     new: 'Създай',
-    newReport: 'Нов сигнал',
     signals: 'Сигнали',
     goodMorning: 'Добро утро!',
     cityServices: 'Това е твоята София!',

@@ -114,9 +114,7 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
             />
             {errors.title && <Text style={styles.errorText}>{t(errors.title.message || '')}</Text>}
           </View>
-        ) : (
-          <Text style={styles.title}>{signal.title}</Text>
-        )}
+        ) : null}
 
         {/* Description */}
         <View style={styles.section}>
