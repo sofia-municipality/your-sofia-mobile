@@ -33,6 +33,7 @@ import {GitHubIcon} from '../../components/GitHubIcon'
 import {getUniqueReporterId} from '../../lib/deviceId'
 import {fetchSignalStats} from '../../lib/payload'
 import {EnvironmentSwitcher} from '@/components/EnvironmentSwitcher'
+import {LanguageSwitch} from '@/components/LanguageSwitch'
 import {useAuth} from '@/contexts/AuthContext'
 
 const getProfileSections = (t: (key: string) => string) => [
@@ -259,6 +260,9 @@ export default function ProfileScreen() {
                 </View>
               )}
             </View>
+          </View>
+          <View style={styles.languageSwitchContainer}>
+            <LanguageSwitch />
           </View>
         </View>
 
@@ -505,6 +509,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  languageSwitchContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 8,
   },
   avatarContainer: {
     position: 'relative',

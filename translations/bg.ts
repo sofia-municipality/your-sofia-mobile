@@ -439,4 +439,8 @@ export default {
     createObjectsSuccess:
       'Създадени {{createdObjects}} обекта. Затворени {{closedSignals}} сигнала. Неуспешни: {{failed}}. Общо групи: {{total}}',
   },
+  metrics: {
+    title: 'Метрики',
+    comingSoon: 'Скоро ще има статистики и графики за София.',
+  },
 }
