@@ -39,7 +39,9 @@ export function useSignalForm({
   const {t} = useTranslation()
 
   const [photos, setPhotos] = useState<PhotoFile[]>([])
-  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(prefilledObjectType)
+  const [selectedObjectType, setSelectedObjectType] = useState<string | null>(
+    prefilledObjectType ?? 'waste-container'
+  )
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)

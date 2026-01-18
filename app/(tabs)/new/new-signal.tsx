@@ -154,7 +154,7 @@ export default function NewScreen() {
   React.useEffect(() => {
     if (prefilledMapObject) {
       setSelectedObject(prefilledMapObject)
-      setSelectedObjectType(prefilledObjectType)
+      setSelectedObjectType(prefilledObjectType ?? 'waste-container')
       setNearbyObjects([prefilledMapObject])
       if (containerLocation) {
         setCurrentLocation(containerLocation)
@@ -476,7 +476,7 @@ export default function NewScreen() {
                 ]}
                 onPress={() => {
                   setSelectedObject(obj)
-                  setSelectedObjectType(obj.type)
+                  setSelectedObjectType('waste-container')
                 }}
               >
                 <View style={styles.objectInfo}>
