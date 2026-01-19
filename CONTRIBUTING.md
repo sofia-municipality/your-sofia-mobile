@@ -6,7 +6,7 @@ Thank you for your interest in contributing to **Your Sofia**! This project is b
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [How Can I Contribute?](#how-can-i-contribute)
@@ -19,7 +19,7 @@ Thank you for your interest in contributing to **Your Sofia**! This project is b
 
 ---
 
-## 🤝 Code of Conduct
+## Code of Conduct
 
 ### Our Pledge
 
@@ -48,70 +48,23 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 ---
 
-## 🎯 How Can I Contribute?
+## Getting Started
 
-### 1. 🐛 Reporting Bugs
+**📦 Monorepo Setup:** Your Sofia consists of two repositories that work together:
 
-Use the provided [issue templates](https://github.com/sofia-municipality/your-sofia/issues/new/choose) to report bugs. Include:
+- [**your-sofia-mobile**](https://github.com/sofia-municipality/your-sofia-mobile) (this repo) - React Native mobile app
+- [**your-sofia-api**](https://github.com/sofia-municipality/your-sofia-api) - Payload CMS backend API
 
-- Clear title and steps to reproduce
-- Expected vs actual behavior
-- Device and OS information
-- Screenshots or error messages
-
-### 2. 💡 Suggesting Features
-
-Have an idea? Check [existing issues](https://github.com/sofia-municipality/your-sofia/issues) first. Describe:
-
-- What problem it solves
-- Proposed solution
-- Benefit for Sofia residents
-- Mockups (if applicable)
-
-### 3. 🔧 Contributing Code
-
-We welcome:
-
-- Bug fixes
-- New features (after discussion in issues)
-- Performance and UI/UX improvements
-- Test coverage
-- Accessibility enhancements
-
-### 4. 📖 Improving Documentation
-
-- Fix typos and clarify sections
-- Add examples and tutorials
-- Translate to Bulgarian
-- Document new features
-
-### 5. 🌍 Translation and Localization
-
-Help make the app accessible to everyone:
-
-- Translate missing strings (bg/en)
-- Improve existing translations
-- Report incorrect or unclear wording
-
----
-
-## 🚀 Getting Started
-
-> **📦 Monorepo Setup:** Your Sofia consists of two repositories that work together:
->
-> - **your-sofia-mobile** (this repo) - React Native mobile app
-> - **your-sofia-api** - Payload CMS backend API
->
-> Both repositories need to be cloned and configured for full functionality. The mobile app requires the API to be running locally for development.
+Both repositories need to be cloned and configured for full functionality. The mobile app requires the API to be running locally for development.
 
 ### 1. Fork the Repository
 
-Click the "Fork" button on the [GitHub repository](https://github.com/sofia-municipality/your-sofia).
+Click the "Fork" button on the [GitHub repository](https://github.com/sofia-municipality/your-sofia-mobile).
 
 ### 2. Clone Your Fork
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/your-sofia.git
+git clone https://github.com/YOUR-USERNAME/your-sofia-mobile.git
 cd your-sofia
 ```
 
@@ -156,76 +109,25 @@ pnpm ios
 
 ```bash
 git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/bug-description
 ```
-
-**Branch naming conventions:**
-
-- `feature/` - New features (e.g., `feature/air-quality-alerts`)
-- `fix/` - Bug fixes (e.g., `fix/news-refresh-language`)
-- `docs/` - Documentation (e.g., `docs/api-endpoints`)
-- `refactor/` - Code refactoring (e.g., `refactor/api-client`)
-- `test/` - Adding tests (e.g., `test/news-component`)
 
 ### 5. Make Your Changes
 
 Write your code following quality and style standards.
 
-### 6. Test Your Changes
-
-```bash
-# Frontend tests
-cd app
-pnpm typecheck
-pnpm lint
-pnpm test
-
-# Backend tests
-cd api
-pnpm lint
-pnpm typecheck
-```
-
-### 7. Commit Your Changes
-
-Write clear, descriptive commit messages in English, example:
-
-```bash
-git add .
-git commit -m "added: air quality notifications
-
-- Added user setting for air quality threshold in profile settings
-- Implemented backend scheduled task to check air quality
-- Send push notifications when threshold exceeded
-- Added Bulgarian and English translations
-
-Closes #123"
-```
-
-**Types:**
-
-- `added:` - New functionality
-- `fixed:` - Bug fix
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, no logic changes)
-- `refactor:` - Code refactoring
-- `test:` - Adding or updating tests
-- `chore:` - Build process, dependencies, etc.
-
-### 8. Push to Your Fork
+### 6. Push to Your Fork
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
-### 9. Open a Pull Request
+### 7. Open a Pull Request
 
 Go to the original repository and click "New Pull Request".
 
 ---
 
-## 📝 Reporting Issues
+## Reporting Issues
 
 ### Writing Good Issues
 
@@ -246,7 +148,7 @@ Go to the original repository and click "New Pull Request".
 
 ---
 
-## 🔄 Submitting Changes
+## Submitting Changes
 
 ### Pull Request Guidelines
 
@@ -261,7 +163,7 @@ Go to the original repository and click "New Pull Request".
 
 ---
 
-## 👀 Code Review Process
+## Code Review Process
 
 ### For Contributors
 
@@ -312,7 +214,7 @@ Go to the original repository and click "New Pull Request".
 
 ---
 
-## 🤝 Community
+## Community
 
 ### Communication Channels
 
@@ -328,13 +230,13 @@ We value all contributions! Contributors are:
 
 ---
 
-## 📜 License
+## License
 
 By contributing to Your Sofia, you agree that your contributions will be licensed under the [EUPL-1.2 License](LICENSE).
 
 ---
 
-## 🙏 Thank You!
+## Thank You!
 
 Your contributions make **Your Sofia** better for everyone. Whether you're fixing a typo or building a major feature, every contribution matters. Together we're building a more transparent, accessible, and livable city.
 

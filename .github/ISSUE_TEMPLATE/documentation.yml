@@ -49,7 +49,7 @@ body:
       label: Current Documentation
       description: What does the current documentation say? (Paste relevant section or provide link)
       placeholder: |
-        Link: https://github.com/sofia-municipality/your-sofia/blob/main/README.md#section
+        Link: https://github.com/sofia-municipality/your-sofia-mobile/blob/main/README.md#section
 
         Current text:
         "To start the app, run npm start"

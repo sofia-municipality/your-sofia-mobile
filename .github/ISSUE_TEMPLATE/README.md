@@ -108,7 +108,7 @@ Use this template to ask questions about using or contributing to the project.
 - Architecture questions
 - Deployment questions
 
-**Note:** For general discussions or feature brainstorming, use [GitHub Discussions](https://github.com/sofia-municipality/your-sofia/discussions) instead.
+**Note:** For general discussions or feature brainstorming, use [GitHub Discussions](https://github.com/sofia-municipality/your-sofia-mobile/discussions) instead.
 
 **Includes:**
 
@@ -277,7 +277,7 @@ Have suggestions for improving our issue templates?
 
 - Open an issue using the **Documentation Improvement** template
 - Submit a PR with template changes
-- Discuss in [GitHub Discussions](https://github.com/sofia-municipality/your-sofia/discussions)
+- Discuss in [GitHub Discussions](https://github.com/sofia-municipality/your-sofia-mobile/discussions)
 
 ---
 

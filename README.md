@@ -11,7 +11,7 @@ A bilingual (Bulgarian/English) open-source mobile application empowering Sofia 
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 
 - [Motivation](#motivation)
 - [Core Features](#core-features)
@@ -22,7 +22,7 @@ A bilingual (Bulgarian/English) open-source mobile application empowering Sofia 
 
 ---
 
-## 🎯 Motivation
+## Motivation
 
 **Your Sofia** is an open-source civic engagement platform created for the citizens of Sofia. Built on the principle of **creating a more liveable city by taking care of its citizens**, this project welcomes contributions from developers, designers, and community members who share the vision of transparent, accessible urban services.
 
@@ -58,7 +58,7 @@ A bilingual (Bulgarian/English) open-source mobile application empowering Sofia 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from everyone! Whether you're fixing a bug, adding a feature, improving documentation, or translating content, your help makes **Your Sofia** better for all citizens.
 
@@ -81,7 +81,7 @@ For detailed instructions, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **European Union Public License (EUPL) v1.2**.
 
@@ -103,21 +103,13 @@ For questions about licensing, visit the [EUPL FAQ](https://joinup.ec.europa.eu/
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Sofia Municipality**: For supporting open civic technology
 - **Contributors**: Everyone who has helped improve this project
 - **Expo Team**: For the amazing React Native framework
 - **Payload CMS**: For the powerful headless CMS
 - **Open Source Community**: For the tools and libraries we build upon
-
----
-
-## 📞 Contact & Support
-
-- **Issues**: [GitHub Issues](https://github.com/sofia-municipality/your-sofia-mobile/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/sofia-municipality/your-sofia-mobile/discussions)
-- **Email**: support@your-sofia.bg (if applicable)
 
 ---
 

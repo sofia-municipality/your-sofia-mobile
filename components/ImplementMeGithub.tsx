@@ -15,9 +15,9 @@ import {X} from 'lucide-react-native'
  * import {ImplementMeGithub} from '@/components/ImplementMeGithub'
  *
  * // In your component:
- * <ImplementMeGithub issueUrl="https://github.com/sofia-municipality/your-sofia/issues/123" />
+ * <ImplementMeGithub issueUrl="https://github.com/sofia-municipality/your-sofia-mobile/issues/123" />
  * <ImplementMeGithub
- *   issueUrl="https://github.com/sofia-municipality/your-sofia/issues/123"
+ *   issueUrl="https://github.com/sofia-municipality/your-sofia-mobile/issues/123"
  *   backgroundColor="#FEF3C7"
  *   extendedText="This feature is under development"
  * />
