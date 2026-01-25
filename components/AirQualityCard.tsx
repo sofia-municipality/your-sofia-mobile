@@ -40,7 +40,10 @@ export function AirQualityCard({data}: Props) {
   }
 
   return (
-    <View style={[styles.container, {backgroundColor: getStatusBgColor(data.aqi)}]}>
+    <View
+      style={[styles.container, {backgroundColor: getStatusBgColor(data.aqi)}]}
+      testID="air-quality-card-container"
+    >
       <View style={styles.iconContainer}>
         <Wind size={20} color={getStatusColor(data.aqi)} />
       </View>
