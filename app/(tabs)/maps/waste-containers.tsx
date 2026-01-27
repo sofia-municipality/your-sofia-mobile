@@ -13,7 +13,7 @@ import {
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {Navigation, Plus} from 'lucide-react-native'
+import {ArrowDownToDot, Navigation, NavigationOff, Plus} from 'lucide-react-native'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
@@ -37,9 +37,11 @@ export default function WasteContainers() {
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
+  const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
   const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
   const isMountedRef = useRef(true)
+  const watchRef = useRef<any>(null)
 
   // Cleanup on unmount
   useEffect(() => {
@@ -47,6 +49,10 @@ export default function WasteContainers() {
     return () => {
       isMountedRef.current = false
       loadingRef.current = false
+      if (watchRef.current) {
+        watchRef.current.remove()
+        watchRef.current = null
+      }
     }
   }, [])
 
@@ -151,7 +157,7 @@ export default function WasteContainers() {
 
   // Animate to user location when it becomes available
   useEffect(() => {
-    if (location && mapRef.current) {
+    if (location && mapRef.current && followMe) {
       mapRef.current.animateToRegion(
         {
           latitude: location.coords.latitude,
@@ -162,7 +168,70 @@ export default function WasteContainers() {
         1000
       )
     }
-  }, [location])
+  }, [location, followMe])
+
+  useEffect(() => {
+    let mounted = true
+
+    const startWatching = async () => {
+      try {
+        if (permissionStatus !== 'granted') {
+          const {status} = await Location.requestForegroundPermissionsAsync()
+          setPermissionStatus(status)
+          if (status !== 'granted') return
+        }
+
+        if (watchRef.current) return
+
+        watchRef.current = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            timeInterval: 5000,
+            distanceInterval: 5,
+          },
+          (pos) => {
+            if (!mounted) return
+            setLocation(pos)
+          }
+        )
+      } catch (error) {
+        console.error('Error starting location watch:', error)
+      }
+    }
+
+    if (followMe) {
+      startWatching()
+    } else {
+      if (watchRef.current) {
+        watchRef.current.remove()
+        watchRef.current = null
+      }
+    }
+
+    return () => {
+      mounted = false
+      if (watchRef.current) {
+        watchRef.current.remove()
+        watchRef.current = null
+      }
+    }
+  }, [followMe, permissionStatus])
+
+  const toggleFollowMe = () => {
+    const next = !followMe
+    setFollowMe(next)
+    if (next && location && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        500
+      )
+    }
+  }
 
   const requestPermission = async () => {
     const {status} = await Location.requestForegroundPermissionsAsync()
@@ -417,8 +486,18 @@ export default function WasteContainers() {
         >
           <Plus size={28} />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton, followMe && styles.actionButtonActive]}
+          onPress={toggleFollowMe}
+        >
+          {followMe ? (
+            <Navigation size={20} color="#ffffff" />
+          ) : (
+            <NavigationOff size={20} color="#6B7280" />
+          )}
+        </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={centerOnLocation}>
-          <Navigation size={24} />
+          <ArrowDownToDot size={24} />
         </TouchableOpacity>
       </View>
 
@@ -610,5 +689,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  actionButtonActive: {
+    backgroundColor: '#1E40AF',
   },
 })
