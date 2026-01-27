@@ -11,7 +11,9 @@ import {
   Dimensions,
   ActivityIndicator,
   Image,
+  Platform,
 } from 'react-native'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useFocusEffect} from '@react-navigation/native'
@@ -375,10 +377,13 @@ export default function NewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        ref={scrollViewRef}
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        contentContainerStyle={{paddingBottom: 20}}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={false}
+        extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
       >
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
@@ -616,7 +621,7 @@ export default function NewScreen() {
         </View>
 
         <View style={styles.bottomSpacer} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Full-Screen Photo Viewer */}
       <FullScreenPhotoViewer
