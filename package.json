@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "test": "jest"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -68,6 +69,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
     "eslint": "^9.37.0",
@@ -77,9 +80,14 @@
     "glob": "^11.0.3",
     "husky": "^9.1.7",
     "inflight": "^1.0.6",
+    "jest": "~29.7.0",
+    "jest-expo": "~54.0.16",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "typescript": "~5.9.2"
+  },
+  "jest": {
+    "preset": "jest-expo"
   },
   "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
 }

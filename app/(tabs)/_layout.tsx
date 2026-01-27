@@ -8,8 +8,8 @@ import {
   Edit3,
   MapPin,
   AlertTriangle,
-  ImagePlus,
-  BarChart3,
+  ChartNoAxesCombined,
+  MapPlus,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -75,7 +75,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
         options={{
           title: t('common.new'),
           tabBarLabel: t('common.new'),
-          tabBarIcon: ({color}) => <ImagePlus size={24} color={color} />,
+          tabBarIcon: ({color}) => <MapPlus size={24} color={color} />,
           headerShown: false,
         }}
       />
@@ -128,7 +128,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
         options={{
           title: t('metrics.title'),
           tabBarLabel: t('metrics.title'),
-          tabBarIcon: ({color}) => <BarChart3 size={24} color={color} />,
+          tabBarIcon: ({color}) => <ChartNoAxesCombined size={24} color={color} />,
           headerTitle: () => <TabHeader title={t('metrics.title')} />,
         }}
       />
