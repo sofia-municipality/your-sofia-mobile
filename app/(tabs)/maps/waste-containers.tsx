@@ -42,6 +42,10 @@ export default function WasteContainers() {
   const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
   const isMountedRef = useRef(true)
   const watchRef = useRef<any>(null)
+  const regionDeltaRef = useRef<{latitudeDelta: number; longitudeDelta: number}>({
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  })
 
   // Cleanup on unmount
   useEffect(() => {
@@ -158,12 +162,13 @@ export default function WasteContainers() {
   // Animate to user location when it becomes available
   useEffect(() => {
     if (location && mapRef.current && followMe) {
+      const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
       mapRef.current.animateToRegion(
         {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta,
+          longitudeDelta,
         },
         1000
       )
@@ -185,7 +190,7 @@ export default function WasteContainers() {
 
         watchRef.current = await Location.watchPositionAsync(
           {
-            accuracy: Location.Accuracy.High,
+            accuracy: Location.Accuracy.BestForNavigation,
             timeInterval: 5000,
             distanceInterval: 5,
           },
@@ -221,12 +226,13 @@ export default function WasteContainers() {
     const next = !followMe
     setFollowMe(next)
     if (next && location && mapRef.current) {
+      const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
       mapRef.current.animateToRegion(
         {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta,
+          longitudeDelta,
         },
         500
       )
@@ -355,12 +361,13 @@ export default function WasteContainers() {
 
   const centerOnLocation = async () => {
     if (location && mapRef.current) {
+      const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
       mapRef.current.animateToRegion(
         {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta,
+          longitudeDelta,
         },
         500
       )
@@ -372,12 +379,13 @@ export default function WasteContainers() {
         })
         setLocation(currentLocation)
         if (mapRef.current) {
+          const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
           mapRef.current.animateToRegion(
             {
               latitude: currentLocation.coords.latitude,
               longitude: currentLocation.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
+              latitudeDelta,
+              longitudeDelta,
             },
             500
           )
@@ -419,6 +427,10 @@ export default function WasteContainers() {
             latitude: region.latitude,
             longitude: region.longitude,
           })
+          regionDeltaRef.current = {
+            latitudeDelta: region.latitudeDelta,
+            longitudeDelta: region.longitudeDelta,
+          }
         }}
         provider={PROVIDER_DEFAULT}
         style={styles.map}
