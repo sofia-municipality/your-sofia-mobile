@@ -8,19 +8,18 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
-  Platform,
 } from 'react-native'
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {ArrowDownToDot, Navigation, NavigationOff, Plus} from 'lucide-react-native'
+import {Navigation, NavigationOff, Plus} from 'lucide-react-native'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
-import type {WasteContainer, ContainerState} from '../../../types/wasteContainer'
+import {type WasteContainer, type ContainerState} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | ContainerState
 
@@ -359,44 +358,6 @@ export default function WasteContainers() {
     }
   }, [params.refreshContainerId, router, handleContainerUpdated])
 
-  const centerOnLocation = async () => {
-    if (location && mapRef.current) {
-      const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
-      mapRef.current.animateToRegion(
-        {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta,
-          longitudeDelta,
-        },
-        500
-      )
-    } else if (!location) {
-      // Try to get current location if not available
-      try {
-        const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        })
-        setLocation(currentLocation)
-        if (mapRef.current) {
-          const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
-          mapRef.current.animateToRegion(
-            {
-              latitude: currentLocation.coords.latitude,
-              longitude: currentLocation.coords.longitude,
-              latitudeDelta,
-              longitudeDelta,
-            },
-            500
-          )
-        }
-      } catch (error) {
-        console.error('Error getting location:', error)
-        Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
-      }
-    }
-  }
-
   if (permissionStatus !== 'granted') {
     return (
       <View style={styles.centerContainer}>
@@ -503,9 +464,6 @@ export default function WasteContainers() {
             <NavigationOff size={20} color="#6B7280" />
           )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={centerOnLocation}>
-          <ArrowDownToDot size={24} />
-        </TouchableOpacity>
       </View>
 
       {/* Container Info Modal */}
@@ -540,18 +498,16 @@ export default function WasteContainers() {
 
 // Helper function to get pin color based on container status
 function getContainerPinColor(container: WasteContainer): string {
-  const colorMap: Record<string, string> = {
-    empty: 'green', // Green
-    full: 'red', // Red
-    dirty: 'brown', // Brown
-    damaged: 'black', // Black
-    leaves: 'wheat', // Green
-    bagged: 'black', // Black
-    maintenance: 'orange', // Orange
-    fallen: 'purple', // Purple
-    bulkyWaste: 'yellow', // Yellow
+  if (container.state?.includes('full')) {
+    return 'red'
   }
-  return colorMap[container.status] || '#10B981'
+  if (container.state?.includes('damaged') || container.state?.includes('bagged')) {
+    return 'black'
+  }
+  if (container.state && container.state.length > 0) {
+    return 'orange'
+  }
+  return 'green'
 }
 
 const styles = StyleSheet.create({
