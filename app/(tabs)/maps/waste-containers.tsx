@@ -446,16 +446,11 @@ export default function WasteContainers() {
             tracksViewChanges={false}
             pinColor={marker.pinColor}
           >
-            {/* Use custom marker for iOS, default pin for Android until react-native-maps supports custom markers properly 
-                see: https://github.com/react-native-maps/react-native-maps/issues/5707
-            */}
-            {Platform.OS === 'ios' && (
-              <WasteContainerMarker
-                color={marker.pinColor}
-                wasteType={marker.container.wasteType}
-                state={marker.container.state}
-              />
-            )}
+            <WasteContainerMarker
+              color={marker.pinColor}
+              wasteType={marker.container.wasteType}
+              state={marker.container.state}
+            />
           </Marker>
         ))}
       </MapView>
