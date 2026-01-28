@@ -74,6 +74,9 @@ export default function NewScreen() {
   }>({stage: null, current: 0, total: 0})
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null)
 
+  // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
+  const [showCamera, setShowCamera] = useState(true)
+
   // Use nearby objects hook
   const {
     nearbyObjects,
@@ -102,7 +105,6 @@ export default function NewScreen() {
     pickImageFromGallery,
     toggleState,
     resetFormState: resetFormStateAction,
-    handleCancel: handleCancelAction,
   } = useSignalForm({
     prefilledMapObject,
     prefilledObjectType,
@@ -116,11 +118,16 @@ export default function NewScreen() {
   const resetFormState = useCallback(() => {
     setSelectedObject(null)
     resetFormStateAction()
+    // Ensure camera is visible when the form is reset (e.g., when tab focused)
+    setShowCamera(true)
   }, [resetFormStateAction])
 
   // Wrapper for handleCancel to pass selectedObject and returnTo
   const handleCancel = useCallback(() => {
-    router.back()
+    // Hide camera first to ensure native camera view is unmounted cleanly
+    setShowCamera(false)
+    // small delay to allow native unmount to complete
+    setTimeout(() => router.back(), 80)
   }, [router])
 
   const objectTypes = [
@@ -318,7 +325,12 @@ export default function NewScreen() {
       Alert.alert(t('signals.success'), '', [
         {
           text: 'OK',
-          onPress: () => {
+          onPress: async () => {
+            // Hide camera first so the native camera view unmounts before navigation.
+            setShowCamera(false)
+            // Small delay to allow unmount to happen cleanly on iOS Fabric
+            await new Promise((r) => setTimeout(r, 80))
+
             // Reset form state
             resetFormState()
 
@@ -387,43 +399,47 @@ export default function NewScreen() {
       >
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
-          <CameraView ref={cameraRef} style={styles.camera} facing="back">
-            {/* Coordinates Overlay */}
-            {currentLocation && (
-              <View style={styles.coordinatesOverlay}>
-                <MapPinIcon size={14} color="#fff" />
-                <Text style={styles.coordinatesText}>
-                  {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
-                </Text>
-              </View>
-            )}
-            {/* Date/Time Overlay */}
-            <View style={styles.dateTimeOverlay}>
-              <Text style={styles.dateTimeText}>
-                {currentDateTime.toLocaleDateString('bg-BG', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}{' '}
-                {currentDateTime.toLocaleTimeString('bg-BG', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                })}
+          {showCamera ? (
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+          ) : (
+            // Keep a placeholder view to preserve layout while camera is hidden
+            <View style={styles.camera} />
+          )}
+          {/* Coordinates Overlay */}
+          {currentLocation && (
+            <View style={styles.coordinatesOverlay}>
+              <MapPinIcon size={14} color="#fff" />
+              <Text style={styles.coordinatesText}>
+                {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
               </Text>
             </View>
-            <View style={styles.cameraOverlay}>
-              <View style={styles.cameraButtonsContainer}>
-                <View style={styles.uploadButtonPlaceholder} />
-                <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
-                  <View style={styles.captureButtonInner} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
-                  <Upload size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
+          )}
+          {/* Date/Time Overlay */}
+          <View style={styles.dateTimeOverlay}>
+            <Text style={styles.dateTimeText}>
+              {currentDateTime.toLocaleDateString('bg-BG', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              })}{' '}
+              {currentDateTime.toLocaleTimeString('bg-BG', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
+            </Text>
+          </View>
+          <View style={styles.cameraOverlay}>
+            <View style={styles.cameraButtonsContainer}>
+              <View style={styles.uploadButtonPlaceholder} />
+              <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+                <View style={styles.captureButtonInner} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                <Upload size={24} color="#fff" />
+              </TouchableOpacity>
             </View>
-          </CameraView>
+          </View>
         </View>
 
         {/* Photo Chips */}
