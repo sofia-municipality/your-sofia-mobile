@@ -25,10 +25,9 @@ export function WasteContainerMarker({
 
   return (
     <View style={[styles.container, {width: size, height: size}]}>
-      <View style={[styles.iconContainer, {backgroundColor: color}]}>
+      <View style={[styles.iconContainer, {backgroundColor: color, zIndex: 2}]}>
         <Icon size={size * 0.64} color="#ffffff" strokeWidth={2} />
       </View>
-      <View style={[styles.pointer, {borderTopColor: color}]} />
     </View>
   )
 }
@@ -51,17 +50,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
-  },
-  pointer: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderTopWidth: 8,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    marginTop: -0.5,
   },
 })
