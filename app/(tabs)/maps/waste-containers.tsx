@@ -498,7 +498,7 @@ export default function WasteContainers() {
 
 // Helper function to get pin color based on container status
 function getContainerPinColor(container: WasteContainer): string {
-  if (container.state?.includes('full')) {
+  if (container.state?.includes('full') || container.status === 'full') {
     return 'red'
   }
   if (container.state?.includes('damaged') || container.state?.includes('bagged')) {
