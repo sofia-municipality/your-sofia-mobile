@@ -4,6 +4,10 @@
 
 **Do not generate summaries of completed work.** The user can see changes in the diff/file changes. Only provide summaries if explicitly requested.
 
+### Use repository skills
+
+This repository includes curated skill documents under `.github/skills/` (for example, `building-native-ui/SKILL.md`, `expo-tailwind-setup/SKILL.md`). Agents should consult the relevant skill files for specific patterns, examples, and idiomatic solutions related to Expo, native UI, and data fetching. Treat these skill docs as the preferred source for implementation examples and conventions unless the user instructs otherwise.
+
 ## Project Overview
 
 A bilingual (Bulgarian/English) React Native mobile app for Sofia city services, built with Expo. The app provides city services, news, air quality monitoring, and payment features for Sofia residents.
