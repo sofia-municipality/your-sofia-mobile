@@ -187,6 +187,7 @@ export default {
     skipPhoto: 'Skip Photo',
     retakePhoto: 'Retake Photo',
     photoOptional: 'Photo is optional',
+    photoRequired: 'Photo is required',
     uploadingPhoto: 'Uploading photo...',
     photoUploaded: 'Photo uploaded successfully',
     noPhotoUploaded: 'No photo uploaded',
