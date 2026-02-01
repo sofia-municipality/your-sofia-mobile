@@ -29,6 +29,7 @@ import {
   History,
 } from 'lucide-react-native'
 import {useAuth} from '../contexts/AuthContext'
+import {useContainerSignals} from '../hooks/useContainerSignals'
 import {cleanContainer} from '../lib/payload'
 import * as ImagePicker from 'expo-image-picker'
 
@@ -46,6 +47,12 @@ export function WasteContainerCard({
   const {t} = useTranslation()
   const router = useRouter()
   const {isContainerAdmin, token} = useAuth()
+  const {
+    total: signalsTotal,
+    active: signalsActive,
+    loading: signalsLoading,
+    error: signalsError,
+  } = useContainerSignals(container.publicNumber)
   const [isCleaning, setIsCleaning] = useState(false)
   const [notes, setNotes] = useState('')
   const [photoUri, setPhotoUri] = useState<string | null>(null)
@@ -233,6 +240,39 @@ export function WasteContainerCard({
           <View style={styles.statusBadge}>
             <View style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]} />
             <Text style={styles.statusText}>{container.status.toUpperCase()}</Text>
+            <TouchableOpacity
+              style={styles.signalsBadge}
+              onPress={() => {
+                if (onClose) onClose()
+                // Navigate to Signals tab and apply container filter
+                router.push({
+                  pathname: '/(tabs)/signals',
+                  params: {containerReferenceId: container.publicNumber},
+                } as any)
+              }}
+              disabled={signalsLoading || !!signalsError}
+            >
+              {signalsLoading ? (
+                <ActivityIndicator size="small" color="#6B7280" />
+              ) : signalsError ? (
+                <AlertTriangle size={16} color="#F59E0B" />
+              ) : (
+                <>
+                  <AlertTriangle
+                    size={16}
+                    color={signalsActive && signalsActive > 0 ? '#EF4444' : '#6B7280'}
+                  />
+                  <Text style={styles.signalsText}>
+                    {signalsTotal
+                      ? t('wasteContainers.signalsCount', {count: signalsTotal})
+                      : t('wasteContainers.signals')}
+                    {signalsActive
+                      ? ` • ${t('wasteContainers.signalsActive', {active: signalsActive})}`
+                      : ''}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
           <View style={styles.lastCleanedContainer}>
             <TouchableOpacity
@@ -689,6 +729,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#6B7280',
+  },
+  signalsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginLeft: 8,
+  },
+  signalsText: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginLeft: 4,
   },
   lastCleanedContainer: {
     flexDirection: 'row',

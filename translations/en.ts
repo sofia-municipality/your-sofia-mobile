@@ -178,6 +178,9 @@ export default {
     lastCleaned: 'Last Cleaned',
     cleaningHistory: 'Cleaning History',
     noHistory: 'No cleaning records found',
+    signals: 'Signals',
+    signalsCount: '{{count}} signals',
+    signalsActive: '{{active}} active',
     cleanDescription:
       'This action will mark all active signals as resolved and set the container status to active.',
     takePhoto: 'Take Photo',
@@ -225,6 +228,8 @@ export default {
     duplicateMessage:
       'You have already reported a problem for this container (Signal #{{id}}). You can view or edit the existing signal.',
     viewExisting: 'View existing signal',
+    filteredForContainer: 'Showing signals for container #{{id}}',
+    clearFilter: 'Clear filter',
     form: {
       headerNew: 'New Signal',
       headerView: 'Signal',

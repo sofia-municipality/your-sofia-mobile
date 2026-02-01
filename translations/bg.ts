@@ -179,6 +179,9 @@ export default {
     lastCleaned: 'Последно почистване',
     cleaningHistory: 'История на почистванията',
     noHistory: 'Няма записани почиствания',
+    signals: 'Сигнали',
+    signalsCount: '{{count}} сигнала',
+    signalsActive: '{{active}} активни',
     cleanDescription:
       'Това действие ще маркира всички активни сигнали като решени и ще промени статуса на контейнера на активен.',
     takePhoto: 'Направи снимка',
@@ -227,6 +230,8 @@ export default {
     duplicateMessage:
       'Вече сте докладвали проблем за този контейнер (Сигнал #{{id}}). Можете да прегледате или редактирате съществуващия сигнал.',
     viewExisting: 'Виж съществуващия сигнал',
+    filteredForContainer: 'Показване на сигнали за контейнер #{{id}}',
+    clearFilter: 'Премахни филтъра',
     form: {
       headerNew: 'Нов сигнал',
       headerView: 'Сигнал',

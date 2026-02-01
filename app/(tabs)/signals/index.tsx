@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useRouter} from 'expo-router'
+import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import {fetchSignals} from '../../../lib/payload'
 import type {Signal} from '../../../types/signal'
@@ -19,6 +19,7 @@ import {AlertCircle, Clock, CheckCircle, XCircle} from 'lucide-react-native'
 export default function SignalsScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
+  const {containerReferenceId} = useLocalSearchParams<{containerReferenceId?: string}>()
   const {registerBellAction} = useBellAction()
   const [signals, setSignals] = useState<Signal[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,6 +46,7 @@ export default function SignalsScreen() {
         const response = await fetchSignals({
           locale: i18n.language as 'bg' | 'en',
           limit: 50,
+          containerReferenceId: containerReferenceId,
         })
         setSignals(response.docs)
       } catch (err) {
@@ -55,7 +57,7 @@ export default function SignalsScreen() {
         setRefreshing(false)
       }
     },
-    [i18n.language, t]
+    [i18n.language, t, containerReferenceId]
   )
 
   useEffect(() => {
@@ -158,6 +160,23 @@ export default function SignalsScreen() {
     )
   }
 
+  const renderListHeader = () => {
+    if (!containerReferenceId) return null
+    return (
+      <View style={styles.filterBanner}>
+        <Text style={styles.filterText}>
+          {t('signals.filteredForContainer', {id: containerReferenceId})}
+        </Text>
+        <TouchableOpacity
+          style={styles.filterClearButton}
+          onPress={() => router.push('/(tabs)/signals' as any)}
+        >
+          <Text style={styles.filterClearButtonText}>{t('signals.clearFilter')}</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -165,6 +184,7 @@ export default function SignalsScreen() {
         renderItem={renderSignalItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
+        ListHeaderComponent={renderListHeader}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>{t('signals.noSignals')}</Text>
@@ -279,5 +299,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     textAlign: 'center',
+  },
+  filterBanner: {
+    backgroundColor: '#EFF6FF',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  filterText: {
+    fontSize: 13,
+    color: '#1E40AF',
+    flex: 1,
+  },
+  filterClearButton: {
+    marginLeft: 12,
+    backgroundColor: '#1E40AF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  filterClearButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 })
