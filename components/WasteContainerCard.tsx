@@ -263,12 +263,8 @@ export function WasteContainerCard({
                     color={signalsActive && signalsActive > 0 ? '#EF4444' : '#6B7280'}
                   />
                   <Text style={styles.signalsText}>
-                    {signalsTotal
-                      ? t('wasteContainers.signalsCount', {count: signalsTotal})
-                      : t('wasteContainers.signals')}
-                    {signalsActive
-                      ? ` • ${t('wasteContainers.signalsActive', {active: signalsActive})}`
-                      : ''}
+                    {t('wasteContainers.signalsCount', {count: signalsTotal ?? 0})}
+                    {` • ${t('wasteContainers.signalsActive', {active: signalsActive})}`}
                   </Text>
                 </>
               )}
@@ -318,34 +314,6 @@ export function WasteContainerCard({
           </Text>
         </View>
 
-        {container.location.address && (
-          <View style={styles.infoRow}>
-            <MapPin size={16} color="#6B7280" />
-            <Text style={styles.infoText}>{container.location.address}</Text>
-          </View>
-        )}
-
-        {container.serviceInterval && (
-          <View style={styles.infoRow}>
-            <Calendar size={16} color="#6B7280" />
-            <Text style={styles.infoText}>{container.serviceInterval}</Text>
-          </View>
-        )}
-
-        {container.servicedBy && (
-          <View style={styles.infoRow}>
-            <User size={16} color="#6B7280" />
-            <Text style={styles.infoText}>{container.servicedBy}</Text>
-          </View>
-        )}
-
-        {container.notes && (
-          <View style={styles.notesContainer}>
-            <Text style={styles.notesLabel}>{t('wasteContainers.notes') || 'Notes'}:</Text>
-            <Text style={styles.notesText}>{container.notes}</Text>
-          </View>
-        )}
-
         {/* Full Info Toggle Button */}
         <TouchableOpacity
           onPress={() => setShowFullInfo(!showFullInfo)}
@@ -385,22 +353,12 @@ export function WasteContainerCard({
               <Text style={styles.extendedInfoValue}>{container.capacityVolume}m³</Text>
             </View>
 
-            {container.binCount && container.binCount > 1 && (
+            {
               <View style={styles.extendedInfoRow}>
                 <Text style={styles.extendedInfoLabel}>{t('wasteContainers.binCount')}:</Text>
                 <Text style={styles.extendedInfoValue}>{container.binCount}</Text>
               </View>
-            )}
-
-            <View style={styles.extendedInfoRow}>
-              <Text style={styles.extendedInfoLabel}>{t('wasteContainers.status')}:</Text>
-              <View style={styles.extendedStatusBadge}>
-                <View
-                  style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]}
-                />
-                <Text style={styles.extendedInfoValue}>{container.status.toUpperCase()}</Text>
-              </View>
-            </View>
+            }
 
             <View style={styles.extendedInfoRow}>
               <Text style={styles.extendedInfoLabel}>{t('wasteContainers.coordinates')}:</Text>
@@ -1008,7 +966,7 @@ const styles = StyleSheet.create({
   fullInfoButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     gap: 8,
   },
   fullInfoButtonText: {
