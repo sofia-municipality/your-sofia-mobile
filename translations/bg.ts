@@ -188,6 +188,7 @@ export default {
     skipPhoto: 'Пропусни снимката',
     retakePhoto: 'Направи нова снимка',
     photoOptional: 'Снимката е по желание',
+    photoRequired: 'Снимката е задължителна',
     uploadingPhoto: 'Качване на снимка...',
     photoUploaded: 'Снимката е качена успешно',
     noPhotoUploaded: 'Няма качена снимка',

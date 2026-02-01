@@ -16,9 +16,7 @@ import {useRouter} from 'expo-router'
 import type {WasteContainer} from '../types/wasteContainer'
 import {
   Trash2,
-  MapPin,
   Calendar,
-  User,
   AlertTriangle,
   CheckCircle,
   Camera,
@@ -154,15 +152,17 @@ export function WasteContainerCard({
   }
 
   const handleSubmitCleaning = async () => {
+    if (!photoUri) {
+      Alert.alert(t('common.error'), t('wasteContainers.photoRequired'))
+      return
+    }
+
     setIsCleaning(true)
     try {
-      let photo
-      if (photoUri) {
-        photo = {
-          uri: photoUri,
-          type: 'image/jpeg',
-          name: `observation-${container.id}-${Date.now()}.jpg`,
-        }
+      const photo = {
+        uri: photoUri,
+        type: 'image/jpeg',
+        name: `observation-${container.id}-${Date.now()}.jpg`,
       }
 
       await cleanContainer(container.id, token!, photo, notes)
@@ -579,7 +579,7 @@ export function WasteContainerCard({
 
             {/* Photo Section */}
             <View style={styles.formSection}>
-              <Text style={styles.formSectionLabel}>{t('wasteContainers.photoOptional')}</Text>
+              <Text style={styles.formSectionLabel}>{t('wasteContainers.photoRequired')}</Text>
               {photoUri ? (
                 <View style={styles.photoPreview}>
                   <Image source={{uri: photoUri}} style={styles.previewImage} />
@@ -595,6 +595,9 @@ export function WasteContainerCard({
                   <Camera size={20} color="#1E40AF" />
                   <Text style={styles.takePhotoButtonText}>{t('wasteContainers.takePhoto')}</Text>
                 </TouchableOpacity>
+              )}
+              {!photoUri && (
+                <Text style={styles.photoRequiredText}>{t('wasteContainers.photoRequired')}</Text>
               )}
             </View>
 
@@ -627,9 +630,12 @@ export function WasteContainerCard({
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.formSubmitButton, isCleaning && styles.cleanButtonDisabled]}
+                style={[
+                  styles.formSubmitButton,
+                  (isCleaning || !photoUri) && styles.cleanButtonDisabled,
+                ]}
                 onPress={handleSubmitCleaning}
-                disabled={isCleaning}
+                disabled={isCleaning || !photoUri}
               >
                 {isCleaning ? (
                   <ActivityIndicator color="#ffffff" size="small" />
@@ -903,6 +909,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1E40AF',
+  },
+  photoRequiredText: {
+    fontSize: 13,
+    color: '#EF4444',
+    marginTop: 8,
   },
   photoPreview: {
     position: 'relative',
