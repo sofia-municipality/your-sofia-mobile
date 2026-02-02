@@ -50,7 +50,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
         tabBarActiveTintColor: '#1E40AF',
         tabBarInactiveTintColor: '#6B7280',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: '600',
         },
       }}
