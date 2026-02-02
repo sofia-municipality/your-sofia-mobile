@@ -9,6 +9,20 @@ export type WasteType =
 
 export type CapacitySize = 'tiny' | 'small' | 'standard' | 'big' | 'industrial'
 
+export interface CreateContainerInput {
+  publicNumber: string
+  wasteType: WasteType
+  capacityVolume: number
+  capacitySize: CapacitySize
+  binCount?: number
+  location: {
+    latitude: number
+    longitude: number
+    address?: string
+  }
+  notes?: string
+}
+
 export type ContainerState =
   | 'full'
   | 'dirty'
