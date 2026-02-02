@@ -140,6 +140,7 @@ export default {
     },
     loading: 'Loading map...',
   },
+
   wasteContainers: {
     name: 'Container',
     size: {
@@ -402,6 +403,7 @@ export default {
     binCount: 'Number of Bins',
     location: 'Location',
     locationRequired: 'Please enter coordinates',
+    locationInfo: 'Coordinates will be updated automatically from the photo or current location',
     latitude: 'Latitude',
     longitude: 'Longitude',
     address: 'Address',
@@ -409,7 +411,13 @@ export default {
     notes: 'Notes',
     notesPlaceholder: 'Additional information...',
     createSuccess: 'City object created successfully',
+    updateSuccess: 'City object updated successfully',
     createError: 'Error creating city object',
+    loadError: 'Error loading city object',
+    adminOnly: 'Only administrators can create and edit city objects',
+    submitting: 'Submitting...',
+    create: 'Create',
+    update: 'Update',
   },
   bulkPhotoUpload: {
     title: 'Bulk Photo Upload',

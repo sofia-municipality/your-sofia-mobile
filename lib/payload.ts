@@ -4,7 +4,7 @@
  * Client for fetching content from Payload CMS
  */
 
-import type {WasteContainer} from '../types/wasteContainer'
+import type {WasteContainer, CreateContainerInput} from '../types/wasteContainer'
 import type {Signal, CreateSignalInput} from '../types/signal'
 import {environmentManager} from './environment'
 
@@ -621,6 +621,114 @@ export async function updateSignal(
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
     throw new Error(errorData.message || `Failed to update signal: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Create a new waste container
+ */
+export async function createWasteContainer(
+  containerData: CreateContainerInput,
+  photo?: {uri: string; type: string; name: string}
+): Promise<WasteContainer> {
+  let imageId: string | undefined
+
+  // Upload photo if provided
+  if (photo) {
+    const formData = new FormData()
+    formData.append('file', {
+      uri: photo.uri,
+      type: photo.type,
+      name: photo.name,
+    } as any)
+
+    const uploadResponse = await fetch(`${getApiUrl()}/api/media`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload container photo')
+    }
+
+    const uploadData = await uploadResponse.json()
+    imageId = uploadData.doc.id
+  }
+
+  // Create container
+  const response = await fetch(`${getApiUrl()}/api/waste-containers`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...containerData,
+      image: imageId,
+      status: 'active',
+    }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    handleAuthError(response)
+    throw new Error(errorData.message || `Failed to create waste container: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Update an existing waste container
+ */
+export async function updateWasteContainer(
+  id: string,
+  containerData: Partial<WasteContainer>,
+  photo?: {uri: string; type: string; name: string}
+): Promise<WasteContainer> {
+  let imageId: string | undefined
+
+  // Upload photo if provided
+  if (photo) {
+    const formData = new FormData()
+    formData.append('file', {
+      uri: photo.uri,
+      type: photo.type,
+      name: photo.name,
+    } as any)
+
+    const uploadResponse = await fetch(`${getApiUrl()}/api/media`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload container photo')
+    }
+
+    const uploadData = await uploadResponse.json()
+    imageId = uploadData.doc.id
+  }
+
+  // Update container
+  const updatePayload = {
+    ...containerData,
+    ...(imageId && {image: imageId}),
+  }
+
+  const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatePayload),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    handleAuthError(response)
+    throw new Error(errorData.message || `Failed to update waste container: ${response.statusText}`)
   }
 
   return response.json()

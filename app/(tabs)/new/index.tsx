@@ -25,19 +25,14 @@ export default function NewScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, styles.buttonDisabled]}
+              style={[styles.button]}
               onPress={() => router.push('../(tabs)/new/new-city-object')}
-              disabled={true}
             >
               <View style={styles.iconContainer}>
-                <MapPin size={36} color="#9CA3AF" />
+                <MapPin size={36} color="#1E40AF" />
               </View>
-              <Text style={[styles.buttonTitle, styles.buttonTitleDisabled]}>
-                {t('new.newCityObject')}
-              </Text>
-              <Text style={[styles.buttonDescription, styles.buttonDescriptionDisabled]}>
-                {t('new.newCityObjectDescription')}
-              </Text>
+              <Text style={[styles.buttonTitle]}>{t('new.newCityObject')}</Text>
+              <Text style={[styles.buttonDescription]}>{t('new.newCityObjectDescription')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

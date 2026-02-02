@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef, useCallback} from 'react'
 import {
   View,
   Text,
@@ -6,86 +6,233 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  TextInput,
   Alert,
+  Dimensions,
+  ActivityIndicator,
+  Image,
+  Platform,
 } from 'react-native'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
-import {useRouter} from 'expo-router'
-import {MapPin, Trash2} from 'lucide-react-native'
-import type {WasteType, CapacitySize} from '../../../types/wasteContainer'
+import {useRouter, useLocalSearchParams} from 'expo-router'
+import {useFocusEffect} from '@react-navigation/native'
+import {CameraView, useCameraPermissions} from 'expo-camera'
+import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
+import {WasteContainerForm, type WasteContainerFormData} from '../../../forms/waste-container'
+import {
+  createWasteContainer,
+  updateWasteContainer,
+  fetchWasteContainerById,
+} from '../../../lib/payload'
+import {useAuth} from '../../../contexts/AuthContext'
+import {FullScreenPhotoViewer} from '../../../components/FullScreenPhotoViewer'
+import * as ImagePicker from 'expo-image-picker'
+import type {WasteContainer} from '../../../types/wasteContainer'
+
+const {height} = Dimensions.get('window')
+
+interface Photo {
+  id: string
+  uri: string
+}
 
 export default function NewCityObjectScreen() {
   const {t} = useTranslation()
   const router = useRouter()
+  const params = useLocalSearchParams()
+  const cameraRef = useRef<CameraView>(null)
+  const formRef = useRef<any>(null)
+  const {user, isContainerAdmin} = useAuth()
 
-  const [objectType, setObjectType] = useState<'waste-container' | null>('waste-container')
-  const [publicNumber, setPublicNumber] = useState('')
-  const [wasteType, setWasteType] = useState<WasteType>('general')
-  const [capacitySize, setCapacitySize] = useState<CapacitySize>('standard')
-  const [capacityVolume, setCapacityVolume] = useState('')
-  const [binCount, setBinCount] = useState('1')
-  const [address, setAddress] = useState('')
-  const [latitude, setLatitude] = useState('')
-  const [longitude, setLongitude] = useState('')
-  const [notes, setNotes] = useState('')
+  // Check if we're editing an existing container
+  const containerId = params.containerId as string | undefined
+  const isEditing = !!containerId
+
+  const [permission, requestPermission] = useCameraPermissions()
+  const [currentDateTime, setCurrentDateTime] = useState(new Date())
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [viewingPhoto, setViewingPhoto] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [loadingContainer, setLoadingContainer] = useState(isEditing)
+  const [container, setContainer] = useState<WasteContainer | undefined>(undefined)
+  const [currentLocation, setCurrentLocation] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null)
 
-  const wasteTypes: WasteType[] = [
-    'general',
-    'recyclables',
-    'organic',
-    'glass',
-    'paper',
-    'plastic',
-    'metal',
-  ]
+  // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
+  const [showCamera, setShowCamera] = useState(true)
 
-  const capacitySizes: CapacitySize[] = ['tiny', 'small', 'standard', 'big', 'industrial']
-
-  const handleSubmit = async () => {
-    if (!publicNumber.trim()) {
-      Alert.alert(t('common.error'), t('newCityObject.publicNumberRequired'))
-      return
-    }
-
-    if (!latitude || !longitude) {
-      Alert.alert(t('common.error'), t('newCityObject.locationRequired'))
-      return
-    }
-
-    if (!capacityVolume) {
-      Alert.alert(t('common.error'), t('newCityObject.capacityRequired'))
-      return
-    }
-
-    setLoading(true)
-    try {
-      // TODO: Implement API call to create waste container
-      const containerData = {
-        publicNumber: publicNumber.trim(),
-        wasteType,
-        capacitySize,
-        capacityVolume: parseFloat(capacityVolume),
-        binCount: parseInt(binCount) || 1,
-        location: {
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude),
-          address: address.trim() || undefined,
-        },
-        notes: notes.trim() || undefined,
-        status: 'active' as const,
-      }
-
-      console.log('[NewCityObject] Creating container:', containerData)
-
-      Alert.alert(t('common.success'), t('newCityObject.createSuccess'), [
+  // Check permissions
+  React.useEffect(() => {
+    if (!isContainerAdmin && isEditing) {
+      Alert.alert(t('common.error'), t('newCityObject.adminOnly'), [
         {
           text: 'OK',
           onPress: () => router.back(),
         },
       ])
+    }
+  }, [isContainerAdmin, isEditing, t, router])
+
+  // Load existing container if editing
+  React.useEffect(() => {
+    if (isEditing && containerId) {
+      loadContainer(containerId)
+    }
+  }, [isEditing, containerId])
+
+  const loadContainer = async (id: string) => {
+    try {
+      setLoadingContainer(true)
+      const data = await fetchWasteContainerById(id)
+      setContainer(data)
+      setCurrentLocation({
+        latitude: data.location.latitude,
+        longitude: data.location.longitude,
+      })
     } catch (error) {
-      console.error('Error creating city object:', error)
+      console.error('Error loading container:', error)
+      Alert.alert(t('common.error'), t('newCityObject.loadError'), [
+        {
+          text: 'OK',
+          onPress: () => router.back(),
+        },
+      ])
+    } finally {
+      setLoadingContainer(false)
+    }
+  }
+
+  // Update date/time every second
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDateTime(new Date())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Get current location
+  React.useEffect(() => {
+    if (!isEditing && !currentLocation) {
+      // Use a default Sofia location if we can't get user location
+      setCurrentLocation({
+        latitude: 42.6977,
+        longitude: 23.3219,
+      })
+    }
+  }, [isEditing, currentLocation])
+
+  const takePhoto = async () => {
+    if (!cameraRef.current) return
+
+    try {
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+        exif: true,
+      })
+
+      if (photo) {
+        const newPhoto: Photo = {
+          id: Date.now().toString(),
+          uri: photo.uri,
+        }
+
+        setPhotos((prev) => [...prev, newPhoto])
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error)
+      Alert.alert(t('common.error'), t('newSignal.photoError'))
+    }
+  }
+
+  const pickImageFromGallery = async () => {
+    try {
+      const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+      if (status !== 'granted') {
+        Alert.alert(t('common.error'), t('newSignal.galleryPermissionRequired'))
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.8,
+        exif: true,
+      })
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0]
+
+        const newPhoto: Photo = {
+          id: Date.now().toString(),
+          uri: asset.uri,
+        }
+
+        setPhotos((prev) => [...prev, newPhoto])
+      }
+    } catch (error) {
+      console.error('Error picking image:', error)
+      Alert.alert(t('common.error'), t('newSignal.photoError'))
+    }
+  }
+
+  const removePhoto = (photoId: string) => {
+    setPhotos((prev) => prev.filter((p) => p.id !== photoId))
+  }
+
+  const handleCancel = useCallback(() => {
+    setShowCamera(false)
+    setTimeout(() => router.back(), 80)
+  }, [router])
+
+  const handleSubmit = async (formData: WasteContainerFormData) => {
+    if (!isContainerAdmin) {
+      Alert.alert(t('common.error'), t('newCityObject.adminOnly'))
+      return
+    }
+
+    setLoading(true)
+    try {
+      // Prepare photo files for upload
+      const photoFiles =
+        photos.length > 0
+          ? photos.map((photo) => ({
+              uri: photo.uri,
+              type: 'image/jpeg',
+              name: `container-${formData.publicNumber}-${photo.id}.jpg`,
+            }))
+          : undefined
+
+      if (isEditing && containerId) {
+        // Update existing container
+        await updateWasteContainer(containerId, formData, photoFiles?.[0])
+        Alert.alert(t('common.success'), t('newCityObject.updateSuccess'), [
+          {
+            text: 'OK',
+            onPress: () => {
+              setShowCamera(false)
+              setTimeout(() => router.back(), 80)
+            },
+          },
+        ])
+      } else {
+        // Create new container
+        await createWasteContainer(formData, photoFiles?.[0])
+        Alert.alert(t('common.success'), t('newCityObject.createSuccess'), [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPhotos([])
+              setShowCamera(false)
+              setTimeout(() => router.back(), 80)
+            },
+          },
+        ])
+      }
+    } catch (error) {
+      console.error('Error submitting container:', error)
       Alert.alert(
         t('common.error'),
         error instanceof Error ? error.message : t('newCityObject.createError')
@@ -95,165 +242,148 @@ export default function NewCityObjectScreen() {
     }
   }
 
-  const handleCancel = () => {
-    router.back()
+  // Reset form when tab is focused
+  useFocusEffect(
+    useCallback(() => {
+      if (!isEditing) {
+        setPhotos([])
+        setShowCamera(true)
+      }
+    }, [isEditing])
+  )
+
+  if (loadingContainer) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#1E40AF" />
+          <Text style={styles.messageText}>{t('common.loading')}</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (!permission) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <Text style={styles.messageText}>{t('newSignal.loading')}</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (!permission.granted) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <Text style={styles.messageText}>{t('newSignal.cameraPermissionRequired')}</Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
+            <Text style={styles.primaryButtonText}>{t('newSignal.allowAccess')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    )
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Trash2 size={32} color="#1E40AF" />
-          <Text style={styles.headerTitle}>{t('newCityObject.title')}</Text>
-        </View>
-
-        {/* Public Number */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.publicNumber')}</Text>
-          <TextInput
-            style={styles.input}
-            value={publicNumber}
-            onChangeText={setPublicNumber}
-            placeholder={t('newCityObject.publicNumberPlaceholder')}
-            placeholderTextColor="#9CA3AF"
-          />
-        </View>
-
-        {/* Waste Type */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.wasteType')}</Text>
-          <View style={styles.chipContainer}>
-            {wasteTypes.map((type) => (
-              <TouchableOpacity
-                key={type}
-                style={[styles.chip, wasteType === type && styles.chipSelected]}
-                onPress={() => setWasteType(type)}
-              >
-                <Text style={[styles.chipText, wasteType === type && styles.chipTextSelected]}>
-                  {t(`wasteContainers.type.${type}`)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Capacity Size */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.capacitySize')}</Text>
-          <View style={styles.chipContainer}>
-            {capacitySizes.map((size) => (
-              <TouchableOpacity
-                key={size}
-                style={[styles.chip, capacitySize === size && styles.chipSelected]}
-                onPress={() => setCapacitySize(size)}
-              >
-                <Text style={[styles.chipText, capacitySize === size && styles.chipTextSelected]}>
-                  {t(`wasteContainers.size.${size}`)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Capacity Volume */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.capacityVolume')}</Text>
-          <TextInput
-            style={styles.input}
-            value={capacityVolume}
-            onChangeText={setCapacityVolume}
-            placeholder="1.0"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="decimal-pad"
-          />
-        </View>
-
-        {/* Bin Count */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.binCount')}</Text>
-          <TextInput
-            style={styles.input}
-            value={binCount}
-            onChangeText={setBinCount}
-            placeholder="1"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-          />
-        </View>
-
-        {/* Location */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.location')}</Text>
-          <View style={styles.locationIcon}>
-            <MapPin size={20} color="#1E40AF" />
-          </View>
-          <TextInput
-            style={styles.input}
-            value={latitude}
-            onChangeText={setLatitude}
-            placeholder={t('newCityObject.latitude')}
-            placeholderTextColor="#9CA3AF"
-            keyboardType="decimal-pad"
-          />
-          <TextInput
-            style={[styles.input, {marginTop: 8}]}
-            value={longitude}
-            onChangeText={setLongitude}
-            placeholder={t('newCityObject.longitude')}
-            placeholderTextColor="#9CA3AF"
-            keyboardType="decimal-pad"
-          />
-        </View>
-
-        {/* Address */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.address')}</Text>
-          <TextInput
-            style={styles.input}
-            value={address}
-            onChangeText={setAddress}
-            placeholder={t('newCityObject.addressPlaceholder')}
-            placeholderTextColor="#9CA3AF"
-          />
-        </View>
-
-        {/* Notes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{t('newCityObject.notes')}</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder={t('newCityObject.notesPlaceholder')}
-            placeholderTextColor="#9CA3AF"
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleCancel}
-            disabled={loading}
-          >
-            <Text style={styles.secondaryButtonText}>{t('common.cancel')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.buttonDisabled]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={styles.primaryButtonText}>
-              {loading ? t('common.creating') : t('common.create')}
+      <KeyboardAwareScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{paddingBottom: 20}}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={false}
+        extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
+      >
+        {/* Camera Section */}
+        <View style={styles.cameraContainer}>
+          {showCamera && !isEditing ? (
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+          ) : (
+            <View style={styles.camera} />
+          )}
+          {/* Coordinates Overlay */}
+          {currentLocation && (
+            <View style={styles.coordinatesOverlay}>
+              <MapPinIcon size={14} color="#fff" />
+              <Text style={styles.coordinatesText}>
+                {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
+              </Text>
+            </View>
+          )}
+          {/* Date/Time Overlay */}
+          <View style={styles.dateTimeOverlay}>
+            <Text style={styles.dateTimeText}>
+              {currentDateTime.toLocaleDateString('bg-BG', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              })}{' '}
+              {currentDateTime.toLocaleTimeString('bg-BG', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
             </Text>
-          </TouchableOpacity>
+          </View>
+          {!isEditing && (
+            <View style={styles.cameraOverlay}>
+              <View style={styles.cameraButtonsContainer}>
+                <View style={styles.uploadButtonPlaceholder} />
+                <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+                  <View style={styles.captureButtonInner} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                  <Upload size={24} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+        {/* Photo Chips */}
+        {photos.length > 0 && (
+          <View style={styles.photosContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {photos.map((photo) => (
+                <View key={photo.id} style={styles.photoChip}>
+                  <TouchableOpacity
+                    onPress={() => setViewingPhoto(photo.uri)}
+                    style={styles.photoThumbnailContainer}
+                  >
+                    <Image source={{uri: photo.uri}} style={styles.photoThumbnail} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => removePhoto(photo.id)}
+                    style={styles.photoRemoveButton}
+                  >
+                    <X size={18} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Container Form */}
+        <WasteContainerForm
+          ref={formRef}
+          container={container}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isSubmitting={loading}
+          isEditing={true}
+          canEdit={isContainerAdmin}
+        />
+      </KeyboardAwareScrollView>
+
+      {/* Full-Screen Photo Viewer */}
+      <FullScreenPhotoViewer
+        visible={viewingPhoto !== null}
+        photoUri={viewingPhoto}
+        onClose={() => setViewingPhoto(null)}
+      />
     </SafeAreaView>
   )
 }
@@ -266,106 +396,134 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  header: {
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  cameraContainer: {
+    height: height * 0.4,
+    backgroundColor: '#000',
+  },
+  camera: {
+    flex: 1,
+  },
+  cameraOverlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 30,
+  },
+  cameraButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    padding: 20,
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 40,
+  },
+  captureButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  captureButtonInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
+  uploadButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(30, 64, 175, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  section: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 8,
+  uploadButtonPlaceholder: {
+    width: 50,
+    height: 50,
   },
-  sectionLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#1F2937',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  textArea: {
-    minHeight: 120,
-  },
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
+  photosContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  photoChip: {
+    position: 'relative',
+    marginRight: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
     backgroundColor: '#F3F4F6',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
   },
-  chipSelected: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#1E40AF',
+  photoThumbnailContainer: {
+    width: 80,
+    height: 80,
   },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
+  photoThumbnail: {
+    width: '100%',
+    height: '100%',
   },
-  chipTextSelected: {
-    color: '#1E40AF',
+  photoRemoveButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    padding: 4,
   },
-  locationIcon: {
-    marginBottom: 8,
-  },
-  actionsContainer: {
+  coordinatesOverlay: {
+    position: 'absolute',
+    bottom: 1,
+    right: 4,
     flexDirection: 'row',
-    gap: 12,
-    padding: 16,
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 8,
+    zIndex: 1,
+  },
+  coordinatesText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  dateTimeOverlay: {
+    position: 'absolute',
+    bottom: 1,
+    left: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 8,
+    zIndex: 1,
+  },
+  dateTimeText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+    textAlign: 'right',
   },
   primaryButton: {
-    flex: 1,
     backgroundColor: '#1E40AF',
     borderRadius: 12,
     paddingVertical: 16,
+    paddingHorizontal: 32,
     alignItems: 'center',
+    marginTop: 16,
   },
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#fff',
-  },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1F2937',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  bottomSpacer: {
-    height: 20,
   },
 })
