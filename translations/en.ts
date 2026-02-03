@@ -160,6 +160,12 @@ export default {
       metal: 'Metal',
       trashCan: 'Trash Can',
     },
+    statuses: {
+      active: 'Active',
+      full: 'Full',
+      maintenance: 'Maintenance',
+      inactive: 'Inactive',
+    },
     filters: {
       all: 'All',
       full: 'Full',
@@ -178,6 +184,7 @@ export default {
     cleanError: 'Error marking container as clean',
     cleanConfirm: 'Are you sure you want to mark this container as clean?',
     lastCleaned: 'Last Cleaned',
+    lastObservations: 'Recent Cleanings',
     cleaningHistory: 'Cleaning History',
     noHistory: 'No cleaning records found',
     signals: 'Signals',

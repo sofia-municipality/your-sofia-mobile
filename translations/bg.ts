@@ -161,6 +161,12 @@ export default {
       metal: 'Метал',
       trashCan: 'Кошче',
     },
+    statuses: {
+      active: 'Активен',
+      full: 'Пълен',
+      maintenance: 'Поддръжка',
+      inactive: 'Неактивен',
+    },
     filters: {
       all: 'Всички',
       full: 'Пълен',
@@ -179,11 +185,11 @@ export default {
     cleanError: 'Грешка при почистване на контейнера',
     cleanConfirm: 'Сигурни ли сте, че искате да почистите този контейнер?',
     lastCleaned: 'Последно почистване',
+    lastObservations: 'Последни почиствания',
     cleaningHistory: 'История на почистванията',
     noHistory: 'Няма записани почиствания',
     signals: 'Сигнали',
-    signalsCount: '{{count}} сигнала',
-    signalsActive: '{{active}} активни',
+    signalsActive: 'Активни сигнали: {{active}}/{{count}}',
     cleanDescription:
       'Това действие ще маркира всички активни сигнали като решени и ще промени статуса на контейнера на активен.',
     takePhoto: 'Направи снимка',
