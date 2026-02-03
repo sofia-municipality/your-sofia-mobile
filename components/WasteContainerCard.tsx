@@ -16,7 +16,6 @@ import {useRouter} from 'expo-router'
 import type {WasteContainer} from '../types/wasteContainer'
 import {
   Trash2,
-  Calendar,
   AlertTriangle,
   CheckCircle,
   Camera,
@@ -24,7 +23,6 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
-  History,
   Edit,
 } from 'lucide-react-native'
 import {useAuth} from '../contexts/AuthContext'
@@ -62,11 +60,11 @@ export function WasteContainerCard({
   const [showCleanForm, setShowCleanForm] = useState(false)
   const [showFullInfo, setShowFullInfo] = useState(false)
   const [showObservations, setShowObservations] = useState(false)
-  const [observations, setObservations] = useState<any[]>([])
-  const [loadingObservations, setLoadingObservations] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const formRef = useRef<any>(null)
+  const [lastObservationPhotos, setLastObservationPhotos] = useState<any[]>([])
+  const [loadingPhotos, setLoadingPhotos] = useState(true)
 
   const handleReportIssue = () => {
     // Close the card first
@@ -88,6 +86,35 @@ export function WasteContainerCard({
     } as any)
   }
 
+  // Fetch last observation photos on mount
+  React.useEffect(() => {
+    const fetchLastObservationPhotos = async () => {
+      setLoadingPhotos(true)
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/api/waste-container-observations?where[container][equals]=${container.id}&depth=2&sort=-cleanedAt&limit=3`
+        )
+        const data = await response.json()
+        const transformedPhotos = (data.docs || [])
+          .filter((obs: any) => obs.photo)
+          .map((obs: any) => ({
+            id: obs.id,
+            url: obs.photo.url?.startsWith('http')
+              ? obs.photo.url
+              : `${process.env.EXPO_PUBLIC_API_URL}${obs.photo.url}`,
+            cleanedAt: obs.cleanedAt,
+          }))
+        setLastObservationPhotos(transformedPhotos)
+      } catch (error) {
+        console.error('Error fetching last observation photos:', error)
+      } finally {
+        setLoadingPhotos(false)
+      }
+    }
+
+    fetchLastObservationPhotos()
+  }, [container.id])
+
   const handleEditSubmit = async (data: WasteContainerFormData) => {
     setIsUpdating(true)
     try {
@@ -105,39 +132,6 @@ export function WasteContainerCard({
       Alert.alert(t('common.error'), t('newCityObject.createError'))
     } finally {
       setIsUpdating(false)
-    }
-  }
-
-  const handleShowObservations = async () => {
-    setShowObservations(true)
-    setLoadingObservations(true)
-    try {
-      // Fetch observations for this container
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/waste-container-observations?where[container][equals]=${container.id}&depth=2&sort=-cleanedAt&limit=5`
-      )
-      const data = await response.json()
-      console.log('Fetched observations:', data)
-
-      // Transform photo URLs to include API URL
-      const transformedObservations = (data.docs || []).map((obs: any) => ({
-        ...obs,
-        photo: obs.photo
-          ? {
-              ...obs.photo,
-              url: obs.photo.url?.startsWith('http')
-                ? obs.photo.url
-                : `${process.env.EXPO_PUBLIC_API_URL}${obs.photo.url}`,
-            }
-          : undefined,
-      }))
-
-      setObservations(transformedObservations)
-    } catch (error) {
-      console.error('Error fetching observations:', error)
-      Alert.alert(t('common.error'), 'Failed to load observations')
-    } finally {
-      setLoadingObservations(false)
     }
   }
 
@@ -273,80 +267,99 @@ export function WasteContainerCard({
           </View>
           <View style={styles.statusBadge}>
             <View style={[styles.statusDot, {backgroundColor: getStatusColor(container.status)}]} />
-            <Text style={styles.statusText}>{container.status.toUpperCase()}</Text>
-            <TouchableOpacity
-              style={styles.signalsBadge}
-              onPress={() => {
-                if (onClose) onClose()
-                // Navigate to Signals tab and apply container filter
-                router.push({
-                  pathname: '/(tabs)/signals',
-                  params: {containerReferenceId: container.publicNumber},
-                } as any)
-              }}
-              disabled={signalsLoading || !!signalsError}
-            >
-              {signalsLoading ? (
-                <ActivityIndicator size="small" color="#6B7280" />
-              ) : signalsError ? (
-                <AlertTriangle size={16} color="#F59E0B" />
-              ) : (
-                <>
-                  <AlertTriangle
-                    size={16}
-                    color={signalsActive && signalsActive > 0 ? '#EF4444' : '#6B7280'}
-                  />
-                  <Text style={styles.signalsText}>
-                    {t('wasteContainers.signalsCount', {count: signalsTotal ?? 0})}
-                    {` • ${t('wasteContainers.signalsActive', {active: signalsActive})}`}
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={styles.lastCleanedContainer}>
-            <TouchableOpacity
-              onPress={handleShowObservations}
-              disabled={!container.lastCleaned}
-              style={styles.lastCleanedButton}
-            >
-              <History size={16} color="#10B981" />
-              <Text style={[styles.lastCleanedText, styles.lastCleanedLink]}>
-                {t('wasteContainers.lastCleaned')}:{' '}
-                {container.lastCleaned ? new Date(container.lastCleaned).toLocaleString() : 'N/A'}
+            <Text style={styles.statusText}>
+              {t(`wasteContainers.statuses.${container.status}`)}
+            </Text>
+            <View style={styles.infoRow}>
+              <Trash2 size={16} color="#6B7280" />
+              <Text style={styles.infoText}>
+                {getWasteTypeLabel(container.wasteType)} •{' '}
+                {getCapacitySizeLabel(container.capacitySize)} ({container.capacityVolume}m³)
               </Text>
-            </TouchableOpacity>
-            {container.lastCleanedPhoto && (
-              <TouchableOpacity
-                onPress={() => setShowPhotoModal(true)}
-                style={styles.photoIconButton}
-              >
-                <Camera size={16} color="#10B981" />
-              </TouchableOpacity>
-            )}
+            </View>
           </View>
         </View>
         <View style={styles.headerButtons}>
           {onClose && (
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>×</Text>
+              <X size={24} color="#6B7280" />
             </TouchableOpacity>
           )}
         </View>
       </View>
-
-      {container.image?.url && (
-        <Image source={{uri: container.image.url}} style={styles.image} resizeMode="cover" />
-      )}
-
       <View style={styles.content}>
-        <View style={styles.infoRow}>
-          <Trash2 size={16} color="#6B7280" />
-          <Text style={styles.infoText}>
-            {getWasteTypeLabel(container.wasteType)} •{' '}
-            {getCapacitySizeLabel(container.capacitySize)} ({container.capacityVolume}m³)
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.signalsBadge}
+          onPress={() => {
+            if (onClose) onClose()
+            // Navigate to Signals tab and apply container filter
+            router.push({
+              pathname: '/(tabs)/signals',
+              params: {containerReferenceId: container.publicNumber},
+            } as any)
+          }}
+          disabled={signalsLoading || !!signalsError}
+        >
+          {signalsLoading ? (
+            <ActivityIndicator size="small" color="#6B7280" />
+          ) : signalsError ? (
+            <AlertTriangle size={16} color="#F59E0B" />
+          ) : (
+            <>
+              <AlertTriangle
+                size={16}
+                color={signalsActive && signalsActive > 0 ? '#EF4444' : '#6B7280'}
+              />
+              <Text
+                style={[
+                  styles.signalsText,
+                  signalsActive && signalsActive > 0 ? styles.signalsTextActive : undefined,
+                ]}
+              >
+                {`${t('wasteContainers.signalsActive', {active: signalsActive, count: signalsTotal ?? 0})}`}
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+        {/* Last Observation Photos */}
+        {loadingPhotos ? (
+          <View style={styles.lastPhotosLoading}>
+            <ActivityIndicator size="small" color="#1E40AF" />
+          </View>
+        ) : lastObservationPhotos.length > 0 ? (
+          <View style={styles.lastPhotosContainer}>
+            <Text style={styles.lastPhotosLabel}>{t('wasteContainers.lastObservations')}:</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.lastPhotosScroll}
+            >
+              {lastObservationPhotos.map((photo) => (
+                <TouchableOpacity
+                  key={photo.id}
+                  onPress={() => {
+                    setSelectedPhotoUrl(photo.url)
+                    setShowPhotoModal(true)
+                  }}
+                  style={styles.lastPhotoItem}
+                >
+                  <Image
+                    source={{uri: photo.url}}
+                    style={styles.lastPhotoThumbnail}
+                    resizeMode="cover"
+                  />
+                  <Text style={styles.lastPhotoDate}>
+                    {new Date(photo.cleanedAt).toLocaleDateString()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        ) : (
+          container.image?.url && (
+            <Image source={{uri: container.image.url}} style={styles.image} resizeMode="cover" />
+          )
+        )}
 
         {/* Full Info Toggle Button */}
         <TouchableOpacity
@@ -534,54 +547,6 @@ export function WasteContainerCard({
                 <X size={24} color="#666" />
               </TouchableOpacity>
             </View>
-
-            {loadingObservations ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#1E40AF" />
-              </View>
-            ) : observations.length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>{t('wasteContainers.noHistory')}</Text>
-              </View>
-            ) : (
-              <ScrollView style={styles.observationsList}>
-                {observations.map((observation: any, index: number) => (
-                  <View key={observation.id} style={styles.observationItem}>
-                    <View style={styles.observationRow}>
-                      <View style={styles.observationHeader}>
-                        <Calendar size={16} color="#666" />
-                        <Text style={styles.observationDate}>
-                          {new Date(observation.cleanedAt).toLocaleString()}
-                        </Text>
-                      </View>
-                      {observation.photo ? (
-                        <TouchableOpacity
-                          onPress={() => {
-                            // Show photo in full screen
-                            setSelectedPhotoUrl(observation.photo.url)
-                            setShowObservations(false)
-                            setShowPhotoModal(true)
-                          }}
-                        >
-                          <Image
-                            source={{uri: observation.photo.url}}
-                            style={styles.observationThumbnail}
-                            resizeMode="cover"
-                          />
-                        </TouchableOpacity>
-                      ) : (
-                        <View style={styles.noPhotoContainer}>
-                          <Camera size={14} color="#9CA3AF" />
-                          <Text style={styles.noPhotoText}>
-                            {t('wasteContainers.noPhotoUploaded')}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
           </View>
         </View>
       </Modal>
@@ -740,6 +705,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: 16,
+    paddingBottom: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -777,20 +743,22 @@ const styles = StyleSheet.create({
   signalsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginLeft: 8,
+    gap: 2,
   },
   signalsText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#6B7280',
     marginLeft: 4,
+  },
+  signalsTextActive: {
+    textDecorationLine: 'underline',
+    color: '#3B82F6',
   },
   lastCleanedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
     gap: 4,
-    marginTop: 4,
   },
   lastCleanedButton: {
     flexDirection: 'row',
@@ -844,6 +812,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingTop: 4,
     gap: 12,
   },
   infoRow: {
@@ -1192,5 +1161,37 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#9CA3AF',
     fontStyle: 'italic',
+  },
+  lastPhotosLoading: {
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  lastPhotosContainer: {
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  lastPhotosLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  lastPhotosScroll: {
+    flexDirection: 'row',
+  },
+  lastPhotoItem: {
+    marginRight: 12,
+    alignItems: 'center',
+  },
+  lastPhotoThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  lastPhotoDate: {
+    fontSize: 10,
+    color: '#6B7280',
+    marginTop: 4,
   },
 })
