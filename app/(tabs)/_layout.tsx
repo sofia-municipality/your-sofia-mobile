@@ -39,6 +39,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       screenOptions={{
         headerShown: true,
         headerTitleAlign: 'left',
+        lazy: false,
         tabBarStyle: {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
