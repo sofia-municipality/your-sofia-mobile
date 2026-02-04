@@ -12,14 +12,18 @@ import {
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {Navigation, NavigationOff, Plus} from 'lucide-react-native'
+import {Navigation, NavigationOff, Plus, ChevronDown, ChevronUp} from 'lucide-react-native'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {fetchWasteContainerById} from '../../../lib/payload'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
-import {type WasteContainer, type ContainerState} from '../../../types/wasteContainer'
+import {
+  type WasteContainer,
+  type ContainerState,
+  type WasteType,
+} from '../../../types/wasteContainer'
 
 type ContainerFilter = 'all' | ContainerState
 
@@ -30,7 +34,10 @@ export default function WasteContainers() {
   const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
-  const [selectedFilter, setSelectedFilter] = useState<ContainerFilter>('all')
+  const [selectedStateFilter, setSelectedStateFilter] = useState<ContainerFilter>('all')
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState<WasteType | 'all'>('all')
+  const [showStateFilters, setShowStateFilters] = useState(false)
+  const [showTypeFilters, setShowTypeFilters] = useState(false)
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [containers, setContainers] = useState<WasteContainer[]>([])
@@ -253,18 +260,47 @@ export default function WasteContainers() {
     }
   }
 
-  // Calculate counts for each filter
-  const getFilterCount = useCallback(
+  // Calculate counts for each state filter
+  const getStateFilterCount = useCallback(
     (filterKey: ContainerFilter): number => {
-      if (filterKey === 'all') return containers.length
+      if (filterKey === 'all') {
+        // If type filter is active, count only containers of that type
+        if (selectedTypeFilter !== 'all') {
+          return containers.filter((c) => c.wasteType === selectedTypeFilter).length
+        }
+        return containers.length
+      }
       return containers.filter((container) => {
-        return container.state?.includes(filterKey) ?? false
+        const matchesState = container.state?.includes(filterKey) ?? false
+        const matchesType =
+          selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
+        return matchesState && matchesType
       }).length
     },
-    [containers]
+    [containers, selectedTypeFilter]
   )
 
-  const filters: {key: ContainerFilter; label: string}[] = [
+  // Calculate counts for each type filter
+  const getTypeFilterCount = useCallback(
+    (typeKey: WasteType | 'all'): number => {
+      if (typeKey === 'all') {
+        // If state filter is active, count only containers with that state
+        if (selectedStateFilter !== 'all') {
+          return containers.filter((c) => c.state?.includes(selectedStateFilter) ?? false).length
+        }
+        return containers.length
+      }
+      return containers.filter((container) => {
+        const matchesType = container.wasteType === typeKey
+        const matchesState =
+          selectedStateFilter === 'all' || (container.state?.includes(selectedStateFilter) ?? false)
+        return matchesType && matchesState
+      }).length
+    },
+    [containers, selectedStateFilter]
+  )
+
+  const stateFilters: {key: ContainerFilter; label: string}[] = [
     {key: 'all', label: t('wasteContainers.filters.all')},
     {key: 'full', label: t('wasteContainers.filters.full')},
     {key: 'dirty', label: t('wasteContainers.filters.dirty')},
@@ -276,11 +312,27 @@ export default function WasteContainers() {
     {key: 'bulkyWaste', label: t('wasteContainers.filters.bulkyWaste')},
   ]
 
-  // Filter containers based on selected filter - use useMemo to avoid recalculating on every render
+  const typeFilters: {key: WasteType | 'all'; label: string}[] = [
+    {key: 'all', label: t('wasteContainers.filters.all')},
+    {key: 'general', label: t('wasteContainers.types.general')},
+    {key: 'recyclables', label: t('wasteContainers.types.recyclables')},
+    {key: 'organic', label: t('wasteContainers.types.organic')},
+    {key: 'glass', label: t('wasteContainers.types.glass')},
+    {key: 'paper', label: t('wasteContainers.types.paper')},
+    {key: 'plastic', label: t('wasteContainers.types.plastic')},
+    {key: 'metal', label: t('wasteContainers.types.metal')},
+    {key: 'trashCan', label: t('wasteContainers.types.trashCan')},
+  ]
+
+  // Filter containers based on selected filters - use useMemo to avoid recalculating on every render
   const visibleContainers = React.useMemo(() => {
-    if (selectedFilter === 'all') return containers
-    return containers.filter((container) => container.state?.includes(selectedFilter) ?? false)
-  }, [containers, selectedFilter])
+    return containers.filter((container) => {
+      const matchesState =
+        selectedStateFilter === 'all' || (container.state?.includes(selectedStateFilter) ?? false)
+      const matchesType = selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
+      return matchesState && matchesType
+    })
+  }, [containers, selectedStateFilter, selectedTypeFilter])
 
   // Memoize container markers to prevent re-renders during map movement
   const containerMarkers = React.useMemo(() => {
@@ -295,10 +347,17 @@ export default function WasteContainers() {
     }))
   }, [visibleContainers])
 
-  const handleFilterChange = useCallback((filter: ContainerFilter) => {
+  const handleStateFilterChange = useCallback((filter: ContainerFilter) => {
     // Force immediate state update without batching
     React.startTransition(() => {
-      setSelectedFilter(filter)
+      setSelectedStateFilter(filter)
+    })
+  }, [])
+
+  const handleTypeFilterChange = useCallback((filter: WasteType | 'all') => {
+    // Force immediate state update without batching
+    React.startTransition(() => {
+      setSelectedTypeFilter(filter)
     })
   }, [])
 
@@ -416,29 +475,97 @@ export default function WasteContainers() {
         ))}
       </MapView>
 
-      {/* Filter chips - overlay */}
-      <View style={styles.filtersContainer}>
-        <ScrollView
-          horizontal={false}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersScrollContent}
-        >
-          {filters.map((filter) => {
-            const count = getFilterCount(filter.key)
-            const isActive = selectedFilter === filter.key
-            return (
-              <TouchableOpacity
-                key={filter.key}
-                style={[styles.filterChip, isActive && styles.filterChipActive]}
-                onPress={() => handleFilterChange(filter.key)}
+      {/* Expandable filter row - overlay */}
+      <View style={styles.filtersRow}>
+        {/* State Filter */}
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.filterHeader}
+            onPress={() => {
+              setShowStateFilters(!showStateFilters)
+              setShowTypeFilters(false)
+            }}
+          >
+            <Text style={styles.filterHeaderText}>{t('wasteContainers.filterByState')}</Text>
+            {showStateFilters ? (
+              <ChevronUp size={20} color="#1F2937" />
+            ) : (
+              <ChevronDown size={20} color="#1F2937" />
+            )}
+          </TouchableOpacity>
+          {showStateFilters && (
+            <View style={styles.filterColumn}>
+              <ScrollView
+                style={styles.filterOptionsScroll}
+                contentContainerStyle={styles.filterOptionsContent}
               >
-                <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
-                  {filter.label} ({count})
-                </Text>
-              </TouchableOpacity>
-            )
-          })}
-        </ScrollView>
+                {stateFilters.map((filter) => {
+                  const count = getStateFilterCount(filter.key)
+                  const isActive = selectedStateFilter === filter.key
+                  return (
+                    <TouchableOpacity
+                      key={filter.key}
+                      style={[styles.filterChip, isActive && styles.filterChipActive]}
+                      onPress={() => handleStateFilterChange(filter.key)}
+                    >
+                      <Text
+                        style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
+                      >
+                        {filter.label} ({count})
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </ScrollView>
+            </View>
+          )}
+        </View>
+
+        {/* Type Filter */}
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.filterHeader}
+            onPress={() => {
+              setShowTypeFilters(!showTypeFilters)
+              setShowStateFilters(false)
+            }}
+          >
+            <Text style={styles.filterHeaderText}>{t('wasteContainers.filterByType')}</Text>
+            {showTypeFilters ? (
+              <ChevronUp size={20} color="#1F2937" />
+            ) : (
+              <ChevronDown size={20} color="#1F2937" />
+            )}
+          </TouchableOpacity>
+          {showTypeFilters && (
+            <View style={styles.filterColumn}>
+              <ScrollView
+                style={styles.filterOptionsScroll}
+                contentContainerStyle={styles.filterOptionsContent}
+              >
+                {typeFilters.map((filter) => {
+                  const count = getTypeFilterCount(filter.key)
+                  const isActive = selectedTypeFilter === filter.key
+                  return (
+                    <TouchableOpacity
+                      key={filter.key}
+                      style={[styles.filterChip, isActive && styles.filterChipActive]}
+                      onPress={() => handleTypeFilterChange(filter.key)}
+                    >
+                      <Text
+                        style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
+                      >
+                        {filter.label} ({count})
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </ScrollView>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Action Buttons */}
@@ -551,6 +678,46 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  filtersRow: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    right: 8,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  filterColumn: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  filterHeader: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  filterHeaderText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  filterOptionsScroll: {
+    maxHeight: 180,
+  },
+  filterOptionsContent: {
+    padding: 8,
+    gap: 6,
   },
   filtersContainer: {
     position: 'absolute',
