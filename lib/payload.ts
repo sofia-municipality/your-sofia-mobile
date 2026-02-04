@@ -101,6 +101,7 @@ export async function fetchNews(options?: {
   console.log('[fetchNews] Request URL:', url)
 
   const response = await fetch(url)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch news: ${response.statusText}`)
@@ -117,6 +118,7 @@ export async function fetchNewsById(
   locale: 'bg' | 'en' = 'bg'
 ): Promise<PayloadNewsItem> {
   const response = await fetch(`${getApiUrl()}/api/news/${id}?locale=${locale}`)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch news item: ${response.statusText}`)
@@ -214,6 +216,7 @@ export async function fetchWasteContainers(options?: {
   console.log('[fetchWasteContainers] Request URL:', url)
 
   const response = await fetch(url)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch waste containers: ${response.statusText}`)
@@ -276,6 +279,7 @@ export async function fetchNearbyWasteContainers(
   console.log('[fetchNearbyWasteContainers] Request URL:', url)
 
   const response = await fetch(url)
+  handleAuthError(response)
 
   if (!response.ok) {
     const errorText = await response.text()
@@ -312,6 +316,7 @@ export async function fetchNearbyWasteContainers(
  */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
   const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch waste container: ${response.statusText}`)
@@ -454,6 +459,7 @@ export async function fetchSignals(options?: {
   console.log('[fetchSignals] Request URL:', url)
 
   const response = await fetch(url)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch signals: ${response.statusText}`)
@@ -480,6 +486,7 @@ export async function fetchSignals(options?: {
  */
 export async function fetchSignalById(id: string, locale: 'bg' | 'en' = 'bg'): Promise<Signal> {
   const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}&depth=1`)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch signal: ${response.statusText}`)
@@ -665,6 +672,7 @@ export async function updateSignal(
     },
     body: JSON.stringify(signalData),
   })
+  handleAuthError(response)
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
@@ -824,6 +832,7 @@ export async function fetchAssignments(options?: {
   params.append('sort', '-createdAt')
 
   const response = await fetch(`${getApiUrl()}/api/assignments?${params.toString()}`)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch assignments: ${response.statusText}`)
@@ -837,6 +846,7 @@ export async function fetchAssignments(options?: {
  */
 export async function fetchAssignmentById(id: string): Promise<Assignment> {
   const response = await fetch(`${getApiUrl()}/api/assignments/${id}?depth=2`)
+  handleAuthError(response)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch assignment: ${response.statusText}`)
