@@ -70,7 +70,6 @@ export default function WasteContainers() {
   const loadContainers = useCallback(async () => {
     // Prevent concurrent loading requests
     if (loadingRef.current) {
-      console.log('[loadContainers] Already loading, skipping')
       return
     }
 
@@ -100,7 +99,6 @@ export default function WasteContainers() {
         searchLocation.longitude
       )
       if (distance < 500) {
-        console.log('[loadContainers] Moved only', distance, 'meters, skipping reload')
         return
       }
     }
@@ -108,7 +106,6 @@ export default function WasteContainers() {
     try {
       loadingRef.current = true
       setContainersLoading(true)
-      console.log('[loadContainers] Loading from position:', searchLocation)
 
       const radiusMeters = 1000
 
@@ -300,7 +297,7 @@ export default function WasteContainers() {
     [containers, selectedStateFilter]
   )
 
-  const stateFilters: {key: ContainerFilter; label: string}[] = [
+  const stateFilters: {key: ContainerState | 'all'; label: string}[] = [
     {key: 'all', label: t('wasteContainers.filters.all')},
     {key: 'full', label: t('wasteContainers.filters.full')},
     {key: 'dirty', label: t('wasteContainers.filters.dirty')},
@@ -496,10 +493,7 @@ export default function WasteContainers() {
           </TouchableOpacity>
           {showStateFilters && (
             <View style={styles.filterColumn}>
-              <ScrollView
-                style={styles.filterOptionsScroll}
-                contentContainerStyle={styles.filterOptionsContent}
-              >
+              <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {stateFilters.map((filter) => {
                   const count = getStateFilterCount(filter.key)
                   const isActive = selectedStateFilter === filter.key
@@ -541,10 +535,7 @@ export default function WasteContainers() {
           </TouchableOpacity>
           {showTypeFilters && (
             <View style={styles.filterColumn}>
-              <ScrollView
-                style={styles.filterOptionsScroll}
-                contentContainerStyle={styles.filterOptionsContent}
-              >
+              <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {typeFilters.map((filter) => {
                   const count = getTypeFilterCount(filter.key)
                   const isActive = selectedTypeFilter === filter.key
@@ -699,11 +690,12 @@ const styles = StyleSheet.create({
   },
   filterHeader: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -711,9 +703,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1F2937',
-  },
-  filterOptionsScroll: {
-    maxHeight: 180,
   },
   filterOptionsContent: {
     padding: 8,
