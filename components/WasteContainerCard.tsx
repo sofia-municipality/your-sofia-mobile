@@ -97,7 +97,6 @@ export function WasteContainerCard({
         const observationsResponse = await fetch(
           `${environmentManager.getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&depth=2&sort=-cleanedAt&limit=3`
         )
-        console.log('Observations data:', observationsResponse)
         const observationsData = await observationsResponse.json()
         const observationPhotos = (observationsData.docs || [])
           .filter((obs: any) => obs.photo)
@@ -110,17 +109,11 @@ export function WasteContainerCard({
             type: 'cleaning',
           }))
 
-        console.log(
-          'Signal fetch url: ',
-          `${environmentManager.getApiUrl()}/api/signals?where[cityObject.referenceId][equals]=${container.publicNumber}&depth=2&sort=-createdAt&limit=3`
-        )
         // Fetch signals for this container
         const signalsResponse = await fetch(
           `${environmentManager.getApiUrl()}/api/signals?where[cityObject.referenceId][equals]=${container.publicNumber}&depth=2&sort=-createdAt&limit=3`
         )
         const signalsData = await signalsResponse.json()
-        //log the signalsData for debugging
-        console.log('Signals data:', signalsData)
 
         const signalPhotos = (signalsData.docs || []).flatMap((signal: Signal) => {
           if (!signal.images || signal.images.length === 0) return []
@@ -138,8 +131,6 @@ export function WasteContainerCard({
         const allPhotos = [...observationPhotos, ...signalPhotos].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
-
-        console.log('All photos:', allPhotos)
 
         // Take only the first 3 photos
         setLastObservationPhotos(allPhotos.slice(0, 3))
