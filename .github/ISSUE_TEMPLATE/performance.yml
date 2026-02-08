@@ -9,42 +9,6 @@ body:
       value: |
         Thanks for reporting a performance issue! Your feedback helps make Your Sofia faster and more efficient for everyone.
 
-  - type: dropdown
-    id: component
-    attributes:
-      label: Affected Component
-      description: Where is the performance issue occurring?
-      options:
-        - Mobile App - Overall
-        - Mobile App - News Feed
-        - Mobile App - Map View
-        - Mobile App - Signal Creation
-        - Mobile App - Navigation/Routing
-        - Backend API - Overall
-        - Backend API - Specific Endpoint
-        - Database Queries
-        - Not Sure
-    validations:
-      required: true
-
-  - type: dropdown
-    id: performance-type
-    attributes:
-      label: Performance Issue Type
-      description: What kind of performance problem is this?
-      options:
-        - Slow Loading/Rendering
-        - High Memory Usage
-        - Memory Leak
-        - Battery Drain
-        - Network Inefficiency
-        - App Freeze/Hang
-        - Slow Database Queries
-        - Large Bundle Size
-        - Other
-    validations:
-      required: true
-
   - type: textarea
     id: description
     attributes:
@@ -117,28 +81,6 @@ body:
       label: Device Information
       description: Device model and specifications
       placeholder: 'iPhone 13 Pro (6GB RAM)'
-    validations:
-      required: false
-
-  - type: textarea
-    id: measurements
-    attributes:
-      label: Performance Measurements
-      description: Provide specific measurements (load times, memory usage, etc.)
-      placeholder: |
-        - Load time: 5.2 seconds (average of 5 tests)
-        - Memory usage: 180 MB → 320 MB after loading
-        - Network: 3 API calls, 2.3 MB transferred
-        - React Native Performance Monitor: 45 FPS during load
-    validations:
-      required: false
-
-  - type: textarea
-    id: profiling
-    attributes:
-      label: Profiling Data
-      description: Screenshots from performance profiler, Chrome DevTools, React Native Performance Monitor, etc.
-      placeholder: Drag and drop profiling screenshots or data here
     validations:
       required: false
 
