@@ -7,40 +7,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
-
-  - type: checkboxes
-    id: prerequisites
-    attributes:
-      label: Prerequisites
-      description: Please confirm the following before submitting
-      options:
-        - label: I have searched existing issues to avoid duplicates
-          required: true
-        - label: I am using the latest version of the app
-          required: true
-        - label: I have checked the documentation
-          required: true
-
-  - type: dropdown
-    id: component
-    attributes:
-      label: Which component is affected?
-      description: Select the part of the application where the bug occurs
-      options:
-        - Mobile App (Frontend)
-        - Backend API (Payload CMS)
-        - Both
-        - Not sure
-    validations:
-      required: true
+        Thanks for taking the time to report a bug! Please first check if it has already been reported.
 
   - type: textarea
     id: description
     attributes:
       label: Bug Description
       description: A clear and concise description of what the bug is
-      placeholder: Example - News feed doesn't refresh when switching language from Bulgarian to English
+      placeholder: Example - Map view not showing newly added city objects.
     validations:
       required: true
 
@@ -50,15 +24,13 @@ body:
       label: Steps to Reproduce
       description: Detailed steps to recreate the bug
       placeholder: |
-        1. Open the app in Bulgarian
-        2. Navigate to Home tab (news feed)
-        3. Switch language to English using toggle
-        4. Notice news articles remain in Bulgarian
+        1. Open the app
+        2. Navigate to Map view
+        3. Notice map does not show newly added city objects
       value: |
         1. 
         2. 
-        3. 
-        4.
+        3.
     validations:
       required: true
 
@@ -67,7 +39,7 @@ body:
     attributes:
       label: Expected Behavior
       description: What should happen?
-      placeholder: News articles should reload and display in English
+      placeholder: Map view should show newly added city objects  immediately after they are added.
     validations:
       required: true
 
@@ -76,7 +48,7 @@ body:
     attributes:
       label: Actual Behavior
       description: What actually happens?
-      placeholder: News articles stay in Bulgarian until app is restarted
+      placeholder: Map view does not show newly added city objects immediately after they are added.
     validations:
       required: true
 
@@ -136,17 +108,5 @@ body:
       label: Screenshots or Videos
       description: Attach screenshots or screen recordings that show the bug
       placeholder: Drag and drop images or videos here
-    validations:
-      required: false
-
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional Context
-      description: Any other relevant information about the problem
-      placeholder: |
-        - This only happens on the news feed, other screens update correctly
-        - The issue started after updating to version X
-        - Works fine on Android but fails on iOS
     validations:
       required: false

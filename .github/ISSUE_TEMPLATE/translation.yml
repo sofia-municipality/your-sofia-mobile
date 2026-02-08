@@ -9,61 +9,6 @@ body:
       value: |
         Thanks for helping improve translations! Your Sofia strives to be accessible to all Sofia residents in both Bulgarian and English.
 
-  - type: dropdown
-    id: translation-type
-    attributes:
-      label: Translation Issue Type
-      description: What kind of translation issue is this?
-      options:
-        - Missing Translation (text not translated)
-        - Incorrect Translation (wrong meaning)
-        - Unclear/Awkward Phrasing
-        - Cultural/Context Issue
-        - Grammar/Spelling Error
-        - Inconsistent Terminology
-        - Other
-    validations:
-      required: true
-
-  - type: dropdown
-    id: language
-    attributes:
-      label: Language
-      description: Which language has the issue?
-      options:
-        - Bulgarian (bg)
-        - English (en)
-    validations:
-      required: true
-
-  - type: dropdown
-    id: location
-    attributes:
-      label: Where is the issue?
-      description: Which part of the app has the translation issue?
-      options:
-        - Mobile App - Home/News
-        - Mobile App - Services
-        - Mobile App - Signals/Reports
-        - Mobile App - Profile
-        - Mobile App - Settings
-        - Backend Admin Panel
-        - Documentation (README, CONTRIBUTING)
-        - Other
-    validations:
-      required: true
-
-  - type: textarea
-    id: current-text
-    attributes:
-      label: Current Translation
-      description: What is the current text? (Screenshot or copy-paste)
-      placeholder: |
-        Translation key: airQuality.alert
-        Current text: "Качеството на въздуха е лошо!"
-    validations:
-      required: true
-
   - type: textarea
     id: issue
     attributes:
@@ -77,7 +22,7 @@ body:
   - type: textarea
     id: suggested
     attributes:
-      label: Suggested Translation
+      label: Suggested Translation Improvement
       description: Provide the corrected or improved translation
       placeholder: |
         Suggested text: "Качеството на въздуха е нездравословно!"
@@ -85,24 +30,6 @@ body:
         This is more formal and clearly indicates health concerns, which is important for a civic notification.
     validations:
       required: true
-
-  - type: input
-    id: translation-key
-    attributes:
-      label: Translation Key (if known)
-      description: The i18n key in the translation files (e.g., airQuality.alert)
-      placeholder: 'airQuality.alert'
-    validations:
-      required: false
-
-  - type: input
-    id: file-location
-    attributes:
-      label: File Location (if known)
-      description: Path to the translation file (e.g., app/translations/bg.ts)
-      placeholder: 'app/translations/bg.ts'
-    validations:
-      required: false
 
   - type: textarea
     id: context
@@ -113,20 +40,3 @@ body:
         This text appears in push notifications when air quality exceeds threshold. Users need to immediately understand the severity, so formal, clear language is essential.
     validations:
       required: false
-
-  - type: checkboxes
-    id: both-languages
-    attributes:
-      label: Does this affect both languages?
-      description: Check if the issue exists in both Bulgarian and English
-      options:
-        - label: This issue affects both Bulgarian and English translations
-        - label: The other language also needs updating for consistency
-
-  - type: checkboxes
-    id: willing-to-fix
-    attributes:
-      label: Are you willing to submit a PR to fix this?
-      description: Translation PRs are valuable contributions!
-      options:
-        - label: Yes, I'd like to update the translation files

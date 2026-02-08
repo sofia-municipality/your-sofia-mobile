@@ -7,39 +7,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a feature! Your ideas help make Your Sofia better for all citizens of Sofia.
-
-  - type: checkboxes
-    id: prerequisites
-    attributes:
-      label: Prerequisites
-      description: Please confirm the following before submitting
-      options:
-        - label: I have searched existing issues and discussions to avoid duplicates
-          required: true
-        - label: This feature aligns with the project goals (citizen engagement, transparency, accessibility)
-          required: true
-
-  - type: dropdown
-    id: feature-area
-    attributes:
-      label: Feature Area
-      description: Which part of the app would this feature affect?
-      options:
-        - News & Notifications
-        - City Services & Navigation
-        - Civic Participation (Signals/Reports)
-        - Maps & Location Services
-        - User Profile & Settings
-        - Backend/Admin Panel
-        - Other
-    validations:
-      required: true
+        Thanks for suggesting a new feature! Your ideas help make Your Sofia better for all citizens of Sofia.
 
   - type: textarea
     id: problem
     attributes:
-      label: Problem Statement
+      label: Problem Statement and User Benefit
       description: What problem does this feature solve? Why is it needed?
       placeholder: |
         Citizens are not notified when air quality reaches unhealthy levels, missing opportunities to protect their health and make informed decisions about outdoor activities.
@@ -71,32 +44,6 @@ body:
         - In-app banner only (less effective, requires app to be open)
         - Email notifications (slower, less immediate)
         - SMS notifications (expensive, privacy concerns)
-    validations:
-      required: false
-
-  - type: textarea
-    id: user-benefit
-    attributes:
-      label: User Benefit
-      description: How would this feature help Sofia residents?
-      placeholder: |
-        - Proactive health protection for vulnerable groups
-        - Informed decisions about outdoor activities and exercise
-        - Increased awareness of environmental issues
-        - Better planning for daily commutes and activities
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority/Impact
-      description: How important is this feature?
-      options:
-        - Critical - Blocks essential functionality
-        - High - Significantly improves user experience
-        - Medium - Nice to have, moderate impact
-        - Low - Minor improvement
     validations:
       required: false
 

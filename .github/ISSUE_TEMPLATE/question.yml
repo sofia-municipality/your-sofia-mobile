@@ -11,35 +11,6 @@ body:
 
         **Note:** For general discussions, feature ideas, or broader topics, consider using [GitHub Discussions](https://github.com/sofia-municipality/your-sofia-mobile/discussions) instead.
 
-  - type: checkboxes
-    id: prerequisites
-    attributes:
-      label: Prerequisites
-      description: Please confirm before asking
-      options:
-        - label: I have read the documentation (README.md and CONTRIBUTING.md)
-          required: true
-        - label: I have searched existing issues and discussions
-          required: true
-
-  - type: dropdown
-    id: question-area
-    attributes:
-      label: Question Category
-      description: What is your question about?
-      options:
-        - Setup & Installation
-        - Using the Mobile App
-        - Backend/API Usage
-        - Contributing Code
-        - Translation/Localization
-        - Testing
-        - Deployment
-        - Architecture/Design Decisions
-        - Other
-    validations:
-      required: true
-
   - type: textarea
     id: question
     attributes:
