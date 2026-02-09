@@ -5,10 +5,9 @@ import {Stack} from 'expo-router'
 import WasteContainers from './waste-containers'
 import TransportMap from './transport-bpilot'
 import NewsMap from './news'
-import EventsMap from './events'
 import BgsmetView from './bgsmet-view'
 
-type MapFilter = 'wasteContainers' | 'bgsmetView' | 'transport' | 'news' | 'events'
+type MapFilter = 'wasteContainers' | 'bgsmetView' | 'transport' | 'news'
 
 export default function MapsLayout() {
   const {t} = useTranslation()
@@ -19,7 +18,6 @@ export default function MapsLayout() {
     // {key: 'bgsmetView', label: t('map.filters.bgsmetView')},
     // {key: 'transport', label: t('map.filters.transportBpilot')},
     {key: 'news', label: t('map.filters.news')},
-    {key: 'events', label: t('map.filters.events')},
   ]
 
   // Determine which map component(s) to render
@@ -33,8 +31,6 @@ export default function MapsLayout() {
         return <TransportMap />
       case 'news':
         return <NewsMap />
-      case 'events':
-        return <EventsMap />
       default:
         return <WasteContainers />
     }

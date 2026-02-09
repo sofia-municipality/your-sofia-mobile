@@ -36,7 +36,7 @@ import {EnvironmentSwitcher} from '@/components/EnvironmentSwitcher'
 import {LanguageSwitch} from '@/components/LanguageSwitch'
 import {useAuth} from '@/contexts/AuthContext'
 
-const getProfileSections = (t: (key: string) => string) => [
+const getProfileSections = (t: (key: string) => string, onNotificationsPress: () => void) => [
   {
     id: 1,
     title: t('profile.accountSettings'),
@@ -52,6 +52,7 @@ const getProfileSections = (t: (key: string) => string) => [
         title: t('profile.notificationSettings'),
         icon: Bell,
         description: t('profile.manageNotifications'),
+        onPress: onNotificationsPress,
       },
       {
         id: 13,
@@ -107,6 +108,7 @@ interface ProfileSection {
     title: string
     icon: any
     description: string
+    onPress?: () => void
   }[]
 }
 
@@ -217,7 +219,7 @@ export default function ProfileScreen() {
     ])
   }
 
-  const profileSections = getProfileSections(t)
+  const profileSections = getProfileSections(t, () => router.push('/oboapp/notifications' as any))
 
   return (
     <SafeAreaView style={styles.container}>
@@ -390,7 +392,12 @@ export default function ProfileScreen() {
               {section.items.map((item) => {
                 const IconComponent = item.icon
                 return (
-                  <TouchableOpacity key={item.id} style={styles.menuItem}>
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.menuItem}
+                    onPress={item.onPress}
+                    disabled={!item.onPress}
+                  >
                     <View style={styles.menuItemContent}>
                       <View style={styles.menuItemIcon}>
                         <IconComponent size={20} color="#1E40AF" />

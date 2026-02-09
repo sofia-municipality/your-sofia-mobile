@@ -1,16 +1,26 @@
 import React, {useState, useEffect} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker} from 'react-native-maps'
+import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {useNews} from '../../../hooks/useNews'
+import {useOboMessages} from '../../../hooks/useOboMessages'
+import {useOboSources} from '../../../hooks/useOboSources'
+import {estimateZoom, getBoundsFromRegion, type MapBounds} from '../../../lib/mapBounds'
 import {ImplementMeGithub} from '../../../components/ImplementMeGithub'
 
 export default function EventsMap() {
   const {t} = useTranslation()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [locationError, setLocationError] = useState(false)
-  const {news: events, loading} = useNews('city-events')
+  const {sourcesMap} = useOboSources()
+  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
+  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const {news: events, loading} = useOboMessages({
+    bounds: mapBounds,
+    zoom: mapZoom,
+    enabled: true,
+    sourcesMap,
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -41,6 +51,11 @@ export default function EventsMap() {
     longitudeDelta: 0.05,
   }
 
+  useEffect(() => {
+    setMapBounds(getBoundsFromRegion(region))
+    setMapZoom(estimateZoom(region))
+  }, [region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta])
+
   // Filter events that have location data
   const eventsWithLocation = events.filter((item) => item.location)
 
@@ -61,6 +76,10 @@ export default function EventsMap() {
         showsUserLocation={true}
         showsMyLocationButton={true}
         showsCompass={true}
+        onRegionChangeComplete={(nextRegion: Region) => {
+          setMapBounds(getBoundsFromRegion(nextRegion))
+          setMapZoom(estimateZoom(nextRegion))
+        }}
       >
         {location && !locationError && (
           <Marker
@@ -86,6 +105,7 @@ export default function EventsMap() {
             />
           ))}
       </MapView>
+      <Text style={styles.poweredByText}>Powered by OboApp</Text>
       <View style={styles.implementMeContainer}>
         <ImplementMeGithub
           extendedText={t('common.implementMeMessage')}
@@ -119,5 +139,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+  },
+  poweredByText: {
+    position: 'absolute',
+    top: 6,
+    left: 10,
+    fontSize: 10,
+    color: '#9CA3AF',
+    opacity: 0.7,
   },
 })

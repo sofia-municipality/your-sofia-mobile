@@ -42,6 +42,7 @@ export default function WasteContainers() {
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
+  const [containersError, setContainersError] = useState<string | null>(null)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
@@ -106,6 +107,7 @@ export default function WasteContainers() {
     try {
       loadingRef.current = true
       setContainersLoading(true)
+      setContainersError(null)
 
       const radiusMeters = 1000
 
@@ -119,7 +121,7 @@ export default function WasteContainers() {
     } catch (error) {
       console.error('Error loading nearby containers:', error)
       if (isMountedRef.current) {
-        Alert.alert(t('common.error'), t('containers.loadError'))
+        setContainersError(t('containers.loadError'))
       }
     } finally {
       if (isMountedRef.current) {
@@ -610,6 +612,22 @@ export default function WasteContainers() {
           <ActivityIndicator size="small" color="#1E40AF" />
         </View>
       )}
+
+      {/* Error banner for containers */}
+      {containersError && !containersLoading && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText}>{containersError}</Text>
+          <TouchableOpacity
+            style={styles.errorRetryButton}
+            onPress={() => {
+              lastLoadLocationRef.current = null
+              loadContainers()
+            }}
+          >
+            <Text style={styles.errorRetryText}>{t('common.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   )
 }
@@ -788,6 +806,42 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  errorBanner: {
+    position: 'absolute',
+    bottom: 80,
+    left: 16,
+    right: 16,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  errorBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#DC2626',
+    marginRight: 12,
+  },
+  errorRetryButton: {
+    backgroundColor: '#DC2626',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  errorRetryText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   actionButtonsContainer: {
     position: 'absolute',

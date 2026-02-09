@@ -1,13 +1,18 @@
-import {useState, useEffect, useRef} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
 import {Platform} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
+import {useOboAppAuth} from '@/contexts/OboAppAuthContext'
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL
+const OBOAPP_API_URL = process.env.EXPO_PUBLIC_OBOAPP_API_URL
 const PUSH_TOKEN_KEY = 'pushToken'
 const UNREAD_COUNT_KEY = 'unreadNotificationCount'
+
+let listenersInitialized = false
+let notificationListener: Notifications.Subscription | null = null
+let responseListener: Notifications.Subscription | null = null
 
 // Configure how notifications are displayed
 Notifications.setNotificationHandler({
@@ -22,43 +27,196 @@ Notifications.setNotificationHandler({
 export function useNotifications() {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null)
   const [unreadCount, setUnreadCount] = useState(0)
-  const notificationListener = useRef<Notifications.Subscription | null>(null)
-  const responseListener = useRef<Notifications.Subscription | null>(null)
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null)
+  const [isRegistering, setIsRegistering] = useState(false)
+  const {user: oboUser, loading: oboLoading, getIdToken, isAuthenticated} = useOboAppAuth()
+  const registerAbortRef = useRef(false)
 
   useEffect(() => {
-    // Register for push notifications
-    registerForPushNotificationsAsync().then((token) => {
-      if (token) {
-        setExpoPushToken(token)
-        // Send token to backend
-        sendTokenToBackend(token)
-      }
-    })
-
     // Load unread count from storage
     loadUnreadCount()
 
     // Listen for incoming notifications
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('Notification received:', notification)
-      incrementUnreadCount()
-    })
+    if (!listenersInitialized) {
+      notificationListener = Notifications.addNotificationReceivedListener((notification) => {
+        console.log('Notification received:', notification)
+        incrementUnreadCount()
+      })
 
-    // Listen for notification interactions
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('Notification tapped:', response)
-      // You can handle navigation here
-    })
+      // Listen for notification interactions
+      responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log('Notification tapped:', response)
+        // You can handle navigation here
+      })
+
+      listenersInitialized = true
+    }
+
+    return () => {}
+  }, [])
+
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (!OBOAPP_API_URL || !oboUser) {
+      setIsSubscribed(false)
+      return
+    }
+
+    try {
+      const idToken = await getIdToken()
+      if (!idToken) {
+        setIsSubscribed(false)
+        return
+      }
+
+      const response = await fetch(`${OBOAPP_API_URL}/api/mobile/notifications/subscription`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        setIsSubscribed(false)
+        return
+      }
+
+      const data = await response.json()
+      setIsSubscribed(data.hasSubscription === true)
+    } catch (error) {
+      console.error('Error checking subscription status:', error)
+      setIsSubscribed(false)
+    }
+  }, [getIdToken, oboUser])
+
+  const sendTokenToBackend = useCallback(
+    async (token: string) => {
+      if (!OBOAPP_API_URL || !oboUser) {
+        return
+      }
+
+      try {
+        const idToken = await getIdToken()
+        if (!idToken) {
+          return
+        }
+
+        const response = await fetch(`${OBOAPP_API_URL}/api/mobile/notifications/subscription`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            token,
+            endpoint: `https://fcm.googleapis.com/fcm/send/${token}`,
+            deviceInfo: {
+              platform: Platform.OS,
+              modelName: Device.modelName,
+              osVersion: Device.osVersion,
+              appVersion: Constants.expoConfig?.version,
+            },
+          }),
+        })
+
+        if (!response.ok) {
+          console.log('Token registration response:', response.status)
+          return
+        }
+
+        setIsSubscribed(true)
+      } catch (error) {
+        console.error('Error sending push token to backend:', error)
+      }
+    },
+    [getIdToken, oboUser]
+  )
+
+  const subscribeToOboApp = useCallback(async () => {
+    if (!oboUser) {
+      return
+    }
+
+    if (!OBOAPP_API_URL) {
+      console.warn('Missing EXPO_PUBLIC_OBOAPP_API_URL')
+      return
+    }
+
+    setIsRegistering(true)
+    registerAbortRef.current = false
+
+    try {
+      const token = await registerForPushNotificationsAsync()
+      if (!token || registerAbortRef.current) {
+        return
+      }
+
+      setExpoPushToken(token)
+      await AsyncStorage.setItem(PUSH_TOKEN_KEY, token)
+      await sendTokenToBackend(token)
+    } finally {
+      setIsRegistering(false)
+    }
+  }, [oboUser, sendTokenToBackend])
+
+  const unsubscribeFromOboApp = useCallback(async () => {
+    if (!oboUser || !OBOAPP_API_URL) {
+      return
+    }
+
+    try {
+      const idToken = await getIdToken()
+      if (!idToken) {
+        return
+      }
+
+      const token = await AsyncStorage.getItem(PUSH_TOKEN_KEY)
+      if (!token) {
+        return
+      }
+
+      const response = await fetch(
+        `${OBOAPP_API_URL}/api/mobile/notifications/subscription?token=${encodeURIComponent(
+          token
+        )}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      )
+
+      if (response.ok) {
+        setIsSubscribed(false)
+        await AsyncStorage.removeItem(PUSH_TOKEN_KEY)
+      }
+    } catch (error) {
+      console.error('Error removing push token:', error)
+    }
+  }, [getIdToken, oboUser])
+
+  useEffect(() => {
+    if (oboLoading || !oboUser) {
+      setIsSubscribed(false)
+      return
+    }
+
+    fetchSubscriptionStatus()
+  }, [fetchSubscriptionStatus, oboLoading, oboUser])
+
+  useEffect(() => {
+    if (!isAuthenticated || oboLoading) {
+      return
+    }
+
+    subscribeToOboApp()
 
     return () => {
-      if (notificationListener.current) {
-        notificationListener.current.remove()
-      }
-      if (responseListener.current) {
-        responseListener.current.remove()
-      }
+      registerAbortRef.current = true
     }
-  }, [])
+  }, [isAuthenticated, oboLoading, subscribeToOboApp])
 
   const loadUnreadCount = async () => {
     try {
@@ -88,37 +246,15 @@ export function useNotifications() {
     }
   }
 
-  const sendTokenToBackend = async (token: string) => {
-    try {
-      // Store token locally
-      await AsyncStorage.setItem(PUSH_TOKEN_KEY, token)
-
-      // Send token to Payload backend
-      const response = await fetch(`${API_URL}/api/push-tokens`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          token,
-          device: Platform.OS,
-          active: true,
-        }),
-      })
-
-      if (!response.ok) {
-        // Token might already exist, that's okay
-        console.log('Token registration response:', response.status)
-      } else {
-        console.log('Push token registered successfully')
-      }
-    } catch (error) {
-      console.error('Error sending push token to backend:', error)
-    }
-  }
-
   return {
     expoPushToken,
     unreadCount,
     clearUnreadCount,
+    isSubscribed,
+    isRegistering,
+    subscribeToOboApp,
+    unsubscribeFromOboApp,
+    refreshSubscriptionStatus: fetchSubscriptionStatus,
   }
 }
 
@@ -148,11 +284,14 @@ async function registerForPushNotificationsAsync() {
       return null
     }
 
-    token = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig?.extra?.eas?.projectId,
-      })
-    ).data
+    const deviceToken = await Notifications.getDevicePushTokenAsync()
+
+    if (deviceToken.type !== 'fcm') {
+      console.log(`Unsupported push token type: ${deviceToken.type}`)
+      return null
+    }
+
+    token = deviceToken.data
   } else {
     console.log('Must use physical device for Push Notifications')
   }
