@@ -3,12 +3,18 @@ import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
 import {Platform} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Constants from 'expo-constants'
 import {useOboAppAuth} from '@/contexts/OboAppAuthContext'
+import {
+  OboNotificationDeleteResponseSchema,
+  OboNotificationSubscriptionRequestSchema,
+  OboNotificationSubscriptionSchema,
+  OboNotificationSubscriptionStatusSchema,
+} from '@/lib/oboappSchema'
+import {getOboAppBaseUrl} from '@/lib/oboapp'
 
-const OBOAPP_API_URL = process.env.EXPO_PUBLIC_OBOAPP_API_URL
 const PUSH_TOKEN_KEY = 'pushToken'
 const UNREAD_COUNT_KEY = 'unreadNotificationCount'
+const NOTIFICATION_SUBSCRIPTION_PATH = '/notifications/subscription'
 
 let listenersInitialized = false
 let notificationListener: Notifications.Subscription | null = null
@@ -56,7 +62,7 @@ export function useNotifications() {
   }, [])
 
   const fetchSubscriptionStatus = useCallback(async () => {
-    if (!OBOAPP_API_URL || !oboUser) {
+    if (!oboUser) {
       setIsSubscribed(false)
       return
     }
@@ -68,7 +74,8 @@ export function useNotifications() {
         return
       }
 
-      const response = await fetch(`${OBOAPP_API_URL}/api/mobile/notifications/subscription`, {
+      const baseUrl = getOboAppBaseUrl()
+      const response = await fetch(`${baseUrl}${NOTIFICATION_SUBSCRIPTION_PATH}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +88,7 @@ export function useNotifications() {
         return
       }
 
-      const data = await response.json()
+      const data = OboNotificationSubscriptionStatusSchema.parse(await response.json())
       setIsSubscribed(data.hasSubscription === true)
     } catch (error) {
       console.error('Error checking subscription status:', error)
@@ -91,7 +98,7 @@ export function useNotifications() {
 
   const sendTokenToBackend = useCallback(
     async (token: string) => {
-      if (!OBOAPP_API_URL || !oboUser) {
+      if (!oboUser) {
         return
       }
 
@@ -101,28 +108,34 @@ export function useNotifications() {
           return
         }
 
-        const response = await fetch(`${OBOAPP_API_URL}/api/mobile/notifications/subscription`, {
+        const baseUrl = getOboAppBaseUrl()
+        const requestPayload = OboNotificationSubscriptionRequestSchema.parse({
+          token,
+          endpoint: `https://fcm.googleapis.com/fcm/send/${token}`,
+          deviceInfo: {
+            platform: Platform.OS,
+            userAgent:
+              Device.modelName && Device.osVersion
+                ? `${Device.modelName} (${Platform.OS} ${Device.osVersion})`
+                : undefined,
+          },
+        })
+
+        const response = await fetch(`${baseUrl}${NOTIFICATION_SUBSCRIPTION_PATH}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${idToken}`,
           },
-          body: JSON.stringify({
-            token,
-            endpoint: `https://fcm.googleapis.com/fcm/send/${token}`,
-            deviceInfo: {
-              platform: Platform.OS,
-              modelName: Device.modelName,
-              osVersion: Device.osVersion,
-              appVersion: Constants.expoConfig?.version,
-            },
-          }),
+          body: JSON.stringify(requestPayload),
         })
 
         if (!response.ok) {
           console.log('Token registration response:', response.status)
           return
         }
+
+        OboNotificationSubscriptionSchema.parse(await response.json())
 
         setIsSubscribed(true)
       } catch (error) {
@@ -137,7 +150,7 @@ export function useNotifications() {
       return
     }
 
-    if (!OBOAPP_API_URL) {
+    if (!process.env.EXPO_PUBLIC_OBOAPP_API_URL) {
       console.warn('Missing EXPO_PUBLIC_OBOAPP_API_URL')
       return
     }
@@ -160,7 +173,7 @@ export function useNotifications() {
   }, [oboUser, sendTokenToBackend])
 
   const unsubscribeFromOboApp = useCallback(async () => {
-    if (!oboUser || !OBOAPP_API_URL) {
+    if (!oboUser) {
       return
     }
 
@@ -175,10 +188,9 @@ export function useNotifications() {
         return
       }
 
+      const baseUrl = getOboAppBaseUrl()
       const response = await fetch(
-        `${OBOAPP_API_URL}/api/mobile/notifications/subscription?token=${encodeURIComponent(
-          token
-        )}`,
+        `${baseUrl}${NOTIFICATION_SUBSCRIPTION_PATH}?token=${encodeURIComponent(token)}`,
         {
           method: 'DELETE',
           headers: {
@@ -189,6 +201,7 @@ export function useNotifications() {
       )
 
       if (response.ok) {
+        OboNotificationDeleteResponseSchema.parse(await response.json())
         setIsSubscribed(false)
         await AsyncStorage.removeItem(PUSH_TOKEN_KEY)
       }

@@ -1,7 +1,13 @@
 import type {MapBounds} from './mapBounds'
 import type {NewsItem} from '@/types/news'
+import {
+  OboMessagesResponseSchema,
+  OboSourcesResponseSchema,
+  type OboMessage,
+  type OboSource,
+} from './oboappSchema'
 
-const getOboAppBaseUrl = () => {
+export const getOboAppBaseUrl = () => {
   const baseUrl = process.env.EXPO_PUBLIC_OBOAPP_API_URL
   if (!baseUrl) {
     throw new Error('EXPO_PUBLIC_OBOAPP_API_URL is not configured')
@@ -9,78 +15,20 @@ const getOboAppBaseUrl = () => {
 
   return baseUrl.replace(/\/$/, '')
 }
+export type {OboMessage, OboSource}
 
-export interface OboMessage {
-  id?: string
-  text: string
-  plainText?: string
-  markdownText?: string
-  addresses?: {
-    originalText: string
-    formattedAddress: string
-    coordinates: {
-      lat: number
-      lng: number
-    }
-    geoJson?: {
-      type: 'Point'
-      coordinates: [number, number]
-    }
-  }[]
-  geoJson?: {
-    type: 'FeatureCollection'
-    features: {
-      type: 'Feature'
-      geometry: {
-        type: 'Point' | 'LineString' | 'Polygon'
-        coordinates: any
-      }
-      properties?: Record<string, unknown>
-    }[]
+async function parseJsonResponse<T>(
+  response: Response,
+  schema: {parse: (value: unknown) => T},
+  context: string
+): Promise<T> {
+  const payload = await response.json()
+  try {
+    return schema.parse(payload)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown validation error'
+    throw new Error(`${context}: invalid response payload (${message})`)
   }
-  createdAt: string | Date
-  crawledAt?: string | Date
-  finalizedAt?: string | Date
-  source?: string
-  sourceUrl?: string
-  categories?: string[]
-  timespanStart?: string | Date
-  timespanEnd?: string | Date
-  cityWide?: boolean
-  responsibleEntity?: string
-  pins?: {
-    address: string
-    coordinates?: {lat: number; lng: number}
-    timespans: {start: string; end: string}[]
-  }[]
-  streets?: {
-    street: string
-    from: string
-    fromCoordinates?: {lat: number; lng: number}
-    to: string
-    toCoordinates?: {lat: number; lng: number}
-    timespans: {start: string; end: string}[]
-  }[]
-  cadastralProperties?: {
-    identifier: string
-    timespans: {start: string; end: string}[]
-  }[]
-  busStops?: string[]
-}
-
-export interface OboSource {
-  id: string
-  name: string
-  url: string
-  logoUrl: string
-}
-
-interface OboMessagesResponse {
-  messages: OboMessage[]
-}
-
-interface OboSourcesResponse {
-  sources: OboSource[]
 }
 
 export async function fetchOboMessages(options?: {
@@ -114,8 +62,8 @@ export async function fetchOboMessages(options?: {
     throw new Error(`Failed to fetch OboApp messages: ${response.statusText}`)
   }
 
-  const data = (await response.json()) as OboMessagesResponse
-  return data.messages ?? []
+  const data = await parseJsonResponse(response, OboMessagesResponseSchema, 'OboApp messages')
+  return data.messages
 }
 
 export async function fetchOboSources(): Promise<OboSource[]> {
@@ -126,8 +74,8 @@ export async function fetchOboSources(): Promise<OboSource[]> {
     throw new Error(`Failed to fetch OboApp sources: ${response.statusText}`)
   }
 
-  const data = (await response.json()) as OboSourcesResponse
-  return data.sources ?? []
+  const data = await parseJsonResponse(response, OboSourcesResponseSchema, 'OboApp sources')
+  return data.sources
 }
 
 export function mapOboMessageToNewsItem(
@@ -209,18 +157,6 @@ export function mapOboMessageToNewsItem(
 }
 
 export async function fetchOboMessageById(id: string): Promise<OboMessage | null> {
-  const baseUrl = getOboAppBaseUrl()
-  try {
-    const response = await fetch(`${baseUrl}/messages/by-id?id=${encodeURIComponent(id)}`)
-    if (response.ok) {
-      const data = (await response.json()) as {message: OboMessage}
-      return data.message ?? null
-    }
-    if (response.status === 404) return null
-  } catch {
-    // Fall through to fallback
-  }
-  // Fallback: fetch all and filter
   const messages = await fetchOboMessages()
   return messages.find((message) => message.id === id) ?? null
 }
