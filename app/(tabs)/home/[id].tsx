@@ -8,11 +8,12 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  SafeAreaView,
 } from 'react-native'
-import {useLocalSearchParams} from 'expo-router'
+import {useLocalSearchParams, useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
 import MapView, {Marker} from 'react-native-maps'
-import {MapPin, Building2, ExternalLink, BusFront} from 'lucide-react-native'
+import {MapPin, Building2, ExternalLink, BusFront, ChevronLeft} from 'lucide-react-native'
 import {useOboMessageById} from '@/hooks/useOboMessageById'
 import {useOboSources} from '@/hooks/useOboSources'
 import {mapOboMessageToNewsItem} from '@/lib/oboapp'
@@ -24,6 +25,7 @@ import {getCategoryColor} from '@/lib/categories'
 export default function NewsDetail() {
   const {id} = useLocalSearchParams<{id: string}>()
   const {t, i18n} = useTranslation()
+  const router = useRouter()
   const {message, loading, error} = useOboMessageById(id)
   const {sourcesMap} = useOboSources()
 
@@ -71,7 +73,22 @@ export default function NewsDetail() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Custom compact header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+        >
+          <ChevronLeft size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {item.title || t('common.news')}
+        </Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {/* Category badges */}
@@ -207,20 +224,44 @@ export default function NewsDetail() {
           ) : null}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  backButton: {
+    padding: 4,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginLeft: 8,
+  },
+  headerSpacer: {
+    width: 32,
   },
   scrollView: {
     flex: 1,
+    backgroundColor: '#F9FAFB',
   },
   content: {
-    padding: 20,
+    padding: 16,
+    paddingTop: 16,
     paddingBottom: 40,
   },
   categoriesRow: {

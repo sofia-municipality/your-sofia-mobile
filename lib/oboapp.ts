@@ -103,17 +103,12 @@ export function mapOboMessageToNewsItem(
     }
   }
 
-  // Generate a smart title from plainText or text (truncated)
-  const titleSource = message.plainText || message.text
-  const title =
-    titleSource.length > 120 ? titleSource.substring(0, 120).trim() + '...' : titleSource
-
   // Collect all locations
   const allLocations = getAllLocations(message)
 
   return {
     id: message.id ?? `${message.createdAt}`,
-    title,
+    title: undefined,
     description: sourceInfo?.name ?? sourceId ?? '',
     date: date.toLocaleDateString(locale === 'bg' ? 'bg-BG' : 'en-US', {
       year: 'numeric',

@@ -34,9 +34,11 @@ export function NewsCard({item}: NewsCardProps) {
         ) : null}
 
         {/* Title */}
-        <Text style={styles.title} numberOfLines={3}>
-          {item.title}
-        </Text>
+        {item.title ? (
+          <Text style={styles.title} numberOfLines={3}>
+            {item.title}
+          </Text>
+        ) : null}
 
         {/* Timespan */}
         {item.timespanStatus ? (
