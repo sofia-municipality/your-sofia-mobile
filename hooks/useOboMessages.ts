@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import type {MapBounds} from '@/lib/mapBounds'
 import {fetchOboMessages, mapOboMessageToNewsItem, type OboSource} from '@/lib/oboapp'
@@ -18,10 +18,6 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Use a ref for sourcesMap to avoid triggering refetches when the reference changes
-  const sourcesMapRef = useRef(options.sourcesMap)
-  sourcesMapRef.current = options.sourcesMap
 
   const loadMessages = useCallback(async () => {
     if (options.enabled === false) {
@@ -43,7 +39,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
       })
 
       const transformed = messages
-        .map((message) => mapOboMessageToNewsItem(message, i18n.language, sourcesMapRef.current))
+        .map((message) => mapOboMessageToNewsItem(message, i18n.language, options.sourcesMap))
         .slice(0, options.limit ?? messages.length)
 
       setNews(transformed)
@@ -58,6 +54,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
     options.categories,
     options.enabled,
     options.limit,
+    options.sourcesMap,
     options.zoom,
     i18n.language,
   ])

@@ -10,12 +10,6 @@ const getOboAppBaseUrl = () => {
   return baseUrl.replace(/\/$/, '')
 }
 
-function fetchWithTimeout(url: string, timeoutMs: number = 10000): Promise<Response> {
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
-  return fetch(url, {signal: controller.signal}).finally(() => clearTimeout(timeoutId))
-}
-
 export interface OboMessage {
   id?: string
   text: string
@@ -115,7 +109,7 @@ export async function fetchOboMessages(options?: {
   const query = params.toString()
   const url = `${baseUrl}/messages${query ? `?${query}` : ''}`
 
-  const response = await fetchWithTimeout(url, 30000)
+  const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Failed to fetch OboApp messages: ${response.statusText}`)
   }
@@ -126,7 +120,7 @@ export async function fetchOboMessages(options?: {
 
 export async function fetchOboSources(): Promise<OboSource[]> {
   const baseUrl = getOboAppBaseUrl()
-  const response = await fetchWithTimeout(`${baseUrl}/sources`)
+  const response = await fetch(`${baseUrl}/sources`)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch OboApp sources: ${response.statusText}`)
@@ -217,9 +211,7 @@ export function mapOboMessageToNewsItem(
 export async function fetchOboMessageById(id: string): Promise<OboMessage | null> {
   const baseUrl = getOboAppBaseUrl()
   try {
-    const response = await fetchWithTimeout(
-      `${baseUrl}/messages/by-id?id=${encodeURIComponent(id)}`
-    )
+    const response = await fetch(`${baseUrl}/messages/by-id?id=${encodeURIComponent(id)}`)
     if (response.ok) {
       const data = (await response.json()) as {message: OboMessage}
       return data.message ?? null

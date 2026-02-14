@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View, StyleSheet, ActivityIndicator, Text, TouchableOpacity} from 'react-native'
+import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useRouter} from 'expo-router'
@@ -22,7 +22,7 @@ export default function NewsMap() {
   const {filterChips} = useOboCategories()
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
-  const {news, loading, error, refresh} = useOboMessages({
+  const {news, loading} = useOboMessages({
     categories: selectedTopic !== 'all' ? [selectedTopic] : undefined,
     bounds: mapBounds,
     zoom: mapZoom,
@@ -72,17 +72,6 @@ export default function NewsMap() {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#1E40AF" />
         <Text style={styles.loadingText}>{t('map.loading')}</Text>
-      </View>
-    )
-  }
-
-  if (error && newsWithLocation.length === 0) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={refresh}>
-          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
-        </TouchableOpacity>
       </View>
     )
   }
@@ -157,23 +146,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#6B7280',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#EF4444',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  retryButton: {
-    backgroundColor: '#1E40AF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   filterOverlay: {
     position: 'absolute',
