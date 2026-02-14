@@ -14,6 +14,7 @@ import {TopicFilter} from '../../../components/TopicFilter'
 import {NewsCard} from '../../../components/NewsCard'
 import {NewsMap} from '../../../components/NewsMap'
 import {useNews} from '../../../hooks/useNews'
+import {useNotifications} from '../../../hooks/useNotifications'
 import {useOboCategories} from '../../../hooks/useOboCategories'
 import {useOboMessages} from '../../../hooks/useOboMessages'
 import {useOboSources} from '../../../hooks/useOboSources'
@@ -43,6 +44,7 @@ export default function HomeScreen() {
   const scrollViewRef = useRef<ScrollView>(null)
   const newsSectionRef = useRef<View>(null)
   const {registerBellAction} = useBellAction()
+  const {unreadCount, clearUnreadCount} = useNotifications()
   const selectedCategories = useMemo(
     () => (selectedTopic !== 'all' ? [selectedTopic] : undefined),
     [selectedTopic]
