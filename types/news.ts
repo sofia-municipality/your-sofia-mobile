@@ -3,6 +3,7 @@ export type NewsTopicType = 'all' | string
 export interface NewsItem {
   id: string
   title?: string
+  snippet?: string
   description: string
   date: string
   topic: NewsTopicType

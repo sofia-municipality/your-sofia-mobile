@@ -6,6 +6,7 @@ import {
   type OboMessage,
   type OboSource,
 } from './oboappSchema'
+import {extractSnippet} from './stringUtils'
 
 export const getOboAppBaseUrl = () => {
   const baseUrl = process.env.EXPO_PUBLIC_OBOAPP_API_URL
@@ -106,9 +107,13 @@ export function mapOboMessageToNewsItem(
   // Collect all locations
   const allLocations = getAllLocations(message)
 
+  // Generate snippet from plainText or text for cards without titles
+  const snippet = extractSnippet(message.plainText || message.text, 100)
+
   return {
     id: message.id ?? `${message.createdAt}`,
     title: undefined,
+    snippet,
     description: sourceInfo?.name ?? sourceId ?? '',
     date: date.toLocaleDateString(locale === 'bg' ? 'bg-BG' : 'en-US', {
       year: 'numeric',

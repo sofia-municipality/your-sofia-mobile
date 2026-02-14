@@ -11,3 +11,25 @@ export function formatCategoryLabel(category: string): string {
   }
   return translated
 }
+
+/**
+ * Extract a short snippet from text for preview purposes
+ * Removes markdown formatting and truncates to specified length
+ */
+export function extractSnippet(text: string, maxLength: number = 100): string {
+  // Remove markdown headers
+  let cleaned = text.replace(/^#{1,6}\s+/gm, '')
+  // Remove bold/italic
+  cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1')
+  cleaned = cleaned.replace(/\*(.+?)\*/g, '$1')
+  // Remove bullet points
+  cleaned = cleaned.replace(/^[-*]\s+/gm, '')
+  // Collapse multiple spaces/newlines
+  cleaned = cleaned.replace(/\s+/g, ' ').trim()
+
+  // Truncate to maxLength
+  if (cleaned.length > maxLength) {
+    return cleaned.substring(0, maxLength).trim() + '...'
+  }
+  return cleaned
+}

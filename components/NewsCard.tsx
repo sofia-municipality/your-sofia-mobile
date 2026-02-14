@@ -33,10 +33,14 @@ export function NewsCard({item}: NewsCardProps) {
           </View>
         ) : null}
 
-        {/* Title */}
+        {/* Title or snippet */}
         {item.title ? (
           <Text style={styles.title} numberOfLines={3}>
             {item.title}
+          </Text>
+        ) : item.snippet ? (
+          <Text style={styles.snippet} numberOfLines={2}>
+            {item.snippet}
           </Text>
         ) : null}
 
@@ -102,6 +106,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: uiTokens.colors.textPrimary,
     lineHeight: 21,
+  },
+  snippet: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: uiTokens.colors.textSecondary,
+    lineHeight: 20,
   },
   timespanRow: {
     marginTop: 2,
