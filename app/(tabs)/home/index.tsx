@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView} from 'react-native'
-import {useRef, useCallback, useState} from 'react'
+import {useRef, useCallback, useState, useMemo} from 'react'
 import {useFocusEffect} from '@react-navigation/native'
 import {
   useFonts,
@@ -43,6 +43,10 @@ export default function HomeScreen() {
   const scrollViewRef = useRef<ScrollView>(null)
   const newsSectionRef = useRef<View>(null)
   const {registerBellAction} = useBellAction()
+  const selectedCategories = useMemo(
+    () => (selectedTopic !== 'all' ? [selectedTopic] : undefined),
+    [selectedTopic]
+  )
 
   // Load recent news from OboApp
   const {news, loading: newsLoading, error: newsError, refresh} = useNews(selectedTopic)
@@ -53,7 +57,7 @@ export default function HomeScreen() {
     error: mapError,
     refresh: refreshMap,
   } = useOboMessages({
-    categories: selectedTopic !== 'all' ? [selectedTopic] : undefined,
+    categories: selectedCategories,
     bounds: isMapView ? mapBounds : null,
     zoom: mapZoom,
     enabled: isMapView,

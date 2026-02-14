@@ -115,7 +115,7 @@ export default {
     personalInfo: 'Лична информация',
     updateProfile: 'Обнови профилни данни',
     notificationSettings: 'Настройки за известия',
-    manageNotifications: 'Управление на известията',
+    manageNotifications: 'Скоро: известия от Твоята София',
     security: 'Сигурност',
     securitySettings: 'Настройки за сигурност',
     deviceId: 'Анонимен идентификатор',
@@ -141,22 +141,7 @@ export default {
       support: 'Поддръжка',
     },
   },
-  oboappNotifications: {
-    title: 'Известия от OboApp',
-    subtitle: 'Влез с OboApp профил, за да получаваш известия по локация.',
-    loginTitle: 'Вход в OboApp',
-    registerTitle: 'Създай OboApp профил',
-    needAccount: 'Нямаш OboApp профил? Създай',
-    haveAccount: 'Вече имаш OboApp профил? Влез',
-    statusTitle: 'Статус на абонамента',
-    statusSubscribed: 'Абониран',
-    statusNotSubscribed: 'Не е абониран',
-    statusUnknown: 'Неизвестен статус',
-    enableNotifications: 'Включи известия',
-    disableNotifications: 'Изключи известия',
-    refreshStatus: 'Обнови статуса',
-    signOut: 'Изход от OboApp',
-  },
+
   payments: {
     bills: {
       electricity: 'Електричество',

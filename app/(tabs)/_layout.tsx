@@ -8,6 +8,7 @@ import {
   Edit3,
   MapPin,
   AlertTriangle,
+  Bell,
   ChartNoAxesCombined,
   MapPlus,
   ClipboardList,
@@ -63,7 +64,9 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           title: t('common.home'),
           tabBarLabel: t('common.home'),
           tabBarIcon: ({color}) => <Home size={24} color={color} />,
-          headerTitle: () => <TabHeader title={t('common.goodMorning')} showActionIcon={true} />,
+          headerTitle: () => (
+            <TabHeader title={t('common.goodMorning')} showActionIcon={true} ActionIcon={Bell} />
+          ),
         }}
       />
       <Tabs.Screen

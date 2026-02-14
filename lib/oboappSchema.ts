@@ -98,39 +98,5 @@ export const OboSourcesResponseSchema = z.object({
   sources: z.array(OboSourceSchema),
 })
 
-export const OboNotificationSubscriptionStatusSchema = z.object({
-  hasSubscription: z.boolean(),
-})
-
-export const OboNotificationSubscriptionRequestSchema = z.object({
-  token: z.string(),
-  endpoint: z.string(),
-  deviceInfo: z
-    .object({
-      userAgent: z.string().optional(),
-      platform: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const OboNotificationSubscriptionSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  token: z.string(),
-  endpoint: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  deviceInfo: z
-    .object({
-      userAgent: z.string().optional(),
-      platform: z.string().optional(),
-    })
-    .optional(),
-})
-
-export const OboNotificationDeleteResponseSchema = z.object({
-  success: z.literal(true),
-})
-
 export type OboMessage = z.infer<typeof OboMessageSchema>
 export type OboSource = z.infer<typeof OboSourceSchema>

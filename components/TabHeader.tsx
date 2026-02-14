@@ -1,6 +1,5 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native'
-import {Bell, LucideIcon} from 'lucide-react-native'
-import {useNotifications} from '../hooks/useNotifications'
+import {LucideIcon} from 'lucide-react-native'
 import {useBellAction} from '../contexts/BellActionContext'
 import {uiTokens} from '../styles/common'
 
@@ -14,37 +13,25 @@ interface TabHeaderProps {
 export function TabHeader({
   title,
   showActionIcon = false,
-  ActionIcon = Bell,
+  ActionIcon,
   onActionPress,
 }: TabHeaderProps) {
-  const {unreadCount, clearUnreadCount} = useNotifications()
   const {triggerBellAction} = useBellAction()
 
   const handleActionPress = () => {
     if (onActionPress) {
       onActionPress()
-    } else if (ActionIcon === Bell) {
-      // Default bell behavior
-      clearUnreadCount()
+    } else {
       triggerBellAction()
     }
   }
 
-  const Icon = ActionIcon
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      {showActionIcon && (
+      {showActionIcon && ActionIcon && (
         <TouchableOpacity style={styles.actionButton} onPress={handleActionPress}>
-          <Icon size={24} color="#6B7280" />
-          {ActionIcon === Bell && unreadCount > 0 && (
-            <View style={styles.notificationBadge}>
-              <Text style={styles.notificationBadgeText}>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </Text>
-            </View>
-          )}
+          <ActionIcon size={24} color="#6B7280" />
         </TouchableOpacity>
       )}
     </View>
@@ -76,25 +63,5 @@ const styles = StyleSheet.create({
     marginRight: uiTokens.spacing.lg,
     borderWidth: 1,
     borderColor: uiTokens.colors.border,
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: uiTokens.colors.danger,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 2,
-    borderColor: uiTokens.colors.surface,
-  },
-  notificationBadgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
   },
 })

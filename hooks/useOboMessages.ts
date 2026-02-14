@@ -18,6 +18,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const categoriesKey = options.categories?.join('|') ?? ''
 
   const loadMessages = useCallback(async () => {
     if (options.enabled === false) {
@@ -33,7 +34,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
       setError(null)
 
       const messages = await fetchOboMessages({
-        categories: options.categories,
+        categories: categoriesKey ? categoriesKey.split('|') : undefined,
         bounds: options.bounds ?? undefined,
         zoom: options.zoom,
       })
@@ -51,7 +52,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
     }
   }, [
     options.bounds,
-    options.categories,
+    categoriesKey,
     options.enabled,
     options.limit,
     options.sourcesMap,

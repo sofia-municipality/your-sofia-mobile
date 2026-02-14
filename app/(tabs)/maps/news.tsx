@@ -18,12 +18,16 @@ export default function NewsMap() {
   const router = useRouter()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
+  const selectedCategories = useMemo(
+    () => (selectedTopic !== 'all' ? [selectedTopic] : undefined),
+    [selectedTopic]
+  )
   const {sourcesMap} = useOboSources()
   const {filterChips} = useOboCategories()
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
   const {news, loading} = useOboMessages({
-    categories: selectedTopic !== 'all' ? [selectedTopic] : undefined,
+    categories: selectedCategories,
     bounds: mapBounds,
     zoom: mapZoom,
     enabled: true,

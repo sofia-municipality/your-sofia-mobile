@@ -116,7 +116,7 @@ export default {
     personalInfo: 'Personal Information',
     updateProfile: 'Update your profile details',
     notificationSettings: 'Notification Settings',
-    manageNotifications: 'Manage your notifications',
+    manageNotifications: 'Coming soon: notifications in Your Sofia',
     security: 'Security',
     securitySettings: 'Password and security settings',
     deviceId: 'Anonymous Identifier',
@@ -142,22 +142,7 @@ export default {
       support: 'Support',
     },
   },
-  oboappNotifications: {
-    title: 'OboApp Notifications',
-    subtitle: 'Sign in with your OboApp account to receive area notifications.',
-    loginTitle: 'Sign in to OboApp',
-    registerTitle: 'Create OboApp account',
-    needAccount: "Don't have an OboApp account? Create one",
-    haveAccount: 'Already have an OboApp account? Sign in',
-    statusTitle: 'Subscription status',
-    statusSubscribed: 'Subscribed',
-    statusNotSubscribed: 'Not subscribed',
-    statusUnknown: 'Status unknown',
-    enableNotifications: 'Enable notifications',
-    disableNotifications: 'Disable notifications',
-    refreshStatus: 'Refresh status',
-    signOut: 'Sign out of OboApp',
-  },
+
   payments: {
     bills: {
       electricity: 'Electricity',

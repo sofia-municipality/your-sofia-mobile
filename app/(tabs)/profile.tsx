@@ -12,7 +12,6 @@ import {
 import {
   User,
   Settings,
-  Bell,
   Shield,
   CreditCard,
   FileText,
@@ -37,7 +36,7 @@ import {LanguageSwitch} from '@/components/LanguageSwitch'
 import {useAuth} from '@/contexts/AuthContext'
 import {commonStyles, uiTokens} from '../../styles/common'
 
-const getProfileSections = (t: (key: string) => string, onNotificationsPress: () => void) => [
+const getProfileSections = (t: (key: string) => string) => [
   {
     id: 1,
     title: t('profile.accountSettings'),
@@ -47,13 +46,6 @@ const getProfileSections = (t: (key: string) => string, onNotificationsPress: ()
         title: t('profile.personalInfo'),
         icon: User,
         description: t('profile.updateProfile'),
-      },
-      {
-        id: 12,
-        title: t('profile.notificationSettings'),
-        icon: Bell,
-        description: t('profile.manageNotifications'),
-        onPress: onNotificationsPress,
       },
       {
         id: 13,
@@ -205,7 +197,7 @@ export default function ProfileScreen() {
     ])
   }
 
-  const profileSections = getProfileSections(t, () => router.push('/oboapp/notifications' as any))
+  const profileSections = getProfileSections(t)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -393,7 +385,7 @@ export default function ProfileScreen() {
                         <Text style={styles.menuItemDescription}>{item.description}</Text>
                       </View>
                     </View>
-                    <ChevronRight size={20} color="#9CA3AF" />
+                    {item.onPress ? <ChevronRight size={20} color="#9CA3AF" /> : null}
                   </TouchableOpacity>
                 )
               })}
