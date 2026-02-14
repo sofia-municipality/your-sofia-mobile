@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import type {MapBounds} from '@/lib/mapBounds'
 import {fetchOboMessages, mapOboMessageToNewsItem, type OboSource} from '@/lib/oboapp'
@@ -19,6 +19,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const categoriesKey = options.categories?.join('|') ?? ''
+  const hasLoadedRef = useRef(false)
 
   const loadMessages = useCallback(async () => {
     if (options.enabled === false) {
@@ -30,7 +31,10 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
     }
 
     try {
-      setLoading(true)
+      // Only show full loading state on initial fetch, not subsequent refetches
+      if (!hasLoadedRef.current) {
+        setLoading(true)
+      }
       setError(null)
 
       const messages = await fetchOboMessages({
@@ -44,6 +48,7 @@ export function useOboMessages(options: UseOboMessagesOptions = {}) {
         .slice(0, options.limit ?? messages.length)
 
       setNews(transformed)
+      hasLoadedRef.current = true
     } catch (err) {
       console.error('Error loading OboApp messages:', err)
       setError(err instanceof Error ? err.message : 'Failed to load messages')

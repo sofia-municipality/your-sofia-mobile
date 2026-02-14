@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
@@ -26,6 +26,7 @@ export default function NewsMap() {
   const {filterChips} = useOboCategories()
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const {news, loading} = useOboMessages({
     categories: selectedCategories,
     bounds: mapBounds,
@@ -90,8 +91,11 @@ export default function NewsMap() {
         showsMyLocationButton={true}
         showsCompass={true}
         onRegionChangeComplete={(nextRegion: Region) => {
-          setMapBounds(getBoundsFromRegion(nextRegion))
-          setMapZoom(estimateZoom(nextRegion))
+          if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
+          regionDebounceRef.current = setTimeout(() => {
+            setMapBounds(getBoundsFromRegion(nextRegion))
+            setMapZoom(estimateZoom(nextRegion))
+          }, 400)
         }}
       >
         {/* News markers with category colors */}

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
@@ -16,6 +16,7 @@ export default function EventsMap() {
   const {sourcesMap} = useOboSources()
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const {news: events, loading} = useOboMessages({
     bounds: mapBounds,
     zoom: mapZoom,
@@ -63,7 +64,7 @@ export default function EventsMap() {
   // Filter events that have location data
   const eventsWithLocation = events.filter((item) => item.location)
 
-  if (loading) {
+  if (loading && eventsWithLocation.length === 0) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={uiTokens.colors.primary} />
@@ -81,8 +82,11 @@ export default function EventsMap() {
         showsMyLocationButton={true}
         showsCompass={true}
         onRegionChangeComplete={(nextRegion: Region) => {
-          setMapBounds(getBoundsFromRegion(nextRegion))
-          setMapZoom(estimateZoom(nextRegion))
+          if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
+          regionDebounceRef.current = setTimeout(() => {
+            setMapBounds(getBoundsFromRegion(nextRegion))
+            setMapZoom(estimateZoom(nextRegion))
+          }, 400)
         }}
       >
         {location && !locationError && (

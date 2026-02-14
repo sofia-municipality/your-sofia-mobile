@@ -54,6 +54,7 @@ export default function WasteContainers() {
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   })
+  const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Cleanup on unmount
   useEffect(() => {
@@ -443,14 +444,17 @@ export default function WasteContainers() {
       <MapView
         ref={mapRef}
         onRegionChangeComplete={(region) => {
-          setMapCenter({
-            latitude: region.latitude,
-            longitude: region.longitude,
-          })
           regionDeltaRef.current = {
             latitudeDelta: region.latitudeDelta,
             longitudeDelta: region.longitudeDelta,
           }
+          if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
+          regionDebounceRef.current = setTimeout(() => {
+            setMapCenter({
+              latitude: region.latitude,
+              longitude: region.longitude,
+            })
+          }, 400)
         }}
         provider={PROVIDER_DEFAULT}
         style={styles.map}
