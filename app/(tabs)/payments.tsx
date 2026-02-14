@@ -17,11 +17,10 @@ import {
   Receipt,
   ChevronRight,
   Search,
-  Plus,
   Clock,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
-import {commonStyles} from '../../styles/common'
+import {commonStyles, uiTokens} from '../../styles/common'
 
 interface Bill {
   id: number
@@ -48,7 +47,7 @@ const getBillCategories = (t: (key: string) => string): Bill[] => [
     icon: Zap,
     color: '#F59E0B',
     amount: '124.50',
-    dueDate: t('payments.common.due') + ' Jan 15',
+    dueDate: `${t('payments.common.due')} Jan 15`,
     status: 'pending',
   },
   {
@@ -57,7 +56,7 @@ const getBillCategories = (t: (key: string) => string): Bill[] => [
     icon: Droplets,
     color: '#3B82F6',
     amount: '89.20',
-    dueDate: t('payments.common.due') + ' Jan 20',
+    dueDate: `${t('payments.common.due')} Jan 20`,
     status: 'pending',
   },
   {
@@ -66,7 +65,7 @@ const getBillCategories = (t: (key: string) => string): Bill[] => [
     icon: Home,
     color: '#059669',
     amount: '450.00',
-    dueDate: t('payments.common.due') + ' Feb 1',
+    dueDate: `${t('payments.common.due')} Feb 1`,
     status: 'pending',
   },
   {
@@ -118,7 +117,7 @@ export default function PaymentsScreen() {
             <Search size={20} color="#6B7280" />
             <TextInput
               style={styles.searchInput}
-              placeholder="Търси сметки и услуги..."
+              placeholder={t('payments.common.searchPlaceholder')}
               placeholderTextColor="#9CA3AF"
             />
           </View>
@@ -127,8 +126,10 @@ export default function PaymentsScreen() {
         {/* Outstanding Bills */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Предстоящи плащания</Text>
-            <Text style={styles.totalAmount}>Общо: 688.70 лв</Text>
+            <Text style={styles.sectionTitle}>{t('payments.common.upcomingPayments')}</Text>
+            <Text style={styles.totalAmount}>
+              {t('payments.common.totalAmount', {amount: '688.70'})}
+            </Text>
           </View>
 
           <View style={styles.billsList}>
@@ -166,21 +167,21 @@ export default function PaymentsScreen() {
 
           <TouchableOpacity style={styles.payAllButton}>
             <CreditCard size={20} color="#ffffff" />
-            <Text style={styles.payAllButtonText}>Плати всички сметки</Text>
+            <Text style={styles.payAllButtonText}>{t('payments.common.payAllBills')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Quick Payment Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Бързи плащания</Text>
+          <Text style={styles.sectionTitle}>{t('payments.common.quickPayments')}</Text>
           <View style={styles.quickPaymentGrid}>
             <TouchableOpacity style={styles.quickPaymentCard}>
               <Wifi size={24} color="#1E40AF" />
-              <Text style={styles.quickPaymentText}>Интернет</Text>
+              <Text style={styles.quickPaymentText}>{t('payments.common.internet')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickPaymentCard}>
               <Receipt size={24} color="#1E40AF" />
-              <Text style={styles.quickPaymentText}>Друго плащане</Text>
+              <Text style={styles.quickPaymentText}>{t('payments.common.otherPayment')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -190,7 +191,7 @@ export default function PaymentsScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>{t('payments.common.recentPayments')}</Text>
             <TouchableOpacity>
-              <Text style={styles.viewAllText}>Виж всички</Text>
+              <Text style={styles.viewAllText}>{t('payments.common.viewAll')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -240,64 +241,31 @@ export default function PaymentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1E40AF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: uiTokens.colors.background,
   },
   scrollView: {
     flex: 1,
   },
   searchContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: uiTokens.spacing.xl,
+    paddingTop: uiTokens.spacing.xl,
   },
   searchBar: {
+    ...commonStyles.card,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   searchInput: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   section: {
-    paddingHorizontal: 20,
-    marginTop: 24,
+    paddingHorizontal: uiTokens.spacing.xl,
+    marginTop: uiTokens.spacing.xxl,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -308,33 +276,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   totalAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#DC2626',
+    color: uiTokens.colors.danger,
   },
   viewAllText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     fontWeight: '500',
   },
   billsList: {
     gap: 12,
   },
   billCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   overdueBill: {
     borderLeftWidth: 4,
@@ -358,12 +317,12 @@ const styles = StyleSheet.create({
   billTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
   },
   billDueDate: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   overdueDueDate: {
     color: '#DC2626',
@@ -377,7 +336,7 @@ const styles = StyleSheet.create({
   billAmount: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   payAllButton: {
     flexDirection: 'row',
@@ -399,23 +358,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   quickPaymentCard: {
+    ...commonStyles.card,
     flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
     padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   quickPaymentText: {
     fontSize: 14,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     fontWeight: '500',
     marginTop: 8,
     textAlign: 'center',
@@ -424,19 +374,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   paymentHistoryCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   paymentHistoryIcon: {
     width: 40,
@@ -453,7 +394,7 @@ const styles = StyleSheet.create({
   paymentHistoryTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
   },
   paymentHistoryMeta: {
@@ -463,7 +404,7 @@ const styles = StyleSheet.create({
   },
   paymentHistoryDate: {
     fontSize: 12,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   paymentHistoryAmount: {
     alignItems: 'flex-end',
@@ -471,7 +412,7 @@ const styles = StyleSheet.create({
   paymentHistoryAmountText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
   },
   paidBadge: {
@@ -486,19 +427,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   paymentMethodCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
     marginBottom: 20,
   },
   paymentMethodInfo: {
@@ -508,11 +440,11 @@ const styles = StyleSheet.create({
   paymentMethodTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
   },
   paymentMethodDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
 })

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
@@ -7,6 +7,7 @@ import {useOboMessages} from '../../../hooks/useOboMessages'
 import {useOboSources} from '../../../hooks/useOboSources'
 import {estimateZoom, getBoundsFromRegion, type MapBounds} from '../../../lib/mapBounds'
 import {ImplementMeGithub} from '../../../components/ImplementMeGithub'
+import {uiTokens} from '../../../styles/common'
 
 export default function EventsMap() {
   const {t} = useTranslation()
@@ -44,17 +45,20 @@ export default function EventsMap() {
   }, [])
 
   // Default to Sofia center if location is not available
-  const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  }
+  const region = useMemo(
+    () => ({
+      latitude: location?.coords.latitude || 42.6977,
+      longitude: location?.coords.longitude || 23.3219,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    }),
+    [location?.coords.latitude, location?.coords.longitude]
+  )
 
   useEffect(() => {
     setMapBounds(getBoundsFromRegion(region))
     setMapZoom(estimateZoom(region))
-  }, [region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta])
+  }, [region])
 
   // Filter events that have location data
   const eventsWithLocation = events.filter((item) => item.location)
@@ -62,7 +66,7 @@ export default function EventsMap() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
+        <ActivityIndicator size="large" color={uiTokens.colors.primary} />
         <Text style={styles.loadingText}>{t('map.loading')}</Text>
       </View>
     )
@@ -87,8 +91,8 @@ export default function EventsMap() {
               latitude: location.coords.latitude,
               longitude: location.coords.longitude,
             }}
-            title={t('common.yourLocation') || 'Your Location'}
-            pinColor="#1E40AF"
+            title={t('common.yourLocation')}
+            pinColor={uiTokens.colors.primary}
           />
         )}
 
@@ -105,7 +109,7 @@ export default function EventsMap() {
             />
           ))}
       </MapView>
-      <Text style={styles.poweredByText}>Powered by OboApp</Text>
+      <Text style={styles.poweredByText}>{t('common.poweredByOboApp')}</Text>
       <View style={styles.implementMeContainer}>
         <ImplementMeGithub
           extendedText={t('common.implementMeMessage')}
@@ -127,12 +131,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   implementMeContainer: {
     position: 'absolute',
@@ -145,7 +149,7 @@ const styles = StyleSheet.create({
     top: 6,
     left: 10,
     fontSize: 10,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     opacity: 0.7,
   },
 })

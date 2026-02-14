@@ -28,6 +28,7 @@ import {
   type ContainerState,
   type WasteContainer,
 } from '../../types/wasteContainer'
+import {commonStyles, uiTokens} from '../../styles/common'
 
 interface ContainerWithSignals extends WasteContainer {
   signalCount: number
@@ -35,7 +36,7 @@ interface ContainerWithSignals extends WasteContainer {
 }
 
 export default function AssignmentsScreen() {
-  const {t} = useTranslation()
+  const {t, i18n} = useTranslation()
   const {user, isContainerAdmin, token} = useAuth()
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [containers, setContainers] = useState<ContainerWithSignals[]>([])
@@ -161,7 +162,7 @@ export default function AssignmentsScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
+          <ActivityIndicator size="large" color={uiTokens.colors.primary} />
           <Text style={styles.loadingText}>{t('common.loading')}</Text>
         </View>
       </View>
@@ -251,14 +252,14 @@ export default function AssignmentsScreen() {
 
                 <View style={styles.assignmentInfo}>
                   <View style={styles.infoItem}>
-                    <CheckSquare size={16} color="#6B7280" />
+                    <CheckSquare size={16} color={uiTokens.colors.textMuted} />
                     <Text style={styles.infoText}>
                       {t('assignments.containerCount', {count: containerCount})}
                     </Text>
                   </View>
                   {assignedToName && (
                     <View style={styles.infoItem}>
-                      <Users size={16} color="#6B7280" />
+                      <Users size={16} color={uiTokens.colors.textMuted} />
                       <Text style={styles.infoText} numberOfLines={1}>
                         {assignedToName}
                       </Text>
@@ -266,12 +267,15 @@ export default function AssignmentsScreen() {
                   )}
                   {item.dueDate && (
                     <View style={styles.infoItem}>
-                      <Calendar size={16} color="#6B7280" />
+                      <Calendar size={16} color={uiTokens.colors.textMuted} />
                       <Text style={styles.infoText}>
-                        {new Date(item.dueDate).toLocaleDateString('bg-BG', {
-                          day: 'numeric',
-                          month: 'short',
-                        })}
+                        {new Date(item.dueDate).toLocaleDateString(
+                          i18n.language === 'bg' ? 'bg-BG' : 'en-US',
+                          {
+                            day: 'numeric',
+                            month: 'short',
+                          }
+                        )}
                       </Text>
                     </View>
                   )}
@@ -325,15 +329,15 @@ export default function AssignmentsScreen() {
                 >
                   <View style={styles.containerCardContent}>
                     {isSelected ? (
-                      <CheckSquare size={24} color="#3B82F6" />
+                      <CheckSquare size={24} color={uiTokens.colors.primary} />
                     ) : (
-                      <Square size={24} color="#9CA3AF" />
+                      <Square size={24} color={uiTokens.colors.textMuted} />
                     )}
                     <Text style={styles.containerNumber}>{item.publicNumber}</Text>
                     <View style={styles.signalsBadge}>
                       <AlertTriangle
                         size={16}
-                        color={item.activeSignalCount > 0 ? '#EF4444' : '#6B7280'}
+                        color={item.activeSignalCount > 0 ? '#EF4444' : uiTokens.colors.textMuted}
                       />
                       <Text
                         style={[
@@ -361,7 +365,7 @@ export default function AssignmentsScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.fabContent}>
-            <Plus size={20} color="#ffffff" />
+            <Plus size={20} color={uiTokens.colors.surface} />
             <Text style={styles.fabText}>{selectedCount}</Text>
           </View>
         </TouchableOpacity>
@@ -378,7 +382,7 @@ export default function AssignmentsScreen() {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t('assignments.createNew')}</Text>
             <TouchableOpacity onPress={() => setShowCreateModal(false)}>
-              <X size={24} color="#1F2937" />
+              <X size={24} color={uiTokens.colors.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -389,7 +393,7 @@ export default function AssignmentsScreen() {
               value={formData.title}
               onChangeText={(text) => setFormData((prev) => ({...prev, title: text}))}
               placeholder={t('assignments.titlePlaceholder')}
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={uiTokens.colors.textMuted}
             />
 
             <Text style={styles.label}>{t('assignments.description')}</Text>
@@ -398,7 +402,7 @@ export default function AssignmentsScreen() {
               value={formData.description}
               onChangeText={(text) => setFormData((prev) => ({...prev, description: text}))}
               placeholder={t('assignments.descriptionPlaceholder')}
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={uiTokens.colors.textMuted}
               multiline
               numberOfLines={4}
             />
@@ -415,9 +419,9 @@ export default function AssignmentsScreen() {
                     activeOpacity={0.7}
                   >
                     {isSelected ? (
-                      <CheckSquare size={20} color="#3B82F6" />
+                      <CheckSquare size={20} color={uiTokens.colors.primary} />
                     ) : (
-                      <Square size={20} color="#9CA3AF" />
+                      <Square size={20} color={uiTokens.colors.textMuted} />
                     )}
                     <Text style={styles.activityLabel}>
                       {t(`signals.containerStates.${activity}`)}
@@ -444,7 +448,7 @@ export default function AssignmentsScreen() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#ffffff" />
+                <ActivityIndicator color={uiTokens.colors.surface} />
               ) : (
                 <Text style={styles.submitButtonText}>{t('common.new')}</Text>
               )}
@@ -465,7 +469,7 @@ export default function AssignmentsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{selectedAssignment.title}</Text>
               <TouchableOpacity onPress={() => setSelectedAssignment(null)}>
-                <X size={24} color="#1F2937" />
+                <X size={24} color={uiTokens.colors.textPrimary} />
               </TouchableOpacity>
             </View>
 
@@ -523,7 +527,7 @@ export default function AssignmentsScreen() {
                   <Text style={styles.detailText}>
                     {typeof selectedAssignment.assignedTo === 'object'
                       ? selectedAssignment.assignedTo.name || selectedAssignment.assignedTo.email
-                      : 'N/A'}
+                      : '—'}
                   </Text>
                 </View>
               )}
@@ -533,7 +537,9 @@ export default function AssignmentsScreen() {
                 <View style={styles.detailSection}>
                   <Text style={styles.detailLabel}>{t('assignments.dueDate')}</Text>
                   <Text style={styles.detailText}>
-                    {new Date(selectedAssignment.dueDate).toLocaleDateString('bg-BG')}
+                    {new Date(selectedAssignment.dueDate).toLocaleDateString(
+                      i18n.language === 'bg' ? 'bg-BG' : 'en-US'
+                    )}
                   </Text>
                 </View>
               )}
@@ -571,7 +577,7 @@ export default function AssignmentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: uiTokens.colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -581,34 +587,34 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   viewSwitcher: {
     flexDirection: 'row',
-    padding: 16,
+    padding: uiTokens.spacing.lg,
     gap: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: uiTokens.colors.border,
   },
   viewButton: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     alignItems: 'center',
   },
   viewButtonActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: uiTokens.colors.primary,
   },
   viewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   viewButtonTextActive: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
   },
   emptyState: {
     flex: 1,
@@ -619,21 +625,18 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
   },
   assignmentCard: {
-    backgroundColor: '#ffffff',
+    ...commonStyles.card,
     marginHorizontal: 16,
     marginVertical: 8,
     padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   assignmentCardHeader: {
     flexDirection: 'row',
@@ -646,11 +649,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   assignmentDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -667,7 +670,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   progressContainer: {
     marginTop: 4,
@@ -681,24 +684,24 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   progressPercentage: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   progressBarBackground: {
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: uiTokens.colors.border,
     borderRadius: 3,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#3B82F6',
+    backgroundColor: uiTokens.colors.primary,
     borderRadius: 3,
   },
   progressBarFillComplete: {
@@ -707,31 +710,28 @@ const styles = StyleSheet.create({
   statusBadgeSmall: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.surfaceMuted,
   },
   statusTextSmall: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   assignmentMeta: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   containerCard: {
-    backgroundColor: '#ffffff',
+    ...commonStyles.card,
     marginHorizontal: 16,
     marginVertical: 4,
     padding: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   containerCardSelected: {
-    borderColor: '#3B82F6',
+    borderColor: uiTokens.colors.primary,
     borderWidth: 1,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: uiTokens.colors.primarySoft,
   },
   containerCardContent: {
     flexDirection: 'row',
@@ -742,10 +742,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   selectionBar: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: uiTokens.colors.primarySoft,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   selectionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
   },
   signalsBadge: {
     flexDirection: 'row',
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
   },
   signalsCount: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   signalsCountActive: {
     color: '#EF4444',
@@ -776,7 +776,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 28,
-    backgroundColor: '#3B82F6',
+    backgroundColor: uiTokens.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
@@ -791,13 +791,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   fabText: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
     fontSize: 16,
     fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -806,32 +806,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: uiTokens.colors.border,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: uiTokens.spacing.xl,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 8,
     marginTop: 16,
   },
   input: {
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     padding: 12,
     fontSize: 16,
-    color: '#1F2937',
-    backgroundColor: '#ffffff',
+    color: uiTokens.colors.textPrimary,
+    backgroundColor: uiTokens.colors.surface,
   },
   textArea: {
     height: 100,
@@ -845,22 +845,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     padding: 4,
-    borderRadius: 8,
-    backgroundColor: '#F9FAFB',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.background,
   },
   activityLabel: {
     fontSize: 14,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   selectedInfo: {
     marginTop: 24,
     padding: 16,
-    backgroundColor: '#EFF6FF',
-    borderRadius: 8,
+    backgroundColor: uiTokens.colors.primarySoft,
+    borderRadius: uiTokens.radius.sm,
   },
   selectedInfoText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     fontWeight: '500',
   },
   modalFooter: {
@@ -868,12 +868,12 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: uiTokens.colors.border,
   },
   cancelButton: {
     flex: 1,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     borderWidth: 1,
     borderColor: '#D1D5DB',
     alignItems: 'center',
@@ -881,13 +881,13 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   submitButton: {
     flex: 1,
     padding: 16,
-    borderRadius: 8,
-    backgroundColor: '#3B82F6',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.primary,
     alignItems: 'center',
   },
   submitButtonDisabled: {
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
   },
   detailSection: {
     marginBottom: 24,
@@ -904,22 +904,22 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   detailText: {
     fontSize: 16,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     lineHeight: 24,
   },
   statusBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.md,
+    backgroundColor: uiTokens.colors.surfaceMuted,
   },
   statusBadgePending: {
     backgroundColor: '#FEF3C7',
@@ -933,13 +933,13 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   statusTextPending: {
     color: '#92400E',
   },
   statusTextInProgress: {
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
   },
   statusTextCompleted: {
     color: '#065F46',
@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   activityTag: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: uiTokens.colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -959,7 +959,7 @@ const styles = StyleSheet.create({
   },
   activityTagText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     fontWeight: '500',
   },
   containersList: {
@@ -968,16 +968,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   containerTag: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: uiTokens.colors.background,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: uiTokens.colors.border,
   },
   containerTagText: {
     fontSize: 14,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     fontWeight: '500',
   },
 })

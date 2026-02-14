@@ -1,6 +1,7 @@
 import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native'
 import type {NewsTopicType, NewsFilterChip} from '../types/news'
 import {getCategoryColor} from '@/lib/categories'
+import {commonStyles, uiTokens} from '../styles/common'
 
 interface TopicFilterProps {
   selectedTopic: NewsTopicType
@@ -23,7 +24,11 @@ export function TopicFilter({selectedTopic, onTopicChange, topics}: TopicFilterP
         return (
           <TouchableOpacity
             key={topic.id}
-            style={[styles.chip, isSelected && {backgroundColor: categoryColor}]}
+            style={[
+              commonStyles.chip,
+              styles.chip,
+              isSelected && {backgroundColor: categoryColor, borderColor: categoryColor},
+            ]}
             onPress={() => onTopicChange(topic.id)}
           >
             {Icon && (
@@ -46,26 +51,21 @@ export function TopicFilter({selectedTopic, onTopicChange, topics}: TopicFilterP
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 4,
-    gap: 8,
+    paddingHorizontal: uiTokens.spacing.xs,
+    gap: uiTokens.spacing.sm,
   },
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    gap: uiTokens.spacing.xs,
   },
   icon: {
-    marginRight: 4,
+    marginRight: uiTokens.spacing.xs,
   },
   label: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#4B5563',
+    color: uiTokens.colors.textSecondary,
   },
   selectedLabel: {
-    color: '#FFFFFF',
+    color: uiTokens.colors.surface,
   },
 })

@@ -28,6 +28,7 @@ import {useAuth} from '../../../contexts/AuthContext'
 import {FullScreenPhotoViewer} from '../../../components/FullScreenPhotoViewer'
 import * as ImagePicker from 'expo-image-picker'
 import type {WasteContainer} from '../../../types/wasteContainer'
+import {uiTokens} from '../../../styles/common'
 
 const {height} = Dimensions.get('window')
 
@@ -63,12 +64,37 @@ export default function NewCityObjectScreen() {
   // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
   const [showCamera, setShowCamera] = useState(true)
 
+  const loadContainer = useCallback(
+    async (id: string) => {
+      try {
+        setLoadingContainer(true)
+        const data = await fetchWasteContainerById(id)
+        setContainer(data)
+        setCurrentLocation({
+          latitude: data.location.latitude,
+          longitude: data.location.longitude,
+        })
+      } catch (error) {
+        console.error('Error loading container:', error)
+        Alert.alert(t('common.error'), t('newCityObject.loadError'), [
+          {
+            text: t('common.ok'),
+            onPress: () => router.back(),
+          },
+        ])
+      } finally {
+        setLoadingContainer(false)
+      }
+    },
+    [t, router]
+  )
+
   // Check permissions
   React.useEffect(() => {
     if (!isContainerAdmin && isEditing) {
       Alert.alert(t('common.error'), t('newCityObject.adminOnly'), [
         {
-          text: 'OK',
+          text: t('common.ok'),
           onPress: () => router.back(),
         },
       ])
@@ -80,31 +106,8 @@ export default function NewCityObjectScreen() {
     if (isEditing && containerId) {
       loadContainer(containerId)
     }
-  }, [isEditing, containerId])
+  }, [isEditing, containerId, loadContainer])
 
-  const loadContainer = async (id: string) => {
-    try {
-      setLoadingContainer(true)
-      const data = await fetchWasteContainerById(id)
-      setContainer(data)
-      setCurrentLocation({
-        latitude: data.location.latitude,
-        longitude: data.location.longitude,
-      })
-    } catch (error) {
-      console.error('Error loading container:', error)
-      Alert.alert(t('common.error'), t('newCityObject.loadError'), [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ])
-    } finally {
-      setLoadingContainer(false)
-    }
-  }
-
-  // Update date/time every second
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDateTime(new Date())
@@ -213,7 +216,7 @@ export default function NewCityObjectScreen() {
         await updateWasteContainer(containerId, formData, token, photoFiles?.[0])
         Alert.alert(t('common.success'), t('newCityObject.updateSuccess'), [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setShowCamera(false)
               setTimeout(() => router.back(), 80)
@@ -228,7 +231,7 @@ export default function NewCityObjectScreen() {
         await createWasteContainer(formData, token, photoFiles?.[0])
         Alert.alert(t('common.success'), t('newCityObject.createSuccess'), [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setPhotos([])
               setShowCamera(false)
@@ -262,7 +265,7 @@ export default function NewCityObjectScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#1E40AF" />
+          <ActivityIndicator size="large" color={uiTokens.colors.primary} />
           <Text style={styles.messageText}>{t('common.loading')}</Text>
         </View>
       </SafeAreaView>
@@ -397,7 +400,7 @@ export default function NewCityObjectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: uiTokens.colors.background,
   },
   scrollView: {
     flex: 1,
@@ -410,7 +413,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     textAlign: 'center',
     marginTop: 12,
   },
@@ -457,7 +460,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#fff',
+    backgroundColor: uiTokens.colors.surface,
   },
   uploadButton: {
     width: 50,
@@ -472,16 +475,16 @@ const styles = StyleSheet.create({
     height: 50,
   },
   photosContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: uiTokens.spacing.lg,
+    paddingVertical: uiTokens.spacing.md,
+    backgroundColor: uiTokens.colors.surface,
   },
   photoChip: {
     position: 'relative',
     marginRight: 12,
-    borderRadius: 12,
+    borderRadius: uiTokens.radius.md,
     overflow: 'hidden',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: uiTokens.colors.surfaceMuted,
   },
   photoThumbnailContainer: {
     width: 80,
@@ -496,7 +499,7 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
+    borderRadius: uiTokens.radius.md,
     padding: 4,
   },
   coordinatesOverlay: {
@@ -530,8 +533,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   primaryButton: {
-    backgroundColor: '#1E40AF',
-    borderRadius: 12,
+    backgroundColor: uiTokens.colors.primary,
+    borderRadius: uiTokens.radius.md,
     paddingVertical: 16,
     paddingHorizontal: 32,
     alignItems: 'center',
@@ -540,6 +543,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: uiTokens.colors.surface,
   },
 })

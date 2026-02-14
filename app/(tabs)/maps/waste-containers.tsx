@@ -24,6 +24,7 @@ import {
   type ContainerState,
   type WasteType,
 } from '../../../types/wasteContainer'
+import {commonStyles, uiTokens} from '../../../styles/common'
 
 type ContainerFilter = 'all' | ContainerState
 
@@ -159,7 +160,7 @@ export default function WasteContainers() {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
+        Alert.alert(t('common.error'), t('common.locationUnavailable'))
       }
     })()
   }, [t])
@@ -609,7 +610,7 @@ export default function WasteContainers() {
       {/* Loading overlay for containers */}
       {containersLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color="#1E40AF" />
+          <ActivityIndicator size="small" color={uiTokens.colors.primary} />
         </View>
       )}
 
@@ -649,42 +650,42 @@ function getContainerPinColor(container: WasteContainer): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   permissionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 12,
     textAlign: 'center',
   },
   permissionMessage: {
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     marginBottom: 24,
     textAlign: 'center',
     lineHeight: 24,
   },
   permissionButton: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
   },
   permissionButtonText: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -697,9 +698,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterColumn: {
+    ...commonStyles.card,
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
+    borderRadius: uiTokens.radius.md,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.15,
@@ -708,19 +710,19 @@ const styles = StyleSheet.create({
   },
   filterHeader: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
+    borderRadius: uiTokens.radius.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: uiTokens.colors.border,
   },
   filterHeaderText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
   },
   filterOptionsContent: {
     padding: 8,
@@ -749,22 +751,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.pill,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: uiTokens.colors.border,
   },
   filterChipActive: {
-    backgroundColor: '#1E40AF',
-    borderColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
+    borderColor: uiTokens.colors.primary,
   },
   filterChipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   filterChipTextActive: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
   },
   map: {
     flex: 1,
@@ -798,9 +800,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 70,
     right: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
     padding: 8,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
@@ -813,7 +815,7 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     backgroundColor: '#FEF2F2',
-    borderRadius: 12,
+    borderRadius: uiTokens.radius.md,
     padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -829,17 +831,17 @@ const styles = StyleSheet.create({
   errorBannerText: {
     flex: 1,
     fontSize: 13,
-    color: '#DC2626',
+    color: uiTokens.colors.danger,
     marginRight: 12,
   },
   errorRetryButton: {
-    backgroundColor: '#DC2626',
+    backgroundColor: uiTokens.colors.danger,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
   },
   errorRetryText: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -850,8 +852,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionButton: {
-    color: '#6B7280',
-    backgroundColor: '#F3F4F6',
+    color: uiTokens.colors.textMuted,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -864,6 +866,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   actionButtonActive: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
   },
 })

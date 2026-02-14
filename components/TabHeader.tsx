@@ -2,6 +2,7 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native'
 import {Bell, LucideIcon} from 'lucide-react-native'
 import {useNotifications} from '../hooks/useNotifications'
 import {useBellAction} from '../contexts/BellActionContext'
+import {uiTokens} from '../styles/common'
 
 interface TabHeaderProps {
   title: string
@@ -56,29 +57,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    paddingLeft: 10,
+    paddingLeft: uiTokens.spacing.sm,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     fontFamily: 'Inter-Bold',
   },
   actionButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
+    width: 36,
+    height: 36,
+    borderRadius: uiTokens.radius.pill,
+    backgroundColor: uiTokens.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    marginRight: 16,
+    marginRight: uiTokens.spacing.lg,
+    borderWidth: 1,
+    borderColor: uiTokens.colors.border,
   },
   notificationBadge: {
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#DC2626',
+    backgroundColor: uiTokens.colors.danger,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: uiTokens.colors.surface,
   },
   notificationBadgeText: {
     color: '#ffffff',

@@ -10,11 +10,10 @@ import {
   Trash2,
   MapPin,
   Users,
-  ChevronRight,
   Search,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
-import {commonStyles} from '../../styles/common'
+import {commonStyles, uiTokens} from '../../styles/common'
 
 interface Service {
   id: number
@@ -148,7 +147,6 @@ const getServiceCategories = (t: (key: string) => string): ServiceCategory[] => 
 
 export default function ServicesScreen() {
   const {t: t_services} = useTranslation('services')
-  const {t} = useTranslation()
   const serviceCategories = getServiceCategories(t_services)
 
   return (
@@ -168,7 +166,6 @@ export default function ServicesScreen() {
             <Text style={styles.sectionTitle}>{category.title}</Text>
             <View style={styles.servicesList}>
               {category.services.map((service: Service) => {
-                const IconComponent = service.icon
                 return (
                   <TouchableOpacity key={service.id} style={styles.serviceCard}>
                     <View style={styles.serviceCardHeader}>
@@ -201,71 +198,43 @@ export default function ServicesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    backgroundColor: uiTokens.colors.background,
   },
   scrollView: {
     flex: 1,
   },
   searchContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: uiTokens.spacing.xl,
+    paddingVertical: uiTokens.spacing.lg,
   },
   searchBar: {
+    ...commonStyles.card,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
   },
   searchPlaceholder: {
     marginLeft: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     fontSize: 14,
   },
   section: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    paddingHorizontal: uiTokens.spacing.xl,
+    marginBottom: uiTokens.spacing.xxl,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 16,
   },
   servicesList: {
     gap: 12,
   },
   serviceCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   serviceCardHeader: {
     flexDirection: 'row',
@@ -276,7 +245,7 @@ const styles = StyleSheet.create({
   serviceTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     flex: 1,
   },
   statusBadge: {
@@ -292,26 +261,25 @@ const styles = StyleSheet.create({
   },
   serviceDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     lineHeight: 20,
   },
   supportSection: {
-    margin: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
+    ...commonStyles.card,
+    margin: uiTokens.spacing.xl,
+    padding: uiTokens.spacing.xl,
     alignItems: 'center',
     marginBottom: 30,
   },
   supportTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 8,
   },
   supportDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 20,

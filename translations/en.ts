@@ -59,6 +59,7 @@ export default {
     version: 'Your Sofia v1.0.0',
     copyright: '© 2025 Sofia Municipality',
     yourLocation: 'Your Location',
+    locationUnavailable: 'We could not get your current location.',
     error: 'Error',
     loading: 'Loading...',
     retry: 'Try again',
@@ -68,6 +69,7 @@ export default {
     success: 'Success',
     confirm: 'Confirm',
     back: 'Back',
+    ok: 'OK',
     yes: 'Yes',
     no: 'No',
     news: 'News',
@@ -83,6 +85,9 @@ export default {
     busStops: 'Bus stops',
     implementMeMessage:
       'This is a demo feature. We would love your help implementing it on GitHub:',
+    notFoundTitle: 'Oops!',
+    notFoundMessage: "This screen doesn't exist.",
+    goHome: 'Go to home screen!',
   },
   services: {
     payBills: 'Pay Bills',
@@ -131,6 +136,11 @@ export default {
     appSettings: 'App Settings',
     appPreferences: 'App Preferences',
     languageAndTheme: 'Language, theme, and more',
+    anonymousUser: 'Anonymous user',
+    sections: {
+      services: 'Services',
+      support: 'Support',
+    },
   },
   oboappNotifications: {
     title: 'OboApp Notifications',
@@ -166,6 +176,14 @@ export default {
       debitCreditCard: 'Debit/Credit Card',
       cardsAccepted: 'Visa, Mastercard, and local bank cards accepted',
       recentPayments: 'Recent Payments',
+      searchPlaceholder: 'Search bills and services...',
+      upcomingPayments: 'Upcoming payments',
+      totalAmount: 'Total: {{amount}} lv',
+      payAllBills: 'Pay all bills',
+      quickPayments: 'Quick payments',
+      viewAll: 'View all',
+      internet: 'Internet',
+      otherPayment: 'Other payment',
     },
   },
   cities: {
@@ -361,6 +379,7 @@ export default {
     apiEnvironment: 'API Environment',
     devModeOnly: 'Development mode only',
     current: 'Current',
+    url: 'URL',
     changeEnvironment: 'Change Environment',
     changeEnvironmentWarning:
       'Are you sure you want to switch the environment to {{env}}? The app will connect to a different API server.',

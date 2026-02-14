@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native'
 import {useEnvironment} from '@/contexts/EnvironmentContext'
 import {Environment} from '@/lib/environment'
 import {useTranslation} from 'react-i18next'
+import {commonStyles, uiTokens} from '../styles/common'
 
 export function EnvironmentSwitcher() {
   const {environment, config, setEnvironment, canSwitch, allEnvironments} = useEnvironment()
@@ -26,7 +27,7 @@ export function EnvironmentSwitcher() {
             try {
               await setEnvironment(newEnv)
               Alert.alert(t('common.success'), t('settings.environmentChanged', {env: newEnv}))
-            } catch (error) {
+            } catch {
               Alert.alert(t('common.error'), t('settings.environmentChangeFailed'))
             }
           },
@@ -42,7 +43,9 @@ export function EnvironmentSwitcher() {
       <Text style={styles.current}>
         {t('settings.current')}: {config.displayName}
       </Text>
-      <Text style={styles.url}>URL: {config.apiUrl}</Text>
+      <Text style={styles.url}>
+        {t('settings.url')}: {config.apiUrl}
+      </Text>
 
       <View style={styles.buttons}>
         {allEnvironments.map((env) => (
@@ -63,31 +66,34 @@ export function EnvironmentSwitcher() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFF3CD',
-    padding: 16,
-    borderRadius: 8,
+    ...commonStyles.card,
+    backgroundColor: uiTokens.colors.warningSoft,
+    padding: uiTokens.spacing.lg,
+    borderRadius: uiTokens.radius.sm,
     borderWidth: 1,
-    borderColor: '#FFC107',
+    borderColor: '#FACC15',
     marginVertical: 16,
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: uiTokens.colors.textPrimary,
   },
   subtitle: {
     fontSize: 12,
-    color: '#666',
+    color: uiTokens.colors.textMuted,
     marginBottom: 12,
   },
   current: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
+    color: uiTokens.colors.textPrimary,
   },
   url: {
     fontSize: 12,
-    color: '#666',
+    color: uiTokens.colors.textMuted,
     marginBottom: 12,
   },
   buttons: {
@@ -96,24 +102,24 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: uiTokens.colors.surface,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 4,
+    borderRadius: uiTokens.radius.sm,
     borderWidth: 1,
-    borderColor: '#DDD',
+    borderColor: uiTokens.colors.border,
     alignItems: 'center',
   },
   buttonActive: {
-    backgroundColor: '#1E40AF',
-    borderColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
+    borderColor: uiTokens.colors.primary,
   },
   buttonText: {
     fontSize: 12,
-    color: '#333',
+    color: uiTokens.colors.textSecondary,
   },
   buttonTextActive: {
-    color: '#FFF',
+    color: uiTokens.colors.surface,
     fontWeight: '600',
   },
 })

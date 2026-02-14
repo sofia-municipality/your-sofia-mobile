@@ -1,5 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native'
 import {useTranslation} from 'react-i18next'
+import {uiTokens} from '../styles/common'
 
 interface TimespanBadgeProps {
   status: 'active' | 'upcoming' | 'ended'
@@ -55,15 +56,15 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: uiTokens.spacing.sm,
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
+    paddingHorizontal: uiTokens.spacing.sm,
+    paddingVertical: uiTokens.spacing.xs,
+    borderRadius: uiTokens.radius.pill,
+    gap: uiTokens.spacing.xs,
   },
   dot: {
     width: 6,
@@ -76,6 +77,6 @@ const styles = StyleSheet.create({
   },
   dateRange: {
     fontSize: 12,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
 })

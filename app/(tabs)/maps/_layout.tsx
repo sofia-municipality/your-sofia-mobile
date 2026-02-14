@@ -6,6 +6,7 @@ import WasteContainers from './waste-containers'
 import TransportMap from './transport-bpilot'
 import NewsMap from './news'
 import BgsmetView from './bgsmet-view'
+import {uiTokens} from '../../../styles/common'
 
 type MapFilter = 'wasteContainers' | 'bgsmetView' | 'transport' | 'news'
 
@@ -75,39 +76,38 @@ export default function MapsLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   filtersContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: uiTokens.colors.border,
     paddingVertical: 12,
     zIndex: 10,
   },
   filtersScrollContent: {
-    paddingHorizontal: 16,
-    gap: 8,
+    paddingHorizontal: uiTokens.spacing.lg,
+    gap: uiTokens.spacing.sm,
   },
   filterChip: {
-    paddingHorizontal: 16,
+    paddingHorizontal: uiTokens.spacing.lg,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.pill,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginRight: 8,
+    borderColor: uiTokens.colors.border,
   },
   filterChipActive: {
-    backgroundColor: '#1E40AF',
-    borderColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
+    borderColor: uiTokens.colors.primary,
   },
   filterChipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   filterChipTextActive: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
   },
   mapContainer: {
     flex: 1,

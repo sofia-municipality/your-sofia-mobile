@@ -63,11 +63,13 @@ export default {
     version: 'Твоята София v1.0.0',
     copyright: '© 2025 Столична община',
     yourLocation: 'Вашето местоположение',
+    locationUnavailable: 'Не можахме да получим текущото ви местоположение.',
     error: 'Грешка',
     cancel: 'Остави',
     success: 'Успех',
     confirm: 'Потвърди',
     back: 'Назад',
+    ok: 'OK',
     yes: 'Да',
     no: 'Не',
     news: 'Новина',
@@ -83,6 +85,9 @@ export default {
     busStops: 'Спирки',
     implementMeMessage:
       'Това е примерна функционалност. Ще се радваме да помогнеш с имплементацията в GitHub:',
+    notFoundTitle: 'Упс!',
+    notFoundMessage: 'Този екран не съществува.',
+    goHome: 'Към началния екран',
   },
   services: {
     payBills: 'Плащане на сметки',
@@ -130,6 +135,11 @@ export default {
     appSettings: 'Настройки на приложението',
     appPreferences: 'Настройки',
     languageAndTheme: 'Език, тема и други',
+    anonymousUser: 'Анонимен потребител',
+    sections: {
+      services: 'Услуги',
+      support: 'Поддръжка',
+    },
   },
   oboappNotifications: {
     title: 'Известия от OboApp',
@@ -165,6 +175,14 @@ export default {
       debitCreditCard: 'Дебитна/Кредитна карта',
       cardsAccepted: 'Приемат се Visa, Mastercard и локални банкови карти',
       recentPayments: 'Последни плащания',
+      searchPlaceholder: 'Търси сметки и услуги...',
+      upcomingPayments: 'Предстоящи плащания',
+      totalAmount: 'Общо: {{amount}} лв',
+      payAllBills: 'Плати всички сметки',
+      quickPayments: 'Бързи плащания',
+      viewAll: 'Виж всички',
+      internet: 'Интернет',
+      otherPayment: 'Друго плащане',
     },
   },
   cities: {
@@ -362,6 +380,7 @@ export default {
     apiEnvironment: 'API Среда',
     devModeOnly: 'Налично само в разработчески режим',
     current: 'Текуща',
+    url: 'URL',
     changeEnvironment: 'Смяна на среда',
     changeEnvironmentWarning:
       'Сигурни ли сте, че искате да смените средата на {{env}}? Приложението ще се свърже с различен API сървър.',

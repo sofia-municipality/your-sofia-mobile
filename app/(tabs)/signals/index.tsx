@@ -15,6 +15,7 @@ import {useBellAction} from '../../../contexts/BellActionContext'
 import {fetchSignals} from '../../../lib/payload'
 import type {Signal} from '../../../types/signal'
 import {AlertCircle, Clock, CheckCircle, XCircle} from 'lucide-react-native'
+import {commonStyles, uiTokens} from '../../../styles/common'
 
 export default function SignalsScreen() {
   const {t, i18n} = useTranslation()
@@ -108,7 +109,7 @@ export default function SignalsScreen() {
 
   const renderSignalItem = ({item}: {item: Signal}) => (
     <TouchableOpacity
-      style={styles.signalCard}
+      style={[commonStyles.card, styles.signalCard]}
       onPress={() => router.push(`/(tabs)/signals/${item.id}` as any)}
     >
       <View style={styles.signalHeader}>
@@ -143,7 +144,7 @@ export default function SignalsScreen() {
   if (loading && !refreshing) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
+        <ActivityIndicator size="large" color={uiTokens.colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
     )
@@ -191,7 +192,11 @@ export default function SignalsScreen() {
           </View>
         }
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1E40AF" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={uiTokens.colors.primary}
+          />
         }
       />
     </View>
@@ -201,50 +206,43 @@ export default function SignalsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: uiTokens.colors.background,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: uiTokens.colors.background,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   errorText: {
     fontSize: 16,
-    color: '#EF4444',
+    color: uiTokens.colors.danger,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
   },
   retryButtonText: {
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
     fontSize: 16,
     fontWeight: '600',
   },
   listContainer: {
-    padding: 16,
+    padding: uiTokens.spacing.lg,
   },
   signalCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    padding: uiTokens.spacing.lg,
+    marginBottom: uiTokens.spacing.md,
   },
   signalHeader: {
     flexDirection: 'row',
@@ -264,8 +262,8 @@ const styles = StyleSheet.create({
   },
   categoryBadge: {
     fontSize: 12,
-    color: '#6B7280',
-    backgroundColor: '#F3F4F6',
+    color: uiTokens.colors.textMuted,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -273,23 +271,23 @@ const styles = StyleSheet.create({
   signalTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 8,
   },
   signalDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     lineHeight: 20,
     marginBottom: 8,
   },
   signalObject: {
     fontSize: 13,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     marginBottom: 8,
   },
   signalDate: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
   },
   emptyContainer: {
     padding: 40,
@@ -297,13 +295,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     textAlign: 'center',
   },
   filterBanner: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: uiTokens.colors.primarySoft,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -311,12 +309,12 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 13,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     flex: 1,
   },
   filterClearButton: {
     marginLeft: 12,
-    backgroundColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,

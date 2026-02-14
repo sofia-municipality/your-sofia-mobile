@@ -4,6 +4,7 @@ import {Wind} from 'lucide-react-native'
 import {AirQualityData} from '../types/airQuality'
 import {useTranslation} from 'react-i18next'
 import {ImplementMeGithub} from './ImplementMeGithub'
+import {uiTokens} from '../styles/common'
 
 interface Props {
   data: AirQualityData
@@ -62,24 +63,26 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 100, // Very high value for pill shape
-    padding: 12,
+    borderRadius: uiTokens.radius.lg,
+    padding: uiTokens.spacing.md,
+    borderWidth: 1,
+    borderColor: uiTokens.colors.border,
   },
   iconContainer: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    borderRadius: uiTokens.radius.pill,
+    backgroundColor: uiTokens.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: uiTokens.spacing.md,
   },
   content: {
     flex: 1,
   },
   title: {
     fontSize: 14,
-    color: '#4B5563',
+    color: uiTokens.colors.textSecondary,
     fontFamily: 'Inter-Medium',
   },
   status: {

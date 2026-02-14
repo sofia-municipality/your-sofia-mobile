@@ -5,6 +5,7 @@ import type {NewsItem} from '../types/news'
 import {CategoryBadge} from './CategoryBadge'
 import {TimespanBadge} from './TimespanBadge'
 import {getCategoryColor} from '@/lib/categories'
+import {commonStyles, uiTokens} from '../styles/common'
 
 interface NewsCardProps {
   item: NewsItem
@@ -18,7 +19,7 @@ export function NewsCard({item}: NewsCardProps) {
 
   return (
     <TouchableOpacity
-      style={[styles.container, {borderLeftColor: borderColor}]}
+      style={[commonStyles.card, styles.container, {borderLeftColor: borderColor}]}
       onPress={() => router.push(`/(tabs)/home/${item.id}`)}
       activeOpacity={0.7}
     >
@@ -80,21 +81,14 @@ export function NewsCard({item}: NewsCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 12,
     borderLeftWidth: 4,
     borderLeftColor: '#9CA3AF',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
   },
   content: {
-    padding: 14,
-    gap: 8,
+    padding: uiTokens.spacing.md,
+    gap: uiTokens.spacing.sm,
   },
   categoriesRow: {
     flexDirection: 'row',
@@ -104,7 +98,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     lineHeight: 21,
   },
   timespanRow: {
@@ -112,15 +106,15 @@ const styles = StyleSheet.create({
   },
   cityWideBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: uiTokens.colors.warningSoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 10,
+    borderRadius: uiTokens.radius.pill,
   },
   cityWideText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#D97706',
+    color: uiTokens.colors.warning,
   },
   bottomRow: {
     flexDirection: 'row',
@@ -141,15 +135,15 @@ const styles = StyleSheet.create({
   },
   sourceText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
   },
   entityText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
   },
   date: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     marginLeft: 8,
   },
 })

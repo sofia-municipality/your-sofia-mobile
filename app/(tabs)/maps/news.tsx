@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
@@ -11,12 +11,12 @@ import {estimateZoom, getBoundsFromRegion, type MapBounds} from '../../../lib/ma
 import {getCategoryColor, getCategoryIcon} from '../../../lib/categories'
 import {TopicFilter} from '../../../components/TopicFilter'
 import type {NewsTopicType} from '../../../types/news'
+import {uiTokens} from '../../../styles/common'
 
 export default function NewsMap() {
   const {t} = useTranslation()
   const router = useRouter()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
-  const [locationError, setLocationError] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
   const {sourcesMap} = useOboSources()
   const {filterChips} = useOboCategories()
@@ -36,7 +36,6 @@ export default function NewsMap() {
         const {status} = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
           console.warn('Location permission not granted')
-          setLocationError(true)
           return
         }
 
@@ -46,23 +45,25 @@ export default function NewsMap() {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        setLocationError(true)
       }
     })()
   }, [])
 
   // Default to Sofia center if location is not available
-  const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  }
+  const region = useMemo(
+    () => ({
+      latitude: location?.coords.latitude || 42.6977,
+      longitude: location?.coords.longitude || 23.3219,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    }),
+    [location?.coords.latitude, location?.coords.longitude]
+  )
 
   useEffect(() => {
     setMapBounds(getBoundsFromRegion(region))
     setMapZoom(estimateZoom(region))
-  }, [region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta])
+  }, [region])
 
   // Filter news items that have location data
   const newsWithLocation = news.filter((item) => item.location)
@@ -70,7 +71,7 @@ export default function NewsMap() {
   if (loading && newsWithLocation.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
+        <ActivityIndicator size="large" color={uiTokens.colors.primary} />
         <Text style={styles.loadingText}>{t('map.loading')}</Text>
       </View>
     )
@@ -140,12 +141,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   filterOverlay: {
     position: 'absolute',
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: uiTokens.colors.surface,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.2,
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     bottom: 8,
     left: 10,
     fontSize: 10,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     opacity: 0.7,
   },
 })

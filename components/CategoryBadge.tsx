@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet} from 'react-native'
 import {getCategoryColor, getCategoryIcon} from '@/lib/categories'
 import {formatCategoryLabel} from '@/lib/stringUtils'
+import {uiTokens} from '../styles/common'
 
 interface CategoryBadgeProps {
   category: string
@@ -28,10 +29,10 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
+    paddingHorizontal: uiTokens.spacing.sm,
+    paddingVertical: uiTokens.spacing.xs,
+    borderRadius: uiTokens.radius.pill,
+    gap: uiTokens.spacing.xs,
   },
   label: {
     fontWeight: '600',

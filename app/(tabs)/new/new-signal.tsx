@@ -37,7 +37,7 @@ interface MapObject {
 }
 
 export default function NewScreen() {
-  const {t} = useTranslation()
+  const {t, i18n} = useTranslation()
   const router = useRouter()
   const params = useLocalSearchParams()
   const cameraRef = useRef<CameraView>(null)
@@ -312,7 +312,7 @@ export default function NewScreen() {
       // Create signal via API with photos
       const newSignal = await createSignal(
         signalData,
-        t('common.header') === 'Твоята София' ? 'bg' : 'en',
+        i18n.language === 'bg' ? 'bg' : 'en',
         photoFiles.length > 0 ? photoFiles : undefined,
         deviceId,
         (current, total) => {

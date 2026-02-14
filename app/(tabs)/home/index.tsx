@@ -17,11 +17,11 @@ import {useNews} from '../../../hooks/useNews'
 import {useOboCategories} from '../../../hooks/useOboCategories'
 import {useOboMessages} from '../../../hooks/useOboMessages'
 import {useOboSources} from '../../../hooks/useOboSources'
-import {useNotifications} from '../../../hooks/useNotifications'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import type {AirQualityData} from '../../../types/airQuality'
 import type {NewsTopicType} from '../../../types/news'
 import type {MapBounds} from '../../../lib/mapBounds'
+import {uiTokens} from '../../../styles/common'
 
 // Mock data for air quality (replace with real API data later)
 const mockAirQualityData: AirQualityData = {
@@ -60,9 +60,6 @@ export default function HomeScreen() {
     sourcesMap,
   })
   const {categories, filterChips} = useOboCategories()
-
-  // Setup push notifications
-  const {unreadCount, clearUnreadCount} = useNotifications()
 
   // Handle bell click - filter to alerts and scroll to news section
   const handleBellPress = useCallback(() => {
@@ -203,46 +200,48 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: uiTokens.colors.background,
   },
   scrollView: {
     flex: 1,
   },
   section: {
-    paddingHorizontal: 20,
-    marginTop: 16,
+    paddingHorizontal: uiTokens.spacing.xl,
+    marginTop: uiTokens.spacing.lg,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
     fontFamily: 'Inter-Bold',
   },
   sectionSubtitle: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     fontFamily: 'Inter-Regular',
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: uiTokens.spacing.lg,
   },
   viewToggleButton: {
-    backgroundColor: '#EFF6FF',
-    paddingHorizontal: 12,
+    backgroundColor: uiTokens.colors.primarySoft,
+    paddingHorizontal: uiTokens.spacing.md,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: uiTokens.radius.pill,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
   },
   viewToggleText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
   },
   newsContainer: {
-    marginTop: 16,
+    marginTop: uiTokens.spacing.lg,
   },
   loadingContainer: {
     padding: 40,
@@ -251,32 +250,32 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     fontFamily: 'Inter-Regular',
   },
   errorContainer: {
-    padding: 20,
-    backgroundColor: '#FEE2E2',
-    borderRadius: 8,
-    marginTop: 16,
+    padding: uiTokens.spacing.xl,
+    backgroundColor: uiTokens.colors.dangerSoft,
+    borderRadius: uiTokens.radius.sm,
+    marginTop: uiTokens.spacing.lg,
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: uiTokens.colors.danger,
     fontFamily: 'Inter-Regular',
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#DC2626',
-    paddingHorizontal: 20,
+    backgroundColor: uiTokens.colors.danger,
+    paddingHorizontal: uiTokens.spacing.xl,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     marginTop: 12,
   },
   retryButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff',
+    color: uiTokens.colors.surface,
     fontFamily: 'Inter-SemiBold',
   },
   emptyContainer: {
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     fontFamily: 'Inter-Regular',
     textAlign: 'center',
   },
