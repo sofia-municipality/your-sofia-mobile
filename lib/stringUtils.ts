@@ -17,13 +17,14 @@ export function formatCategoryLabel(category: string): string {
  * Removes markdown formatting and truncates to specified length
  */
 export function extractSnippet(text: string, maxLength: number = 100): string {
+  // Remove bullet points first (before other replacements)
+  let cleaned = text.replace(/^[-*]\s+/gm, '')
   // Remove markdown headers
-  let cleaned = text.replace(/^#{1,6}\s+/gm, '')
-  // Remove bold/italic
+  cleaned = cleaned.replace(/^#{1,6}\s+/gm, '')
+  // Remove bold (must be before italic to avoid conflicts)
   cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1')
+  // Remove italic
   cleaned = cleaned.replace(/\*(.+?)\*/g, '$1')
-  // Remove bullet points
-  cleaned = cleaned.replace(/^[-*]\s+/gm, '')
   // Collapse multiple spaces/newlines
   cleaned = cleaned.replace(/\s+/g, ' ').trim()
 
