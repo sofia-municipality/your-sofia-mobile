@@ -1,16 +1,39 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker} from 'react-native-maps'
+import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
+import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
-import {useNews} from '../../../hooks/useNews'
-import {ImplementMeGithub} from '../../../components/ImplementMeGithub'
+import {useOboMessages} from '../../../hooks/useOboMessages'
+import {useOboSources} from '../../../hooks/useOboSources'
+import {useOboCategories} from '../../../hooks/useOboCategories'
+import {estimateZoom, getBoundsFromRegion, type MapBounds} from '../../../lib/mapBounds'
+import {getCategoryColor, getCategoryIcon} from '../../../lib/categories'
+import {TopicFilter} from '../../../components/TopicFilter'
+import type {NewsTopicType} from '../../../types/news'
+import {uiTokens} from '../../../styles/common'
 
 export default function NewsMap() {
   const {t} = useTranslation()
+  const router = useRouter()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
-  const [locationError, setLocationError] = useState(false)
-  const {news, loading} = useNews('all')
+  const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
+  const selectedCategories = useMemo(
+    () => (selectedTopic !== 'all' ? [selectedTopic] : undefined),
+    [selectedTopic]
+  )
+  const {sourcesMap} = useOboSources()
+  const {filterChips} = useOboCategories()
+  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
+  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const {news, loading} = useOboMessages({
+    categories: selectedCategories,
+    bounds: mapBounds,
+    zoom: mapZoom,
+    enabled: true,
+    sourcesMap,
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -18,7 +41,6 @@ export default function NewsMap() {
         const {status} = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
           console.warn('Location permission not granted')
-          setLocationError(true)
           return
         }
 
@@ -28,26 +50,33 @@ export default function NewsMap() {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        setLocationError(true)
       }
     })()
   }, [])
 
   // Default to Sofia center if location is not available
-  const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  }
+  const region = useMemo(
+    () => ({
+      latitude: location?.coords.latitude || 42.6977,
+      longitude: location?.coords.longitude || 23.3219,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    }),
+    [location?.coords.latitude, location?.coords.longitude]
+  )
+
+  useEffect(() => {
+    setMapBounds(getBoundsFromRegion(region))
+    setMapZoom(estimateZoom(region))
+  }, [region])
 
   // Filter news items that have location data
   const newsWithLocation = news.filter((item) => item.location)
 
-  if (loading) {
+  if (loading && newsWithLocation.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1E40AF" />
+        <ActivityIndicator size="large" color={uiTokens.colors.primary} />
         <Text style={styles.loadingText}>{t('map.loading')}</Text>
       </View>
     )
@@ -61,38 +90,50 @@ export default function NewsMap() {
         showsUserLocation={true}
         showsMyLocationButton={true}
         showsCompass={true}
+        onRegionChangeComplete={(nextRegion: Region) => {
+          if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
+          regionDebounceRef.current = setTimeout(() => {
+            setMapBounds(getBoundsFromRegion(nextRegion))
+            setMapZoom(estimateZoom(nextRegion))
+          }, 400)
+        }}
       >
-        {/* User location marker - only show if location permission was denied */}
-        {location && !locationError && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title={t('common.yourLocation') || 'Your Location'}
-            pinColor="#1E40AF"
-          />
-        )}
+        {/* News markers with category colors */}
+        {newsWithLocation.map((item) => {
+          const category = item.categories?.[0] ?? item.topic
+          const color = getCategoryColor(category)
+          const Icon = getCategoryIcon(category)
 
-        {/* News markers */}
-        {newsWithLocation.map((item) => (
-          <Marker
-            key={item.id}
-            coordinate={{
-              latitude: item.location?.latitude ?? 42.6977,
-              longitude: item.location?.longitude ?? 23.3219,
-            }}
-            title={item.title}
-            description={item.description}
-          />
-        ))}
+          return (
+            <Marker
+              key={item.id}
+              coordinate={{
+                latitude: item.location!.latitude,
+                longitude: item.location!.longitude,
+              }}
+              onPress={() => router.push(`/(tabs)/home/${item.id}`)}
+            >
+              <View style={styles.markerContainer}>
+                <View style={[styles.markerIcon, {backgroundColor: color}]}>
+                  <Icon size={14} color="#ffffff" />
+                </View>
+                <View style={[styles.markerPointer, {borderTopColor: color}]} />
+              </View>
+            </Marker>
+          )
+        })}
       </MapView>
-      <View style={styles.implementMeContainer}>
-        <ImplementMeGithub
-          extendedText={t('common.implementMeMessage')}
-          issueUrl="https://github.com/sofia-municipality/your-sofia-mobile/issues/3"
+
+      {/* Category filter overlay */}
+      <View style={styles.filterOverlay}>
+        <TopicFilter
+          selectedTopic={selectedTopic}
+          onTopicChange={setSelectedTopic}
+          topics={filterChips}
         />
       </View>
+
+      <Text style={styles.poweredByText}>{t('common.poweredByOboApp')}</Text>
     </View>
   )
 }
@@ -108,18 +149,54 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
-  implementMeContainer: {
+  filterOverlay: {
     position: 'absolute',
-    top: 2,
-    left: 2,
-    right: 2,
-    borderRadius: 8,
+    top: 8,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  markerContainer: {
+    alignItems: 'center',
+  },
+  markerIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: uiTokens.colors.surface,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  markerPointer: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#1E40AF',
+    marginTop: -2,
+  },
+  poweredByText: {
+    position: 'absolute',
+    bottom: 8,
+    left: 10,
+    fontSize: 10,
+    color: uiTokens.colors.textMuted,
+    opacity: 0.7,
   },
 })

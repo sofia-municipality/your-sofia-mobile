@@ -14,11 +14,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          title: t('common.news'),
-          headerShown: true,
-          headerTitleAlign: 'left',
-          presentation: 'card',
-          headerBackTitle: t('common.back'),
+          headerShown: false,
         }}
       />
     </Stack>

@@ -12,7 +12,6 @@ import {
 import {
   User,
   Settings,
-  Bell,
   Shield,
   CreditCard,
   FileText,
@@ -35,6 +34,7 @@ import {fetchSignalStats} from '../../lib/payload'
 import {EnvironmentSwitcher} from '@/components/EnvironmentSwitcher'
 import {LanguageSwitch} from '@/components/LanguageSwitch'
 import {useAuth} from '@/contexts/AuthContext'
+import {commonStyles, uiTokens} from '../../styles/common'
 
 const getProfileSections = (t: (key: string) => string) => [
   {
@@ -48,12 +48,6 @@ const getProfileSections = (t: (key: string) => string) => [
         description: t('profile.updateProfile'),
       },
       {
-        id: 12,
-        title: t('profile.notificationSettings'),
-        icon: Bell,
-        description: t('profile.manageNotifications'),
-      },
-      {
         id: 13,
         title: t('profile.security'),
         icon: Shield,
@@ -63,7 +57,7 @@ const getProfileSections = (t: (key: string) => string) => [
   },
   {
     id: 2,
-    title: 'Services',
+    title: t('profile.sections.services'),
     items: [
       {
         id: 21,
@@ -81,7 +75,7 @@ const getProfileSections = (t: (key: string) => string) => [
   },
   {
     id: 3,
-    title: 'Support',
+    title: t('profile.sections.support'),
     items: [
       {
         id: 31,
@@ -107,6 +101,7 @@ interface ProfileSection {
     title: string
     icon: any
     description: string
+    onPress?: () => void
   }[]
 }
 
@@ -167,21 +162,6 @@ export default function ProfileScreen() {
     }, [isFirstFocus, deviceId, loadSignalStats])
   )
 
-  const handleForgetMeConfirm = () => {
-    // Double confirmation before deletion
-    Alert.alert(t('auth.forgetMeAreYouSure'), t('auth.forgetMeAreYouSureMessage'), [
-      {
-        text: t('common.no'),
-        style: 'cancel',
-      },
-      {
-        text: t('common.yes'),
-        style: 'destructive',
-        onPress: handleForgetMe,
-      },
-    ])
-  }
-
   const handleForgetMe = async () => {
     // Final confirmation before deletion
     Alert.alert(t('auth.forgetMeAreYouSure'), t('auth.forgetMeAreYouSureMessage'), [
@@ -199,7 +179,7 @@ export default function ProfileScreen() {
             setShowForgetMeModal(false)
             Alert.alert(t('common.success'), t('auth.forgetMeSuccess'), [
               {
-                text: 'OK',
+                text: t('common.ok'),
                 onPress: () => router.push('/(tabs)' as any),
               },
             ])
@@ -243,7 +223,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>
-              {isAuthenticated ? user?.name || user?.email : 'Анонимен Потребител'}
+              {isAuthenticated ? user?.name || user?.email : t('profile.anonymousUser')}
             </Text>
             <Text style={styles.profileStatus}>
               {isContainerAdmin
@@ -390,7 +370,12 @@ export default function ProfileScreen() {
               {section.items.map((item) => {
                 const IconComponent = item.icon
                 return (
-                  <TouchableOpacity key={item.id} style={styles.menuItem}>
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.menuItem}
+                    onPress={item.onPress}
+                    disabled={!item.onPress}
+                  >
                     <View style={styles.menuItemContent}>
                       <View style={styles.menuItemIcon}>
                         <IconComponent size={20} color="#1E40AF" />
@@ -400,7 +385,7 @@ export default function ProfileScreen() {
                         <Text style={styles.menuItemDescription}>{item.description}</Text>
                       </View>
                     </View>
-                    <ChevronRight size={20} color="#9CA3AF" />
+                    {item.onPress ? <ChevronRight size={20} color="#9CA3AF" /> : null}
                   </TouchableOpacity>
                 )
               })}
@@ -446,69 +431,37 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: uiTokens.colors.background,
   },
   notificationBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    padding: 16,
-    margin: 16,
-    borderRadius: 12,
+    backgroundColor: uiTokens.colors.primarySoft,
+    padding: uiTokens.spacing.lg,
+    margin: uiTokens.spacing.lg,
+    borderRadius: uiTokens.radius.md,
     borderLeftWidth: 4,
-    borderLeftColor: '#1E40AF',
+    borderLeftColor: uiTokens.colors.primary,
     gap: 12,
   },
   notificationText: {
     flex: 1,
     fontSize: 14,
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     lineHeight: 20,
   },
   githubIcon: {
     flexShrink: 0,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-  },
-  editButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#EFF6FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   scrollView: {
     flex: 1,
   },
   profileCard: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    marginTop: 20,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    ...commonStyles.card,
+    marginHorizontal: uiTokens.spacing.xl,
+    marginTop: uiTokens.spacing.xl,
+    borderRadius: uiTokens.radius.lg,
+    padding: uiTokens.spacing.xl,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -526,7 +479,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: uiTokens.colors.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -541,7 +494,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#ffffff',
+    borderColor: uiTokens.colors.surface,
   },
   profileInfo: {
     alignItems: 'center',
@@ -549,12 +502,12 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 4,
   },
   profileStatus: {
     fontSize: 14,
-    color: '#055796ff',
+    color: uiTokens.colors.primary,
     fontWeight: '500',
     marginBottom: 16,
   },
@@ -569,21 +522,21 @@ const styles = StyleSheet.create({
   },
   profileDetailText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   section: {
-    paddingHorizontal: 20,
-    marginTop: 24,
+    paddingHorizontal: uiTokens.spacing.xl,
+    marginTop: uiTokens.spacing.xxl,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 12,
   },
   sectionItems: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
+    borderRadius: uiTokens.radius.md,
     overflow: 'hidden',
   },
   menuItem: {
@@ -592,7 +545,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: uiTokens.colors.surfaceMuted,
   },
   menuItemContent: {
     flexDirection: 'row',
@@ -602,8 +555,8 @@ const styles = StyleSheet.create({
   menuItemIcon: {
     width: 36,
     height: 36,
-    borderRadius: 8,
-    backgroundColor: '#f3f4f6',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -614,16 +567,16 @@ const styles = StyleSheet.create({
   menuItemTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginBottom: 2,
   },
   menuItemDescription: {
     fontSize: 12,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
   },
   statsSection: {
-    paddingHorizontal: 20,
-    marginTop: 24,
+    paddingHorizontal: uiTokens.spacing.xl,
+    marginTop: uiTokens.spacing.xxl,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -631,18 +584,9 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    ...commonStyles.card,
     padding: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   statNumber: {
     fontSize: 24,
@@ -652,15 +596,15 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     textAlign: 'center',
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: uiTokens.colors.surface,
+    borderRadius: uiTokens.radius.md,
     paddingVertical: 16,
     gap: 8,
     borderWidth: 1,
@@ -678,24 +622,24 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
     marginBottom: 4,
   },
   copyrightText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: uiTokens.colors.textMuted,
   },
   authSection: {
-    marginHorizontal: 20,
+    marginHorizontal: uiTokens.spacing.xl,
     marginTop: 16,
     padding: 20,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
+    backgroundColor: uiTokens.colors.surfaceMuted,
+    borderRadius: uiTokens.radius.md,
     alignItems: 'center',
   },
   authTitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -707,7 +651,7 @@ const styles = StyleSheet.create({
   loginButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#1E40AF',
+    backgroundColor: uiTokens.colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -723,7 +667,7 @@ const styles = StyleSheet.create({
   registerButton: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    backgroundColor: uiTokens.colors.surface,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -731,20 +675,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#1E40AF',
+    borderColor: uiTokens.colors.primary,
   },
   registerButtonText: {
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
   logoutButton: {
     flexDirection: 'row',
-    marginHorizontal: 20,
+    marginHorizontal: uiTokens.spacing.xl,
     marginTop: 16,
     padding: 16,
     backgroundColor: '#FEF2F2',
-    borderRadius: 8,
+    borderRadius: uiTokens.radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
@@ -758,11 +702,11 @@ const styles = StyleSheet.create({
   },
   forgetMeButton: {
     flexDirection: 'row',
-    marginHorizontal: 20,
+    marginHorizontal: uiTokens.spacing.xl,
     marginTop: 8,
     padding: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
+    backgroundColor: uiTokens.colors.surface,
+    borderRadius: uiTokens.radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
@@ -782,8 +726,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    backgroundColor: uiTokens.colors.surface,
+    borderRadius: uiTokens.radius.lg,
     padding: 24,
     width: '100%',
     maxWidth: 400,
@@ -803,13 +747,13 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     marginTop: 12,
     textAlign: 'center',
   },
   modalMessage: {
     fontSize: 14,
-    color: '#6B7280',
+    color: uiTokens.colors.textMuted,
     lineHeight: 22,
     marginBottom: 16,
     textAlign: 'center',
@@ -820,7 +764,7 @@ const styles = StyleSheet.create({
   },
   modalInfoLinkText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
@@ -834,20 +778,20 @@ const styles = StyleSheet.create({
   modalCancelButton: {
     paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.surfaceMuted,
     alignItems: 'center',
   },
   modalCancelButtonText: {
-    color: '#1F2937',
+    color: uiTokens.colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
   modalConfirmButton: {
     paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 8,
-    backgroundColor: '#DC2626',
+    borderRadius: uiTokens.radius.sm,
+    backgroundColor: uiTokens.colors.danger,
     alignItems: 'center',
   },
   modalConfirmButtonText: {

@@ -8,6 +8,7 @@ import {
   Edit3,
   MapPin,
   AlertTriangle,
+  Bell,
   ChartNoAxesCombined,
   MapPlus,
   ClipboardList,
@@ -17,6 +18,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {BellActionProvider} from '../../contexts/BellActionContext'
 import {TabHeader} from '../../components/TabHeader'
 import {useAuth} from '../../contexts/AuthContext'
+import {uiTokens} from '../../styles/common'
 
 export default function TabLayout() {
   const {t} = useTranslation()
@@ -41,15 +43,15 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
         headerTitleAlign: 'left',
         lazy: false,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: uiTokens.colors.surface,
           borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
-          paddingBottom: Math.max(insets.bottom, 8),
-          paddingTop: 8,
-          height: 64 + Math.max(insets.bottom, 8),
+          borderTopColor: uiTokens.colors.border,
+          paddingBottom: Math.max(insets.bottom, uiTokens.spacing.sm),
+          paddingTop: uiTokens.spacing.sm,
+          height: 64 + Math.max(insets.bottom, uiTokens.spacing.sm),
         },
-        tabBarActiveTintColor: '#1E40AF',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: uiTokens.colors.primary,
+        tabBarInactiveTintColor: uiTokens.colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -62,7 +64,9 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           title: t('common.home'),
           tabBarLabel: t('common.home'),
           tabBarIcon: ({color}) => <Home size={24} color={color} />,
-          headerTitle: () => <TabHeader title={t('common.goodMorning')} showActionIcon={true} />,
+          headerTitle: () => (
+            <TabHeader title={t('common.goodMorning')} showActionIcon={true} ActionIcon={Bell} />
+          ),
         }}
       />
       <Tabs.Screen

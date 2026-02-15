@@ -1,6 +1,7 @@
-import {TouchableOpacity, View, Text, StyleSheet} from 'react-native'
+import {TouchableOpacity, Text, StyleSheet} from 'react-native'
 import {useTranslation} from 'react-i18next'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {uiTokens} from '../styles/common'
 
 export function LanguageSwitch() {
   const {i18n} = useTranslation()
@@ -21,11 +22,11 @@ export function LanguageSwitch() {
 
 const styles = StyleSheet.create({
   container: {
-    marginRight: 16,
+    marginRight: uiTokens.spacing.lg,
   },
   language: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: uiTokens.colors.primary,
   },
 })
