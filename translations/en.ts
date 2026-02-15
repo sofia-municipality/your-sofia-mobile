@@ -179,8 +179,7 @@ export default {
       all: 'All',
       wasteContainers: 'Waste Containers',
       transport: 'Transport',
-      news: 'News',
-      events: 'Events',
+      newsAndEvents: 'News & Events',
     },
     permissions: {
       title: 'Location Permission Required',

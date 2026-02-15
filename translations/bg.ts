@@ -180,8 +180,7 @@ export default {
       bgsmetView: 'БГ Смет',
       transport: 'Транспорт',
       transportBpilot: 'bPilot',
-      news: 'Новини',
-      events: 'Събития',
+      newsAndEvents: 'Новини и събития',
     },
     permissions: {
       title: 'Необходимо е разрешение за местоположение',

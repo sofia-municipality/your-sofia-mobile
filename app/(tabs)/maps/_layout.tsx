@@ -18,7 +18,7 @@ export default function MapsLayout() {
     {key: 'wasteContainers', label: t('map.filters.wasteContainers')},
     // {key: 'bgsmetView', label: t('map.filters.bgsmetView')},
     // {key: 'transport', label: t('map.filters.transportBpilot')},
-    {key: 'news', label: t('map.filters.news')},
+    {key: 'news', label: t('map.filters.newsAndEvents')},
   ]
 
   // Determine which map component(s) to render
