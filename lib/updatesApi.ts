@@ -130,7 +130,7 @@ export function mapUpdateMessageToNewsItem(
   locale: string,
   sourcesById?: Record<string, UpdateSource>
 ): NewsItem {
-  const dateSource = message.finalizedAt ?? message.createdAt
+  const dateSource = message.finalizedAt ?? message.timespanEnd
   const date = dateSource ? new Date(dateSource) : new Date()
 
   let timespanStatus: 'active' | 'upcoming' | 'ended' | undefined
@@ -189,7 +189,6 @@ export function mapUpdateMessageToNewsItem(
     })),
     busStops: message.busStops,
     allLocations: getAllLocations(message),
-    createdAt: message.createdAt ? new Date(message.createdAt).toISOString() : undefined,
     finalizedAt: message.finalizedAt ? new Date(message.finalizedAt).toISOString() : undefined,
   }
 }
