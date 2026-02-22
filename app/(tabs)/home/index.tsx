@@ -453,7 +453,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 20,
   },
   viewToggleButton: {
     backgroundColor: '#EFF6FF',

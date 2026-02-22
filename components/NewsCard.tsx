@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
 import {useRouter} from 'expo-router'
 import type {NewsItem} from '../types/news'
+import {getCategoryColor} from '@/lib/categories'
 
 interface NewsCardProps {
   item: NewsItem
@@ -8,10 +9,12 @@ interface NewsCardProps {
 
 export function NewsCard({item}: NewsCardProps) {
   const router = useRouter()
+  const primaryCategory = item.categories?.[0] ?? item.topic
+  const borderColor = getCategoryColor(primaryCategory)
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, {borderLeftColor: borderColor}]}
       onPress={() => router.push(`/(tabs)/home/${item.id}`)}
       activeOpacity={0.7}
     >
@@ -41,8 +44,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
-    marginHorizontal: 20,
     marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#9CA3AF',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
