@@ -2,6 +2,7 @@ import React from 'react'
 import {View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Linking} from 'react-native'
 import {useLocalSearchParams} from 'expo-router'
 import {useTranslation} from 'react-i18next'
+import Markdown from 'react-native-markdown-display'
 import {useUpdateById} from '@/hooks/useUpdateById'
 
 export default function NewsDetail() {
@@ -38,7 +39,19 @@ export default function NewsDetail() {
 
           {newsItem.snippet ? <Text style={styles.description}>{newsItem.snippet}</Text> : null}
 
-          <Text style={styles.contentText}>{newsItem.markdownText || newsItem.rawText || ''}</Text>
+          {newsItem.markdownText ? (
+            <Markdown
+              style={markdownStyles}
+              onLinkPress={(url) => {
+                Linking.openURL(url)
+                return false
+              }}
+            >
+              {newsItem.markdownText}
+            </Markdown>
+          ) : (
+            <Text style={styles.contentText}>{newsItem.rawText || ''}</Text>
+          )}
 
           {newsItem.sourceUrl ? (
             <Text style={styles.sourceLink} onPress={() => Linking.openURL(newsItem.sourceUrl!)}>
@@ -136,5 +149,56 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     marginBottom: 20,
     textAlign: 'center',
+  },
+})
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: 15,
+    color: '#374151',
+    lineHeight: 24,
+  },
+  paragraph: {
+    marginTop: 0,
+    marginBottom: 12,
+  },
+  heading1: {
+    fontSize: 24,
+    lineHeight: 32,
+    color: '#1F2937',
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  heading2: {
+    fontSize: 20,
+    lineHeight: 28,
+    color: '#1F2937',
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  heading3: {
+    fontSize: 17,
+    lineHeight: 24,
+    color: '#1F2937',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  bullet_list: {
+    marginBottom: 12,
+  },
+  ordered_list: {
+    marginBottom: 12,
+  },
+  list_item: {
+    color: '#374151',
+    lineHeight: 24,
+  },
+  link: {
+    color: '#1E40AF',
+    textDecorationLine: 'underline',
+  },
+  strong: {
+    fontWeight: '700',
+    color: '#1F2937',
   },
 })
