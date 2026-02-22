@@ -17,6 +17,12 @@ interface UseUpdatesOptions {
   enabled?: boolean
 }
 
+function getTodayStartTimestamp(): number {
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  return start.getTime()
+}
+
 export function useUpdates(options: UseUpdatesOptions = {}) {
   const FAILURE_COOLDOWN_MS = 15000
   const {i18n} = useTranslation()
@@ -83,7 +89,10 @@ export function useUpdates(options: UseUpdatesOptions = {}) {
       try {
         inFlightRef.current = true
         lastRequestKeyRef.current = requestKey
-        setLoading(true)
+        const shouldShowBlockingLoading = !hasLoadedRef.current
+        if (shouldShowBlockingLoading) {
+          setLoading(true)
+        }
 
         setError(null)
 
@@ -101,7 +110,18 @@ export function useUpdates(options: UseUpdatesOptions = {}) {
 
         const sourcesById = mapSourcesById(sources)
 
+        const todayStartTimestamp = getTodayStartTimestamp()
+
         const transformed = messages
+          .filter((message) => {
+            const candidate = message.timespanEnd ?? message.finalizedAt ?? message.createdAt
+            if (!candidate) {
+              return false
+            }
+
+            const timestamp = new Date(candidate).getTime()
+            return !Number.isNaN(timestamp) && timestamp >= todayStartTimestamp
+          })
           .map((message) => mapUpdateMessageToNewsItem(message, i18n.language, sourcesById))
           .slice(0, options.limit ?? messages.length)
 
