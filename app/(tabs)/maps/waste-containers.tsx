@@ -42,6 +42,7 @@ export default function WasteContainers() {
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
+  const [containersError, setContainersError] = useState<string | null>(null)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
@@ -106,6 +107,7 @@ export default function WasteContainers() {
     try {
       loadingRef.current = true
       setContainersLoading(true)
+      setContainersError(null)
 
       const radiusMeters = 1000
 
@@ -119,7 +121,7 @@ export default function WasteContainers() {
     } catch (error) {
       console.error('Error loading nearby containers:', error)
       if (isMountedRef.current) {
-        Alert.alert(t('common.error'), t('containers.loadError'))
+        setContainersError(t('wasteContainers.loadError'))
       }
     } finally {
       if (isMountedRef.current) {
@@ -610,6 +612,15 @@ export default function WasteContainers() {
           <ActivityIndicator size="small" color="#1E40AF" />
         </View>
       )}
+
+      {containersError && (
+        <View style={styles.errorOverlay}>
+          <Text style={styles.errorOverlayText}>{containersError}</Text>
+          <TouchableOpacity onPress={() => setContainersError(null)}>
+            <Text style={styles.errorOverlayDismiss}>{t('common.cancel')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   )
 }
@@ -788,6 +799,37 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  errorOverlay: {
+    position: 'absolute',
+    top: 70,
+    left: 16,
+    right: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  errorOverlayText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#B91C1C',
+  },
+  errorOverlayDismiss: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1E40AF',
   },
   actionButtonsContainer: {
     position: 'absolute',

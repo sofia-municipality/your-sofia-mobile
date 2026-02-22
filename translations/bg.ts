@@ -26,6 +26,8 @@ export default {
     seeList: 'Виж списък',
     loading: 'Зареждане...',
     retry: 'Опитай отново',
+    unexpectedErrorMessage:
+      'Възникна неочаквана грешка при зареждане на данните. Моля, опитайте отново.',
     noNews: 'Няма налични новини',
     topics: {
       all: 'Всички новини',
@@ -235,6 +237,7 @@ export default {
     containerStates: 'Състояния на контейнера',
     createdAt: 'Създаден на',
     updatedAt: 'Актуализиран на',
+    loadError: 'Грешка при зареждане на контейнерите',
   },
   signals: {
     title: 'Сигнали',

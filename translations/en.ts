@@ -42,6 +42,7 @@ export default {
     error: 'Error',
     loading: 'Loading...',
     retry: 'Try again',
+    unexpectedErrorMessage: 'An unexpected error occurred while loading data. Please try again.',
     noNews: 'No news available',
     payments: 'Payments',
     cancel: 'Cancel',
@@ -234,6 +235,7 @@ export default {
     containerStates: 'Container States',
     createdAt: 'Created At',
     updatedAt: 'Updated At',
+    loadError: 'Error loading containers',
   },
   signals: {
     title: 'Signals',
