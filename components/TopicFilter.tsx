@@ -1,26 +1,14 @@
 import {View, Text, ScrollView, TouchableOpacity, StyleSheet} from 'react-native'
-import {PartyPopper, Route, Calendar, Bell} from 'lucide-react-native'
 import type {NewsTopicType, NewsFilterChip} from '../types/news'
+import {getCategoryColor} from '@/lib/categories'
 
 interface TopicFilterProps {
   selectedTopic: NewsTopicType
   onTopicChange: (topic: NewsTopicType) => void
-  t: (key: string) => string
+  topics: NewsFilterChip[]
 }
 
-export function TopicFilter({selectedTopic, onTopicChange, t}: TopicFilterProps) {
-  const topics: NewsFilterChip[] = [
-    {id: 'all', label: t('common.topics.all')},
-    {id: 'festivals', label: t('common.topics.festivals'), icon: PartyPopper},
-    {
-      id: 'street-closure',
-      label: t('common.topics.streetClosure'),
-      icon: Route,
-    },
-    {id: 'city-events', label: t('common.topics.cityEvents'), icon: Calendar},
-    {id: 'alerts', label: t('common.topics.alerts'), icon: Bell},
-  ]
-
+export function TopicFilter({selectedTopic, onTopicChange, topics}: TopicFilterProps) {
   return (
     <ScrollView
       horizontal
@@ -30,22 +18,25 @@ export function TopicFilter({selectedTopic, onTopicChange, t}: TopicFilterProps)
       {topics.map((topic) => {
         const isSelected = selectedTopic === topic.id
         const Icon = topic.icon
+        const categoryColor = topic.id === 'all' ? '#1E40AF' : getCategoryColor(topic.id)
 
         return (
           <TouchableOpacity
             key={topic.id}
-            style={[styles.chip, isSelected && styles.selectedChip]}
-            onPress={() => {
-              console.log('[TopicFilter] Topic changed to:', topic.id)
-              onTopicChange(topic.id)
-            }}
+            style={[
+              styles.chip,
+              isSelected && {backgroundColor: categoryColor, borderColor: categoryColor},
+            ]}
+            onPress={() => onTopicChange(topic.id)}
           >
             {Icon && (
               <View style={styles.icon}>
-                <Icon size={16} color={isSelected ? '#FFFFFF' : '#6B7280'} />
+                <Icon size={14} color={isSelected ? '#FFFFFF' : categoryColor} />
               </View>
             )}
-            <Text style={[styles.label, isSelected && styles.selectedLabel]}>{topic.label}</Text>
+            <Text style={[styles.label, isSelected ? styles.selectedLabel : styles.defaultLabel]}>
+              {topic.label}
+            </Text>
           </TouchableOpacity>
         )
       })}
@@ -64,18 +55,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
-  },
-  selectedChip: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   icon: {
     marginRight: 4,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
-    color: '#6B7280',
+  },
+  defaultLabel: {
+    color: '#4B5563',
   },
   selectedLabel: {
     color: '#FFFFFF',

@@ -47,6 +47,8 @@ export default function WasteContainers() {
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
   const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
+  const lastAttemptLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
+  const lastAttemptAtRef = useRef<number>(0)
   const isMountedRef = useRef(true)
   const watchRef = useRef<any>(null)
   const regionDeltaRef = useRef<{latitudeDelta: number; longitudeDelta: number}>({
@@ -69,6 +71,8 @@ export default function WasteContainers() {
 
   // Load nearby containers based on map center position
   const loadContainers = useCallback(async () => {
+    const FAILURE_COOLDOWN_MS = 15000
+
     // Prevent concurrent loading requests
     if (loadingRef.current) {
       return
@@ -90,6 +94,21 @@ export default function WasteContainers() {
 
     if (!searchLocation) return
 
+    // Avoid rapid retries when previous attempts are failing
+    if (lastAttemptLocationRef.current) {
+      const distanceSinceLastAttempt = getDistanceFromLatLonInMeters(
+        lastAttemptLocationRef.current.latitude,
+        lastAttemptLocationRef.current.longitude,
+        searchLocation.latitude,
+        searchLocation.longitude
+      )
+
+      const withinCooldown = Date.now() - lastAttemptAtRef.current < FAILURE_COOLDOWN_MS
+      if (withinCooldown && distanceSinceLastAttempt < 300) {
+        return
+      }
+    }
+
     // Check if we've moved significantly since last load (>250 meters)
     // This creates a buffer zone so markers don't disappear on small movements
     if (lastLoadLocationRef.current) {
@@ -106,6 +125,8 @@ export default function WasteContainers() {
 
     try {
       loadingRef.current = true
+      lastAttemptAtRef.current = Date.now()
+      lastAttemptLocationRef.current = searchLocation
       setContainersLoading(true)
       setContainersError(null)
 

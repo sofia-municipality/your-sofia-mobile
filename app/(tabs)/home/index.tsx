@@ -7,9 +7,8 @@ import {
   SafeAreaView,
   Dimensions,
 } from 'react-native'
-import {useRef, useEffect, useCallback, useState} from 'react'
+import {useRef, useCallback, useEffect, useState} from 'react'
 import {useFocusEffect} from '@react-navigation/native'
-import {MapPin, Phone, Bell, Car, Building2, FileCheck, Zap, Heart} from 'lucide-react-native'
 import {
   useFonts,
   Inter_400Regular,
@@ -22,11 +21,14 @@ import {AirQualityCard} from '../../../components/AirQualityCard'
 import {TopicFilter} from '../../../components/TopicFilter'
 import {NewsCard} from '../../../components/NewsCard'
 import {NewsMap} from '../../../components/NewsMap'
-import {useNews} from '../../../hooks/useNews'
+import {useUpdates} from '../../../hooks/useUpdates'
+import {useUpdateCategories} from '../../../hooks/useUpdateCategories'
 import {useNotifications} from '../../../hooks/useNotifications'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import type {AirQualityData} from '../../../types/airQuality'
 import type {NewsTopicType} from '../../../types/news'
+import type {MapBounds} from '../../../lib/mapBounds'
+import {SOFIA_DEFAULT_BOUNDS} from '../../../lib/mapBounds'
 
 const {width} = Dimensions.get('window')
 
@@ -39,92 +41,54 @@ const mockAirQualityData: AirQualityData = {
   status: 'Good',
 }
 
-const getQuickServices = (t: (key: string) => string) => [
-  {
-    id: 1,
-    title: t('services.payBills'),
-    icon: Zap,
-    color: '#059669',
-    description: t('services.utilitiesAndTaxes'),
-  },
-  {
-    id: 2,
-    title: t('services.parking'),
-    icon: Car,
-    color: '#268adcff',
-    description: t('services.findAndPay'),
-  },
-  {
-    id: 3,
-    title: t('services.documents'),
-    icon: FileCheck,
-    color: '#ac5538ff',
-    description: t('services.certificates'),
-  },
-  {
-    id: 4,
-    title: t('services.emergency'),
-    icon: Phone,
-    color: '#e25454ff',
-    description: t('services.contactHelp'),
-  },
-]
-
-const getCityServices = (t: (key: string) => string) => [
-  {
-    id: 1,
-    title: t('services.buildingPermits'),
-    icon: Building2,
-    description: t('services.applyConstruction'),
-  },
-  {
-    id: 2,
-    title: t('services.healthcareServices'),
-    icon: Heart,
-    description: t('services.findHospitals'),
-  },
-  {
-    id: 3,
-    title: t('services.cityUpdates'),
-    icon: Bell,
-    description: t('services.latestNews'),
-  },
-  {
-    id: 4,
-    title: t('services.findLocations'),
-    icon: MapPin,
-    description: t('services.municipalOffices'),
-  },
-]
-
-interface Service {
-  id: number
-  title: string
-  icon: any
-  color?: string
-  description: string
-}
-
 export default function HomeScreen() {
   const {t} = useTranslation()
+  const router = useRouter()
   const [selectedTopic, setSelectedTopic] = useState<NewsTopicType>('all')
   const [isMapView, setIsMapView] = useState(false)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
+  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
+  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
   const scrollViewRef = useRef<ScrollView>(null)
   const newsSectionRef = useRef<View>(null)
+  const bellScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const {registerBellAction} = useBellAction()
+  const selectedCategories = selectedTopic !== 'all' ? [selectedTopic] : undefined
 
-  // Load news from Payload API
-  const {news, loading: newsLoading, error: newsError, refresh} = useNews(selectedTopic)
+  const {filterChips, categories} = useUpdateCategories()
+  const {
+    news,
+    loading: newsLoading,
+    error: newsError,
+    refresh,
+  } = useUpdates({
+    categories: selectedCategories,
+    limit: 20,
+    bounds: SOFIA_DEFAULT_BOUNDS,
+    zoom: 11,
+    enabled: !isMapView,
+  })
+  const {
+    news: mapNews,
+    loading: mapLoading,
+    error: mapError,
+    refresh: refreshMap,
+  } = useUpdates({
+    categories: selectedCategories,
+    bounds: isMapView ? mapBounds : null,
+    zoom: mapZoom,
+    enabled: isMapView,
+  })
 
   // Setup push notifications
-  const {unreadCount, clearUnreadCount} = useNotifications()
+  useNotifications()
 
   // Handle bell click - filter to alerts and scroll to news section
   const handleBellPress = useCallback(() => {
-    setSelectedTopic('alerts')
+    const bellTopic = categories.includes('uncategorized') ? 'uncategorized' : 'all'
+    setSelectedTopic(bellTopic)
     // Scroll to news section after a brief delay to allow state update
-    setTimeout(() => {
+    bellScrollTimeoutRef.current = setTimeout(() => {
       newsSectionRef.current?.measureLayout(
         scrollViewRef.current as any,
         (x, y) => {
@@ -133,6 +97,14 @@ export default function HomeScreen() {
         () => {} // onFail callback
       )
     }, 100)
+  }, [categories])
+
+  useEffect(() => {
+    return () => {
+      if (bellScrollTimeoutRef.current) {
+        clearTimeout(bellScrollTimeoutRef.current)
+      }
+    }
   }, [])
 
   // Register bell action when screen is focused
@@ -149,8 +121,12 @@ export default function HomeScreen() {
         setIsFirstFocus(false)
         return
       }
-      refresh()
-    }, [isFirstFocus, refresh])
+      if (isMapView) {
+        refreshMap()
+      } else {
+        refresh()
+      }
+    }, [isFirstFocus, isMapView, refresh, refreshMap])
   )
 
   const [fontsLoaded] = useFonts({
@@ -162,9 +138,6 @@ export default function HomeScreen() {
   if (!fontsLoaded) {
     return null
   }
-
-  const quickServices = getQuickServices(t)
-  const cityServices = getCityServices(t)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -181,7 +154,10 @@ export default function HomeScreen() {
         {/* News For You */}
         <View ref={newsSectionRef} style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t('common.newsForYou')}</Text>
+            <View>
+              <Text style={styles.sectionTitle}>{t('common.newsForYou')}</Text>
+              <Text style={styles.sectionSubtitle}>{t('common.newsForYouSource')}</Text>
+            </View>
             <TouchableOpacity
               style={styles.viewToggleButton}
               onPress={() => setIsMapView(!isMapView)}
@@ -192,9 +168,41 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <TopicFilter selectedTopic={selectedTopic} onTopicChange={setSelectedTopic} t={t} />
+          <TopicFilter
+            selectedTopic={selectedTopic}
+            onTopicChange={setSelectedTopic}
+            topics={filterChips}
+          />
 
-          {newsLoading ? (
+          {isMapView ? (
+            <>
+              <NewsMap
+                news={mapNews}
+                onMarkerPress={(item) => {
+                  router.push(`/(tabs)/home/${item.id}`)
+                }}
+                onBoundsChange={(bounds, zoom) => {
+                  setMapBounds(bounds)
+                  setMapZoom(zoom)
+                }}
+              />
+
+              {mapLoading ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
+                </View>
+              ) : null}
+
+              {mapError ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{mapError}</Text>
+                  <TouchableOpacity style={styles.retryButton} onPress={refreshMap}>
+                    <Text style={styles.retryButtonText}>{t('common.retry') || 'Retry'}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+            </>
+          ) : newsLoading ? (
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
             </View>
@@ -205,14 +213,6 @@ export default function HomeScreen() {
                 <Text style={styles.retryButtonText}>{t('common.retry') || 'Retry'}</Text>
               </TouchableOpacity>
             </View>
-          ) : isMapView ? (
-            <NewsMap
-              news={news}
-              onMarkerPress={(item) => {
-                // You can implement marker press handling here
-                console.log('Marker pressed:', item)
-              }}
-            />
           ) : (
             <View style={styles.newsContainer}>
               {news.length === 0 ? (
@@ -375,6 +375,11 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     marginBottom: 4,
     fontFamily: 'Inter-Bold',
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: 'Inter-Regular',
   },
   quickServicesGrid: {
     flexDirection: 'row',
