@@ -1,36 +1,14 @@
-import React, {useState, useEffect} from 'react'
-import {View, Text, StyleSheet, ScrollView, Image, ActivityIndicator} from 'react-native'
+import React from 'react'
+import {View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Linking} from 'react-native'
 import {useLocalSearchParams} from 'expo-router'
 import {useTranslation} from 'react-i18next'
-import {fetchNewsById, type PayloadNewsItem} from '@/lib/payload'
-import {environmentManager} from '@/lib/environment'
+import Markdown from 'react-native-markdown-display'
+import {useUpdateById} from '@/hooks/useUpdateById'
 
 export default function NewsDetail() {
   const {id} = useLocalSearchParams<{id: string}>()
-  const {t, i18n} = useTranslation()
-  const [news, setNews] = useState<PayloadNewsItem | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!id) return
-
-    const loadNews = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const data = await fetchNewsById(id, i18n.language as 'bg' | 'en')
-        setNews(data)
-      } catch (err) {
-        console.error('Error loading news:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load news')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadNews()
-  }, [id, i18n.language])
+  const {t} = useTranslation()
+  const {newsItem, loading, error} = useUpdateById(id)
 
   if (loading) {
     return (
@@ -40,7 +18,7 @@ export default function NewsDetail() {
     )
   }
 
-  if (error || !news) {
+  if (error || !newsItem) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error || t('common.error')}</Text>
@@ -48,38 +26,38 @@ export default function NewsDetail() {
     )
   }
 
-  const imageUrl =
-    news.image && typeof news.image !== 'string'
-      ? `${environmentManager.getApiUrl()}${news.image.url}`
-      : undefined
-
-  const formattedDate = new Date(news.publishedAt).toLocaleDateString(
-    i18n.language === 'bg' ? 'bg-BG' : 'en-US',
-    {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }
-  )
-
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        {imageUrl && <Image source={{uri: imageUrl}} style={styles.image} resizeMode="contain" />}
+        {newsItem.image && (
+          <Image source={{uri: newsItem.image}} style={styles.image} resizeMode="contain" />
+        )}
 
         <View style={styles.content}>
-          <Text style={styles.title}>{news.title}</Text>
-          <Text style={styles.date}>{formattedDate}</Text>
-          <Text style={styles.description}>{news.description}</Text>
+          {newsItem.title ? <Text style={styles.title}>{newsItem.title}</Text> : null}
+          <Text style={styles.date}>{newsItem.date}</Text>
 
-          {news.content && (
-            <View style={styles.richContent}>
-              <Text style={styles.contentText}>
-                {/* TODO: Render Lexical rich text content properly */}
-                {/* {JSON.stringify(news.content, null, 2)} */}
-              </Text>
-            </View>
+          {newsItem.snippet ? <Text style={styles.description}>{newsItem.snippet}</Text> : null}
+
+          {newsItem.markdownText ? (
+            <Markdown
+              style={markdownStyles}
+              onLinkPress={(url) => {
+                Linking.openURL(url)
+                return false
+              }}
+            >
+              {newsItem.markdownText}
+            </Markdown>
+          ) : (
+            <Text style={styles.contentText}>{newsItem.rawText || ''}</Text>
           )}
+
+          {newsItem.sourceUrl ? (
+            <Text style={styles.sourceLink} onPress={() => Linking.openURL(newsItem.sourceUrl!)}>
+              {newsItem.sourceUrl}
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
     </View>
@@ -142,13 +120,16 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 24,
   },
-  richContent: {
-    marginTop: 8,
-  },
   contentText: {
     fontSize: 15,
     color: '#374151',
     lineHeight: 24,
+  },
+  sourceLink: {
+    fontSize: 13,
+    color: '#1E40AF',
+    marginTop: 16,
+    textDecorationLine: 'underline',
   },
   loadingContainer: {
     flex: 1,
@@ -169,15 +150,55 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+})
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: 15,
+    color: '#374151',
+    lineHeight: 24,
   },
-  backButtonText: {
-    fontSize: 16,
+  paragraph: {
+    marginTop: 0,
+    marginBottom: 12,
+  },
+  heading1: {
+    fontSize: 24,
+    lineHeight: 32,
+    color: '#1F2937',
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  heading2: {
+    fontSize: 20,
+    lineHeight: 28,
+    color: '#1F2937',
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  heading3: {
+    fontSize: 17,
+    lineHeight: 24,
+    color: '#1F2937',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  bullet_list: {
+    marginBottom: 12,
+  },
+  ordered_list: {
+    marginBottom: 12,
+  },
+  list_item: {
+    color: '#374151',
+    lineHeight: 24,
+  },
+  link: {
     color: '#1E40AF',
-    marginLeft: 8,
+    textDecorationLine: 'underline',
+  },
+  strong: {
+    fontWeight: '700',
+    color: '#1F2937',
   },
 })

@@ -42,10 +42,13 @@ export default function WasteContainers() {
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [containers, setContainers] = useState<WasteContainer[]>([])
   const [containersLoading, setContainersLoading] = useState(false)
+  const [containersError, setContainersError] = useState<string | null>(null)
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
   const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
+  const lastAttemptLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
+  const lastAttemptAtRef = useRef<number>(0)
   const isMountedRef = useRef(true)
   const watchRef = useRef<any>(null)
   const regionDeltaRef = useRef<{latitudeDelta: number; longitudeDelta: number}>({
@@ -68,6 +71,8 @@ export default function WasteContainers() {
 
   // Load nearby containers based on map center position
   const loadContainers = useCallback(async () => {
+    const FAILURE_COOLDOWN_MS = 15000
+
     // Prevent concurrent loading requests
     if (loadingRef.current) {
       return
@@ -89,6 +94,21 @@ export default function WasteContainers() {
 
     if (!searchLocation) return
 
+    // Avoid rapid retries when previous attempts are failing
+    if (lastAttemptLocationRef.current) {
+      const distanceSinceLastAttempt = getDistanceFromLatLonInMeters(
+        lastAttemptLocationRef.current.latitude,
+        lastAttemptLocationRef.current.longitude,
+        searchLocation.latitude,
+        searchLocation.longitude
+      )
+
+      const withinCooldown = Date.now() - lastAttemptAtRef.current < FAILURE_COOLDOWN_MS
+      if (withinCooldown && distanceSinceLastAttempt < 300) {
+        return
+      }
+    }
+
     // Check if we've moved significantly since last load (>250 meters)
     // This creates a buffer zone so markers don't disappear on small movements
     if (lastLoadLocationRef.current) {
@@ -105,7 +125,10 @@ export default function WasteContainers() {
 
     try {
       loadingRef.current = true
+      lastAttemptAtRef.current = Date.now()
+      lastAttemptLocationRef.current = searchLocation
       setContainersLoading(true)
+      setContainersError(null)
 
       const radiusMeters = 1000
 
@@ -119,7 +142,7 @@ export default function WasteContainers() {
     } catch (error) {
       console.error('Error loading nearby containers:', error)
       if (isMountedRef.current) {
-        Alert.alert(t('common.error'), t('containers.loadError'))
+        setContainersError(t('wasteContainers.loadError'))
       }
     } finally {
       if (isMountedRef.current) {
@@ -610,6 +633,15 @@ export default function WasteContainers() {
           <ActivityIndicator size="small" color="#1E40AF" />
         </View>
       )}
+
+      {containersError && (
+        <View style={styles.errorOverlay}>
+          <Text style={styles.errorOverlayText}>{containersError}</Text>
+          <TouchableOpacity onPress={() => setContainersError(null)}>
+            <Text style={styles.errorOverlayDismiss}>{t('common.cancel')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   )
 }
@@ -788,6 +820,37 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  errorOverlay: {
+    position: 'absolute',
+    top: 70,
+    left: 16,
+    right: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  errorOverlayText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#B91C1C',
+  },
+  errorOverlayDismiss: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1E40AF',
   },
   actionButtonsContainer: {
     position: 'absolute',

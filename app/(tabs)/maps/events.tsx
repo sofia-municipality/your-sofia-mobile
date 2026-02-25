@@ -1,16 +1,24 @@
-import React, {useState, useEffect} from 'react'
+import React, {useMemo, useRef, useState, useEffect} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker} from 'react-native-maps'
+import MapView, {Marker, type Region} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {useNews} from '../../../hooks/useNews'
+import {useUpdates} from '../../../hooks/useUpdates'
 import {ImplementMeGithub} from '../../../components/ImplementMeGithub'
+import {estimateZoom, getBoundsFromRegion, type MapBounds} from '../../../lib/mapBounds'
 
 export default function EventsMap() {
   const {t} = useTranslation()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
-  const [locationError, setLocationError] = useState(false)
-  const {news: events, loading} = useNews('city-events')
+  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
+  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const {news: events, loading} = useUpdates({
+    categories: ['culture', 'art', 'sports'],
+    limit: 100,
+    bounds: mapBounds,
+    zoom: mapZoom,
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -18,7 +26,6 @@ export default function EventsMap() {
         const {status} = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
           console.warn('Location permission not granted')
-          setLocationError(true)
           return
         }
 
@@ -28,18 +35,33 @@ export default function EventsMap() {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        setLocationError(true)
       }
     })()
   }, [])
 
   // Default to Sofia center if location is not available
-  const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  }
+  const region = useMemo(
+    () => ({
+      latitude: location?.coords.latitude || 42.6977,
+      longitude: location?.coords.longitude || 23.3219,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    }),
+    [location?.coords.latitude, location?.coords.longitude]
+  )
+
+  useEffect(() => {
+    setMapBounds(getBoundsFromRegion(region))
+    setMapZoom(estimateZoom(region))
+  }, [region])
+
+  useEffect(() => {
+    return () => {
+      if (regionDebounceRef.current) {
+        clearTimeout(regionDebounceRef.current)
+      }
+    }
+  }, [])
 
   // Filter events that have location data
   const eventsWithLocation = events.filter((item) => item.location)
@@ -61,8 +83,15 @@ export default function EventsMap() {
         showsUserLocation={true}
         showsMyLocationButton={true}
         showsCompass={true}
+        onRegionChangeComplete={(nextRegion: Region) => {
+          if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
+          regionDebounceRef.current = setTimeout(() => {
+            setMapBounds(getBoundsFromRegion(nextRegion))
+            setMapZoom(estimateZoom(nextRegion))
+          }, 400)
+        }}
       >
-        {location && !locationError && (
+        {location && (
           <Marker
             coordinate={{
               latitude: location.coords.latitude,
