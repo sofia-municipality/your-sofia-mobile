@@ -44,7 +44,7 @@ export default {
     verifiedCitizen: 'Непотвърден гражданин',
     signOut: 'Изход',
     version: 'Твоята София v1.0.0',
-    copyright: '© 2025 Столична община',
+    copyright: '© 2026 Столична община',
     yourLocation: 'Вашето местоположение',
     error: 'Грешка',
     cancel: 'Остави',
