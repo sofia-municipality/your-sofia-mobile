@@ -12,7 +12,15 @@ import {
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {Navigation, NavigationOff, Plus, ChevronDown, ChevronUp} from 'lucide-react-native'
+import {
+  Navigation,
+  NavigationOff,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react-native'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
@@ -247,6 +255,40 @@ export default function WasteContainers() {
       }
     }
   }, [followMe, permissionStatus])
+
+  const zoomIn = () => {
+    if (!mapRef.current) return
+    const center = mapCenter || {
+      latitude: location?.coords.latitude ?? 42.6977,
+      longitude: location?.coords.longitude ?? 23.3219,
+    }
+    const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
+    mapRef.current.animateToRegion(
+      {
+        ...center,
+        latitudeDelta: latitudeDelta / 2,
+        longitudeDelta: longitudeDelta / 2,
+      },
+      300
+    )
+  }
+
+  const zoomOut = () => {
+    if (!mapRef.current) return
+    const center = mapCenter || {
+      latitude: location?.coords.latitude ?? 42.6977,
+      longitude: location?.coords.longitude ?? 23.3219,
+    }
+    const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
+    mapRef.current.animateToRegion(
+      {
+        ...center,
+        latitudeDelta: Math.min(latitudeDelta * 2, 90),
+        longitudeDelta: Math.min(longitudeDelta * 2, 180),
+      },
+      300
+    )
+  }
 
   const toggleFollowMe = () => {
     const next = !followMe
@@ -604,6 +646,12 @@ export default function WasteContainers() {
           ) : (
             <NavigationOff size={20} color="#6B7280" />
           )}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={zoomIn}>
+          <ZoomIn size={20} color="#6B7280" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={zoomOut}>
+          <ZoomOut size={20} color="#6B7280" />
         </TouchableOpacity>
       </View>
 
