@@ -264,6 +264,7 @@ export default {
     title: 'Сигнали',
     newSignal: 'Нов сигнал',
     mySignals: 'Моите сигнали',
+    allSignals: 'Всички сигнали',
     noSignals: 'Няма сигнали',
     createSignal: 'Създай сигнал',
     signalDetails: 'Детайли за сигнала',
