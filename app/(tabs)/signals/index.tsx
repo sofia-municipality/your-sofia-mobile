@@ -13,6 +13,7 @@ import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import {fetchSignals} from '../../../lib/payload'
+import {getUniqueReporterId} from '../../../lib/deviceId'
 import type {Signal} from '../../../types/signal'
 import {AlertCircle, Clock, CheckCircle, XCircle} from 'lucide-react-native'
 
@@ -26,6 +27,12 @@ export default function SignalsScreen() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
+  const [filter, setFilter] = useState<'all' | 'mine'>('mine')
+  const [deviceId, setDeviceId] = useState<string | null>(null)
+
+  useEffect(() => {
+    getUniqueReporterId().then(setDeviceId)
+  }, [])
 
   const handleCreateSignal = useCallback(() => {
     router.push('/(tabs)/signals/new' as any)
@@ -46,6 +53,7 @@ export default function SignalsScreen() {
         const response = await fetchSignals({
           limit: 50,
           containerReferenceId: containerReferenceId,
+          ...(filter === 'mine' && deviceId ? {reporterUniqueId: deviceId} : {}),
         })
         setSignals(response.docs)
       } catch (err) {
@@ -56,7 +64,7 @@ export default function SignalsScreen() {
         setRefreshing(false)
       }
     },
-    [i18n.language, t, containerReferenceId]
+    [t, containerReferenceId, filter, deviceId]
   )
 
   useEffect(() => {
@@ -160,18 +168,45 @@ export default function SignalsScreen() {
   }
 
   const renderListHeader = () => {
-    if (!containerReferenceId) return null
     return (
-      <View style={styles.filterBanner}>
-        <Text style={styles.filterText}>
-          {t('signals.filteredForContainer', {id: containerReferenceId})}
-        </Text>
-        <TouchableOpacity
-          style={styles.filterClearButton}
-          onPress={() => router.push('/(tabs)/signals' as any)}
-        >
-          <Text style={styles.filterClearButtonText}>{t('signals.clearFilter')}</Text>
-        </TouchableOpacity>
+      <View>
+        {!containerReferenceId && (
+          <View style={styles.filterRow}>
+            <TouchableOpacity
+              style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
+              onPress={() => setFilter('all')}
+            >
+              <Text
+                style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}
+              >
+                {t('signals.allSignals')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterChip, filter === 'mine' && styles.filterChipActive]}
+              onPress={() => setFilter('mine')}
+            >
+              <Text
+                style={[styles.filterChipText, filter === 'mine' && styles.filterChipTextActive]}
+              >
+                {t('signals.mySignals')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {containerReferenceId && (
+          <View style={styles.filterBanner}>
+            <Text style={styles.filterText}>
+              {t('signals.filteredForContainer', {id: containerReferenceId})}
+            </Text>
+            <TouchableOpacity
+              style={styles.filterClearButton}
+              onPress={() => router.push('/(tabs)/signals' as any)}
+            >
+              <Text style={styles.filterClearButtonText}>{t('signals.clearFilter')}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     )
   }
@@ -324,5 +359,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  filterChip: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+  },
+  filterChipActive: {
+    backgroundColor: '#1E40AF',
+    borderColor: '#1E40AF',
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  filterChipTextActive: {
+    color: '#ffffff',
   },
 })

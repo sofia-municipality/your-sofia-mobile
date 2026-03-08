@@ -262,6 +262,7 @@ export default {
     title: 'Signals',
     newSignal: 'New Signal',
     mySignals: 'My Signals',
+    allSignals: 'All Signals',
     noSignals: 'No signals',
     createSignal: 'Create Signal',
     signalDetails: 'Signal Details',
