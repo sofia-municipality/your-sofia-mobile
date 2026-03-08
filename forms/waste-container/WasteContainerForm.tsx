@@ -34,9 +34,9 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
             capacitySize: container.capacitySize || 'standard',
             binCount: container.binCount || 1,
             location: {
-              latitude: container.location.latitude,
-              longitude: container.location.longitude,
-              address: container.location.address || '',
+              latitude: container.latitude,
+              longitude: container.longitude,
+              address: container.address || '',
             },
             notes: container.notes || '',
           }

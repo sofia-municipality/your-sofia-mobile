@@ -286,6 +286,7 @@ export async function createSignalsFromPhotos(
           },
           body: JSON.stringify({
             ...signalData,
+            location: [signalData.location!.longitude, signalData.location!.latitude],
             images: imageIds,
           }),
         }

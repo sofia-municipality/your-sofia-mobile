@@ -75,11 +75,13 @@ export interface WasteContainer {
     url: string
     alt?: string
   }
-  location: {
-    latitude: number
-    longitude: number
-    address?: string
-  }
+  /** [longitude, latitude] tuple as returned by Payload CMS point field */
+  location: [number, number]
+  /** Derived from location[1] for convenience */
+  latitude: number
+  /** Derived from location[0] for convenience */
+  longitude: number
+  address?: string
   capacityVolume: number
   capacitySize: CapacitySize
   binCount?: number

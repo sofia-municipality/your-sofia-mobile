@@ -401,8 +401,8 @@ export default function WasteContainers() {
     return visibleContainers.map((container) => ({
       id: container.id,
       coordinate: {
-        latitude: container.location.latitude,
-        longitude: container.location.longitude,
+        latitude: container.latitude,
+        longitude: container.longitude,
       },
       pinColor: getContainerPinColor(container),
       container,

@@ -88,8 +88,8 @@ export default function NewCityObjectScreen() {
       const data = await fetchWasteContainerById(id)
       setContainer(data)
       setCurrentLocation({
-        latitude: data.location.latitude,
-        longitude: data.location.longitude,
+        latitude: data.latitude,
+        longitude: data.longitude,
       })
     } catch (error) {
       console.error('Error loading container:', error)

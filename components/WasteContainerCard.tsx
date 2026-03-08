@@ -81,7 +81,10 @@ export function WasteContainerCard({
         containerId: container.id,
         containerPublicNumber: container.publicNumber,
         containerName: container.publicNumber,
-        containerLocation: JSON.stringify(container.location),
+        containerLocation: JSON.stringify({
+          latitude: container.latitude,
+          longitude: container.longitude,
+        }),
         prefilledObjectType: 'waste-container',
         returnTo: '/(tabs)/maps/waste-containers',
       },
@@ -440,14 +443,14 @@ export function WasteContainerCard({
             <View style={styles.extendedInfoRow}>
               <Text style={styles.extendedInfoLabel}>{t('wasteContainers.coordinates')}:</Text>
               <Text style={styles.extendedInfoValue}>
-                {container.location.latitude.toFixed(6)}, {container.location.longitude.toFixed(6)}
+                {container.latitude.toFixed(6)}, {container.longitude.toFixed(6)}
               </Text>
             </View>
 
-            {container.location.address && (
+            {container.address && (
               <View style={styles.extendedInfoRow}>
                 <Text style={styles.extendedInfoLabel}>{t('wasteContainers.address')}:</Text>
-                <Text style={styles.extendedInfoValue}>{container.location.address}</Text>
+                <Text style={styles.extendedInfoValue}>{container.address}</Text>
               </View>
             )}
 

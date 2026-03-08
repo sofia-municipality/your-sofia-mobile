@@ -174,6 +174,8 @@ export async function fetchContainersWithSignals(options?: {
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
+      latitude: container.location?.[1],
+      longitude: container.location?.[0],
       images:
         container.images?.map((img: any) =>
           typeof img === 'string' ? img : `${getApiUrl()}${img.url}`
@@ -228,6 +230,8 @@ export async function fetchWasteContainers(options?: {
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
+      latitude: container.location?.[1],
+      longitude: container.location?.[0],
       image: container.image
         ? {
             ...container.image,
@@ -299,6 +303,8 @@ export async function fetchNearbyWasteContainers(
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
+      latitude: container.location?.[1],
+      longitude: container.location?.[0],
       image: container.image
         ? {
             ...container.image,
@@ -331,6 +337,9 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
       url: getMediaUrl(container.image),
     }
   }
+
+  container.latitude = container.location?.[1]
+  container.longitude = container.location?.[0]
 
   // Fetch latest observation with photo for this container
   try {
@@ -505,6 +514,19 @@ export async function fetchSignalById(id: string): Promise<Signal> {
 /**
  * Create a new signal with optional photos
  */
+
+/**
+ * Serialize a signal's location from {latitude, longitude} object to
+ * the [longitude, latitude] array format expected by Payload CMS point fields.
+ */
+function serializeSignalLocation(data: CreateSignalInput): Record<string, unknown> {
+  const {location, ...rest} = data
+  return {
+    ...rest,
+    ...(location ? {location: [location.longitude, location.latitude]} : {}),
+  }
+}
+
 export async function createSignal(
   signalData: CreateSignalInput,
   photos?: {uri: string; type: string; name: string}[],
@@ -562,7 +584,7 @@ export async function createSignal(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...signalData,
+        ...serializeSignalLocation(signalData),
         images: imageIds,
       }),
     })
@@ -573,7 +595,7 @@ export async function createSignal(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(signalData),
+      body: JSON.stringify(serializeSignalLocation(signalData)),
     })
   }
 
@@ -702,6 +724,9 @@ export async function updateSignal(
   // Always include images field if existingPhotoIds was provided, even if empty array
   const finalUpdateData = {
     ...updateData,
+    ...(updateData.location
+      ? {location: [updateData.location.longitude, updateData.location.latitude]}
+      : {}),
     ...(existingPhotoIds !== undefined ? {images: allImageIds} : {}),
     ...(reporterUniqueId !== undefined ? {reporterUniqueId} : {}),
   }
@@ -786,7 +811,7 @@ export async function createWasteContainer(
  */
 export async function updateWasteContainer(
   id: string,
-  containerData: Partial<WasteContainer>,
+  containerData: CreateContainerInput,
   authToken: string,
   photo?: {uri: string; type: string; name: string}
 ): Promise<WasteContainer> {
