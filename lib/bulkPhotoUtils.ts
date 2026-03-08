@@ -137,12 +137,10 @@ export async function findClosestCityObject(
  */
 export async function findNearbySignals(
   location: {latitude: number; longitude: number},
-  radiusMeters: number = 10,
-  locale: 'bg' | 'en' = 'bg'
+  radiusMeters: number = 10
 ): Promise<Signal[]> {
   try {
     const response = await fetchSignals({
-      locale,
       limit: 100,
     })
 
@@ -230,7 +228,6 @@ export async function uploadPhotos(
 export async function createSignalsFromPhotos(
   groups: PhotoGroup[],
   reporterUniqueId?: string,
-  locale: 'bg' | 'en' = 'bg',
   onProgress?: (current: number, total: number) => void
 ): Promise<{created: number; failed: number}> {
   let created = 0
@@ -281,7 +278,7 @@ export async function createSignalsFromPhotos(
       }
 
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000'}/api/signals?locale=${locale}`,
+        `${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000'}/api/signals`,
         {
           method: 'POST',
           headers: {
@@ -368,7 +365,6 @@ export async function createObjectsFromPhotos(
   groups: PhotoGroup[],
   authToken: string,
   reporterUniqueId?: string,
-  locale: 'bg' | 'en' = 'bg',
   onProgress?: (current: number, total: number) => void
 ): Promise<{createdObjects: number; closedSignals: number; failed: number}> {
   let createdObjects = 0
@@ -384,7 +380,7 @@ export async function createObjectsFromPhotos(
 
     try {
       // Find nearby signals within 10m
-      const nearbySignals = await findNearbySignals(group.centerLocation, 10, locale)
+      const nearbySignals = await findNearbySignals(group.centerLocation, 10)
       const activeSignals = nearbySignals.filter(
         (signal) => signal.status !== 'resolved' && signal.status !== 'rejected'
       )
@@ -441,7 +437,6 @@ export async function createObjectsFromPhotos(
               {
                 status: 'resolved',
               },
-              locale,
               reporterUniqueId
             )
             closedSignals++

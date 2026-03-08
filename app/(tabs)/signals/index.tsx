@@ -44,7 +44,6 @@ export default function SignalsScreen() {
         if (!isRefreshing) setLoading(true)
         setError(null)
         const response = await fetchSignals({
-          locale: i18n.language as 'bg' | 'en',
           limit: 50,
           containerReferenceId: containerReferenceId,
         })

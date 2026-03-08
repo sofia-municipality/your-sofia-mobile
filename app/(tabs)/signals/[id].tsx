@@ -35,7 +35,7 @@ export default function SignalDetailsScreen() {
     try {
       setLoading(true)
       setError(null)
-      const data = await fetchSignalById(id, i18n.language as 'bg' | 'en')
+      const data = await fetchSignalById(id)
       setSignal(data)
     } catch (err) {
       console.error('Error loading signal:', err)
@@ -91,12 +91,7 @@ export default function SignalDetailsScreen() {
           existingPhotoIds,
         }
 
-        const response = await updateSignal(
-          signal.id,
-          updateData,
-          i18n.language as 'bg' | 'en',
-          deviceId
-        )
+        const response = await updateSignal(signal.id, updateData, deviceId)
 
         const updatedSignal = (response as any).doc
 

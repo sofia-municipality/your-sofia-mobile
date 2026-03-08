@@ -128,7 +128,7 @@ export default function ProfileScreen() {
     async (reporterId: string) => {
       try {
         setLoadingStats(true)
-        const stats = await fetchSignalStats(reporterId, i18n.language as 'bg' | 'en')
+        const stats = await fetchSignalStats(reporterId)
         setSignalStats(stats)
       } catch (error) {
         console.error('Error loading signal stats:', error)

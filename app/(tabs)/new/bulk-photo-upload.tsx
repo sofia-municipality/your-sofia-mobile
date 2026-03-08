@@ -179,11 +179,8 @@ export default function BulkPhotoUploadScreen() {
       let result: any
       switch (mode) {
         case 'create-signals':
-          result = await createSignalsFromPhotos(
-            photoGroups,
-            reporterUniqueId,
-            locale,
-            (current, total) => setProcessProgress({current, total})
+          result = await createSignalsFromPhotos(photoGroups, reporterUniqueId, (current, total) =>
+            setProcessProgress({current, total})
           )
           handleResult(result, mode)
           break
@@ -198,7 +195,6 @@ export default function BulkPhotoUploadScreen() {
             photoGroups,
             token!,
             reporterUniqueId,
-            locale,
             (current, total) => setProcessProgress({current, total})
           )
           handleResult(result, mode)

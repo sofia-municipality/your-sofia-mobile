@@ -408,7 +408,6 @@ export async function cleanContainer(
  * Fetch signals from Payload CMS
  */
 export async function fetchSignals(options?: {
-  locale?: 'bg' | 'en'
   status?: string
   category?: string
   limit?: number
@@ -417,7 +416,6 @@ export async function fetchSignals(options?: {
   containerReferenceId?: string
 }): Promise<PayloadResponse<Signal>> {
   const {
-    locale = 'bg',
     status,
     category,
     limit = 20,
@@ -428,7 +426,6 @@ export async function fetchSignals(options?: {
 
   // Build query parameters
   const params = new URLSearchParams({
-    locale,
     limit: limit.toString(),
     page: page.toString(),
     depth: '1', // Populate image relationship
@@ -484,8 +481,8 @@ export async function fetchSignals(options?: {
 /**
  * Fetch a single signal by ID
  */
-export async function fetchSignalById(id: string, locale: 'bg' | 'en' = 'bg'): Promise<Signal> {
-  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}&depth=1`)
+export async function fetchSignalById(id: string): Promise<Signal> {
+  const response = await fetch(`${getApiUrl()}/api/signals/${id}?depth=1`)
   handleAuthError(response)
 
   if (!response.ok) {
@@ -510,7 +507,6 @@ export async function fetchSignalById(id: string, locale: 'bg' | 'en' = 'bg'): P
  */
 export async function createSignal(
   signalData: CreateSignalInput,
-  locale: 'bg' | 'en' = 'bg',
   photos?: {uri: string; type: string; name: string}[],
   reporterUniqueId?: string,
   onUploadProgress?: (current: number, total: number) => void
@@ -560,7 +556,7 @@ export async function createSignal(
     }
 
     // Create signal with uploaded image IDs
-    response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
+    response = await fetch(`${getApiUrl()}/api/signals`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -572,7 +568,7 @@ export async function createSignal(
     })
   } else {
     // Create signal without photos
-    response = await fetch(`${getApiUrl()}/api/signals?locale=${locale}`, {
+    response = await fetch(`${getApiUrl()}/api/signals`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -601,12 +597,10 @@ export async function createSignal(
  */
 export async function checkExistingSignal(
   reporterUniqueId: string,
-  containerReferenceId: string,
-  locale: 'bg' | 'en' = 'bg'
+  containerReferenceId: string
 ): Promise<{exists: boolean; signal?: Signal}> {
   try {
     const response = await fetchSignals({
-      locale,
       reporterUniqueId,
       containerReferenceId,
       category: 'waste-container',
@@ -632,13 +626,11 @@ export async function checkExistingSignal(
  * Fetch signal statistics for a reporter
  */
 export async function fetchSignalStats(
-  reporterUniqueId: string,
-  locale: 'bg' | 'en' = 'bg'
+  reporterUniqueId: string
 ): Promise<{total: number; active: number}> {
   try {
     // Fetch all signals for this reporter
     const response = await fetchSignals({
-      locale,
       reporterUniqueId,
       limit: 1000, // High limit to get all signals
     })
@@ -666,7 +658,6 @@ export async function updateSignal(
     newPhotos?: {uri: string; type: string; name: string}[]
     existingPhotoIds?: number[]
   },
-  locale: 'bg' | 'en' = 'bg',
   reporterUniqueId?: string
 ): Promise<Signal> {
   const {newPhotos, existingPhotoIds, ...updateData} = signalData
@@ -715,7 +706,7 @@ export async function updateSignal(
     ...(reporterUniqueId !== undefined ? {reporterUniqueId} : {}),
   }
 
-  const response = await fetch(`${getApiUrl()}/api/signals/${id}?locale=${locale}`, {
+  const response = await fetch(`${getApiUrl()}/api/signals/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

@@ -312,7 +312,6 @@ export default function NewScreen() {
       // Create signal via API with photos
       const newSignal = await createSignal(
         signalData,
-        t('common.header') === 'Твоята София' ? 'bg' : 'en',
         photoFiles.length > 0 ? photoFiles : undefined,
         deviceId,
         (current, total) => {
