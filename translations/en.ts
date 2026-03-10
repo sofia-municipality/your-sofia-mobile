@@ -518,6 +518,10 @@ export default {
     summaryCollected: 'Collected in period',
     summaryZones: 'Zones',
     summaryDistricts: 'Districts with data',
+    tabWaste: 'Waste Collection',
+    tabCars: 'Abandoned Cars',
+    tabPotholes: 'Potholes',
+    comingSoonSubtitle: 'Coming soon',
   },
   assignments: {
     title: 'Assignments',

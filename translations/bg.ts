@@ -521,6 +521,10 @@ export default {
     summaryCollected: 'Събрани за периода',
     summaryZones: 'Зони',
     summaryDistricts: 'Райони с данни',
+    tabWaste: 'Сметосъбиране',
+    tabCars: 'Изоставени Автомобили',
+    tabPotholes: 'Дупки',
+    comingSoonSubtitle: 'Очаквайте скоро',
   },
   assignments: {
     title: 'Възлагане',
