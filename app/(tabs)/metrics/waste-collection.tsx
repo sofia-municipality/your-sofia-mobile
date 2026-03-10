@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {CartesianChart, StackedBar} from 'victory-native'
+import {CartesianChart, StackedBar, Bar} from 'victory-native'
 import {useCollectionMetrics, MetricsRange} from '../../../hooks/useCollectionMetrics'
 
 type ChartTab = 'zone' | 'district'
@@ -28,6 +28,12 @@ export default function WasteCollectionDashboard() {
       name: d.districtName.slice(0, 8),
       collected: d.collectedContainers,
       notCollected: d.totalContainers - d.collectedContainers,
+    })) ?? []
+
+  const histogramData =
+    data?.byTimeSinceCollection.map((b) => ({
+      bucket: b.bucket,
+      count: b.containerCount,
     })) ?? []
 
   const chartData = chartTab === 'zone' ? zoneData : districtData
@@ -160,6 +166,42 @@ export default function WasteCollectionDashboard() {
           <Text style={styles.emptyText}>{t('metrics.noData')}</Text>
         </View>
       )}
+
+      {/* Histogram: time since last collection */}
+      {!loading && !error && data && (
+        <View style={[styles.chartSection, {marginTop: 8}]}>
+          <Text style={styles.sectionTitle}>{t('metrics.timeSinceCollection')}</Text>
+          {histogramData.length === 0 ? (
+            <View style={styles.center}>
+              <Text style={styles.emptyText}>{t('metrics.noData')}</Text>
+            </View>
+          ) : (
+            <View style={{width: Math.max(300, histogramData.length * 56), height: 220}}>
+              <CartesianChart
+                data={histogramData}
+                xKey="bucket"
+                yKeys={['count']}
+                domainPadding={{left: 20, right: 20}}
+                axisOptions={{
+                  font: null,
+                  tickCount: {x: histogramData.length, y: 5},
+                  labelColor: '#6B7280',
+                  lineColor: '#E5E7EB',
+                }}
+              >
+                {({points, chartBounds}) => (
+                  <Bar
+                    points={points.count}
+                    chartBounds={chartBounds}
+                    color="#059669"
+                    roundedCorners={{topLeft: 4, topRight: 4}}
+                  />
+                )}
+              </CartesianChart>
+            </View>
+          )}
+        </View>
+      )}
     </ScrollView>
   )
 }
@@ -234,6 +276,7 @@ const styles = StyleSheet.create({
   retryBtnText: {color: '#fff', fontWeight: '600', fontSize: 14},
   emptyText: {color: '#9CA3AF', fontSize: 14},
   chartSection: {paddingHorizontal: 16, paddingTop: 8},
+  sectionTitle: {fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 10},
   legend: {flexDirection: 'row', gap: 16, marginBottom: 8},
   legendItem: {flexDirection: 'row', alignItems: 'center', gap: 6},
   legendDot: {width: 10, height: 10, borderRadius: 2},

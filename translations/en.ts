@@ -518,6 +518,7 @@ export default {
     summaryCollected: 'Collected in period',
     summaryZones: 'Zones',
     summaryDistricts: 'Districts with data',
+    timeSinceCollection: 'Time Since Last Collection',
     tabWaste: 'Waste Collection',
     tabCars: 'Abandoned Cars',
     tabPotholes: 'Potholes',

@@ -1034,11 +1034,18 @@ export interface ZoneStat {
   collectedContainers: number
 }
 
+export interface TimeBucket {
+  bucket: string
+  bucketOrder: number
+  containerCount: number
+}
+
 export interface CollectionMetrics {
   from: string
   to: string
   byDistrict: DistrictStat[]
   byZone: ZoneStat[]
+  byTimeSinceCollection: TimeBucket[]
 }
 
 export async function fetchCollectionMetrics(from: string, to: string): Promise<CollectionMetrics> {

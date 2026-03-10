@@ -521,6 +521,7 @@ export default {
     summaryCollected: 'Събрани за периода',
     summaryZones: 'Зони',
     summaryDistricts: 'Райони с данни',
+    timeSinceCollection: 'Време от последно събиране',
     tabWaste: 'Сметосъбиране',
     tabCars: 'Изоставени Автомобили',
     tabPotholes: 'Дупки',
