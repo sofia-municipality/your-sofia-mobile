@@ -158,7 +158,7 @@ export default function WasteCollectionDashboard() {
                         isTop ? {roundedCorners: {topLeft: 3, topRight: 3}} : {}
                       }
                     />
-                    {points.total.map((point, i) => {
+                    {points.collected.map((point, i) => {
                       const val = chartData[i]?.collected ?? 0
                       if (val === 0 || point.y == null) return null
                       const label = String(val)
