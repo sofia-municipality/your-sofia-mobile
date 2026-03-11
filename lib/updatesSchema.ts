@@ -35,7 +35,7 @@ const GeoJsonFeatureCollectionSchema = z.object({
 
 const TimespanSchema = z.object({
   start: z.string(),
-  end: z.string(),
+  end: z.string().nullable(),
 })
 
 const PinSchema = z.object({

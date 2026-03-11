@@ -33,13 +33,13 @@ export interface NewsItem {
   pins?: {
     address: string
     coordinates?: {lat: number; lng: number}
-    timespans: {start: string; end: string}[]
+    timespans: {start: string; end: string | null}[]
   }[]
   streets?: {
     street: string
     from: string
     to: string
-    timespans: {start: string; end: string}[]
+    timespans: {start: string; end: string | null}[]
   }[]
   busStops?: string[]
   allLocations?: {latitude: number; longitude: number}[]
