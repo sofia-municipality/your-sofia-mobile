@@ -2,19 +2,19 @@ import {
   Bike,
   Bus,
   Car,
-  CircleDot,
-  CloudSun,
+  CarFront,
+  CircleHelp,
+  CircleParking,
+  CircleSlash,
+  CloudRain,
   Construction,
+  Drama,
   Droplets,
-  Dumbbell,
-  Flame,
-  HardHat,
+  Heater,
   Heart,
   Palette,
-  ParkingSquare,
-  Theater,
-  TrafficCone,
   Trash2,
+  Trophy,
   Wind,
   Zap,
 } from 'lucide-react-native'
@@ -45,22 +45,22 @@ export const UNCATEGORIZED = 'uncategorized' as const
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   water: Droplets,
   electricity: Zap,
-  heating: Flame,
-  traffic: TrafficCone,
-  'construction-and-repairs': HardHat,
-  'road-block': Construction,
+  heating: Heater,
+  traffic: CarFront,
+  'construction-and-repairs': Construction,
+  'road-block': CircleSlash,
   'public-transport': Bus,
-  parking: ParkingSquare,
+  parking: CircleParking,
   waste: Trash2,
-  weather: CloudSun,
+  weather: CloudRain,
   'air-quality': Wind,
   vehicles: Car,
   health: Heart,
-  culture: Theater,
+  culture: Drama,
   art: Palette,
-  sports: Dumbbell,
+  sports: Trophy,
   bicycles: Bike,
-  uncategorized: CircleDot,
+  uncategorized: CircleHelp,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -85,7 +85,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export function getCategoryIcon(slug: string): LucideIcon {
-  return CATEGORY_ICONS[slug] ?? CircleDot
+  return CATEGORY_ICONS[slug] ?? CircleHelp
 }
 
 export function getCategoryColor(slug: string): string {
