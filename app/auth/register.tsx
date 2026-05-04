@@ -46,8 +46,12 @@ export default function RegisterScreen() {
     setIsLoading(true)
     try {
       await register(name, email, password)
-      Alert.alert(t('common.success'), t('auth.registerSuccess'))
-      router.back()
+      Alert.alert(t('auth.verifyEmailTitle'), t('auth.verifyEmailMessage'), [
+        {
+          text: t('auth.login'),
+          onPress: () => router.replace('/auth/login'),
+        },
+      ])
     } catch (error) {
       Alert.alert(
         t('common.error'),
@@ -59,111 +63,125 @@ export default function RegisterScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <UserPlus size={48} color={colors.primary} />
-          <Text style={styles.title}>{t('auth.register')}</Text>
-          <Text style={styles.subtitle}>{t('auth.registerSubtitle')}</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.name')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.namePlaceholder')}
-              value={name}
-              onChangeText={setName}
-              autoComplete="name"
-              textContentType="name"
-              editable={!isLoading}
-              accessibilityLabel={t('auth.name')}
-            />
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        >
+          <View style={styles.header}>
+            <UserPlus size={48} color={colors.primary} />
+            <Text style={styles.title}>{t('auth.register')}</Text>
+            <Text style={styles.subtitle}>{t('auth.registerSubtitle')}</Text>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.email')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.emailPlaceholder')}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="username-new"
-              textContentType="username"
-              importantForAutofill="yes"
-              editable={!isLoading}
-              accessibilityLabel={t('auth.email')}
-            />
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('auth.name')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={t('auth.namePlaceholder')}
+                value={name}
+                onChangeText={setName}
+                autoComplete="name"
+                textContentType="name"
+                autoCorrect={false}
+                editable={!isLoading}
+                accessibilityLabel={t('auth.name')}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('auth.email')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={t('auth.emailPlaceholder')}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                autoCorrect={false}
+                importantForAutofill="yes"
+                editable={!isLoading}
+                accessibilityLabel={t('auth.email')}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('auth.password')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={t('auth.passwordPlaceholder')}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoComplete="off"
+                textContentType="none"
+                autoCorrect={false}
+                spellCheck={false}
+                importantForAutofill="no"
+                editable={!isLoading}
+                accessibilityLabel={t('auth.password')}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={t('auth.confirmPasswordPlaceholder')}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                autoComplete="off"
+                textContentType="none"
+                autoCorrect={false}
+                spellCheck={false}
+                importantForAutofill="no"
+                editable={!isLoading}
+                accessibilityLabel={t('auth.confirmPassword')}
+              />
+            </View>
           </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.password')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.passwordPlaceholder')}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password-new"
-              textContentType="newPassword"
-              importantForAutofill="yes"
-              editable={!isLoading}
-              accessibilityLabel={t('auth.password')}
-            />
-          </View>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
+          onPress={handleRegister}
+          disabled={isLoading}
+          accessibilityRole="button"
+          accessibilityLabel={t('auth.register')}
+          accessibilityState={{disabled: isLoading}}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={colors.surface} />
+          ) : (
+            <Text style={styles.registerButtonText}>{t('auth.register')}</Text>
+          )}
+        </TouchableOpacity>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.confirmPasswordPlaceholder')}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              autoComplete="password-new"
-              textContentType="newPassword"
-              importantForAutofill="yes"
-              editable={!isLoading}
-              accessibilityLabel={t('auth.confirmPassword')}
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
-            onPress={handleRegister}
-            disabled={isLoading}
-            accessibilityRole="button"
-            accessibilityLabel={t('auth.register')}
-            accessibilityState={{disabled: isLoading}}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.surface} />
-            ) : (
-              <Text style={styles.registerButtonText}>{t('auth.register')}</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.loginLink}
-            onPress={() => router.back()}
-            disabled={isLoading}
-            accessibilityRole="button"
-            accessibilityLabel={t('auth.login')}
-          >
-            <Text style={styles.loginLinkText}>
-              {t('auth.alreadyHaveAccount')}{' '}
-              <Text style={styles.loginLinkHighlight}>{t('auth.login')}</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        <TouchableOpacity
+          style={styles.loginLink}
+          onPress={() => router.back()}
+          disabled={isLoading}
+          accessibilityRole="button"
+          accessibilityLabel={t('auth.login')}
+        >
+          <Text style={styles.loginLinkText}>
+            {t('auth.alreadyHaveAccount')}{' '}
+            <Text style={styles.loginLinkHighlight}>{t('auth.login')}</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   )
 }
 
@@ -172,9 +190,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
+  flex: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     padding: 24,
+    paddingBottom: 16,
+  },
+  footer: {
+    padding: 24,
+    paddingTop: 8,
+    backgroundColor: colors.surface,
   },
   header: {
     alignItems: 'center',

@@ -31,6 +31,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const AUTH_TOKEN_KEY = 'auth_token'
 const AUTH_USER_KEY = 'auth_user'
 
+type ApiErrorResponse = {
+  message?: string
+  errors?: Array<{
+    message?: string
+  }>
+}
+
+const extractApiErrorMessage = async (response: Response, fallback: string): Promise<string> => {
+  try {
+    const errorBody = (await response.json()) as ApiErrorResponse
+    return errorBody?.errors?.[0]?.message || errorBody?.message || fallback
+  } catch {
+    return fallback
+  }
+}
+
 function isTokenExpired(token: string): boolean {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
@@ -98,8 +114,8 @@ export function AuthProvider({children}: {children: ReactNode}) {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Login failed')
+        const message = await extractApiErrorMessage(response, 'Login failed')
+        throw new Error(message)
       }
 
       const data = await response.json()
@@ -144,12 +160,9 @@ export function AuthProvider({children}: {children: ReactNode}) {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Registration failed')
+        const message = await extractApiErrorMessage(response, 'Registration failed')
+        throw new Error(message)
       }
-
-      // After successful registration, log the user in
-      await login(email, password)
     } catch (error) {
       console.error('Registration error:', error)
       throw error

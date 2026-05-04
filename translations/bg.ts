@@ -444,6 +444,9 @@ export default {
     passwordTooShort: 'Паролата трябва да бъде поне 6 символа',
     loginFailed: 'Неуспешен вход',
     registerSuccess: 'Успешна регистрация',
+    verifyEmailTitle: 'Потвърдете имейла си',
+    verifyEmailMessage:
+      'Изпратихме ви линк за потвърждение. Акаунтът ви ще бъде активиран след като отворите линка от имейла.',
     registerFailed: 'Неуспешна регистрация',
     dontHaveAccount: 'Нямате акаунт?',
     alreadyHaveAccount: 'Вече имате акаунт?',

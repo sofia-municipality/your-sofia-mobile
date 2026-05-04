@@ -442,6 +442,9 @@ export default {
     passwordTooShort: 'Password must be at least 6 characters',
     loginFailed: 'Login failed',
     registerSuccess: 'Registered successfully',
+    verifyEmailTitle: 'Verify your email',
+    verifyEmailMessage:
+      'We sent you a confirmation link. Your account will be activated after you open the link from your email.',
     registerFailed: 'Registration failed',
     dontHaveAccount: "Don't have an account?",
     alreadyHaveAccount: 'Already have an account?',
