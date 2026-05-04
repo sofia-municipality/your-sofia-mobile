@@ -45,6 +45,7 @@ export function NotificationsProvider({children}: {children: React.ReactNode}) {
   const responseListener = useRef<Notifications.Subscription | null>(null)
 
   useEffect(() => {
+    loadStoredPushToken()
     registerAndSendToken()
 
     loadUnreadCount()
@@ -88,6 +89,15 @@ export function NotificationsProvider({children}: {children: React.ReactNode}) {
     try {
       const count = await AsyncStorage.getItem(UNREAD_COUNT_KEY)
       setUnreadCount(count ? parseInt(count, 10) : 0)
+    } catch {}
+  }
+
+  const loadStoredPushToken = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(PUSH_TOKEN_KEY)
+      if (stored) {
+        setExpoPushToken(stored)
+      }
     } catch {}
   }
 
@@ -173,13 +183,17 @@ export function NotificationsProvider({children}: {children: React.ReactNode}) {
 
   const registerAndSendToken = async () => {
     console.log('[Notifications] registerAndSendToken called')
-    const token = await registerForPushNotificationsAsync()
-    if (token) {
-      console.log('[Notifications] Token obtained:', token)
-      setExpoPushToken(token)
-      await sendTokenToBackend(token)
-    } else {
-      console.warn('[Notifications] No token returned from registerForPushNotificationsAsync')
+    try {
+      const token = await registerForPushNotificationsAsync()
+      if (token) {
+        console.log('[Notifications] Token obtained:', token)
+        setExpoPushToken(token)
+        await sendTokenToBackend(token)
+      } else {
+        console.warn('[Notifications] No token returned from registerForPushNotificationsAsync')
+      }
+    } catch (error) {
+      console.error('[Notifications] Failed to register push notifications:', error)
     }
   }
 
@@ -257,12 +271,25 @@ async function registerForPushNotificationsAsync() {
 
   if (finalStatus !== 'granted') return null
 
-  const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
-  if (!projectId) {
-    console.error('[Notifications] No projectId found')
+  const projectId = getEasProjectId()
+
+  try {
+    const tokenResponse = projectId
+      ? await Notifications.getExpoPushTokenAsync({projectId})
+      : await Notifications.getExpoPushTokenAsync()
+
+    return tokenResponse.data
+  } catch (error) {
+    console.error('[Notifications] Error getting Expo push token:', error)
     return null
   }
+}
 
-  const {data: token} = await Notifications.getExpoPushTokenAsync({projectId})
-  return token
+function getEasProjectId(): string | undefined {
+  const fromEasConfig = Constants?.easConfig?.projectId
+  const fromExpoExtra = Constants?.expoConfig?.extra?.eas?.projectId
+  const fromLegacyManifest = (Constants as any)?.manifest?.extra?.eas?.projectId
+  const fromManifest2 = (Constants as any)?.manifest2?.extra?.eas?.projectId
+
+  return fromEasConfig ?? fromExpoExtra ?? fromLegacyManifest ?? fromManifest2
 }

@@ -27,6 +27,7 @@
         "android.permission.ACCESS_FINE_LOCATION"
       ],
       "blockedPermissions": ["android.permission.ACTIVITY_RECOGNITION"],
+      "googleServicesFile": "google-services.json",
       "config": {
         "googleMaps": {
           "apiKey": "${GOOGLE_MAPS_ANDROID_API_KEY}"

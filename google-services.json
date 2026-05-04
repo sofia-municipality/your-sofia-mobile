@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "451807295492",
+    "project_id": "your-sofia",
+    "storage_bucket": "your-sofia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451807295492:android:af4b2e732200225f13dd51",
+        "android_client_info": {
+          "package_name": "bg.sofia.yoursofia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtyUqcP5HIHZ7vxd-C5t8_oqLo51ss6EI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
