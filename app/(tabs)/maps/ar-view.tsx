@@ -11,7 +11,7 @@ import {
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
-import {X} from 'lucide-react-native'
+import {ChevronLeft, ChevronRight, X} from 'lucide-react-native'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
@@ -20,73 +20,10 @@ import {type WasteContainer} from '../../../types/wasteContainer'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
 const HORIZONTAL_FOV = 60 // degrees — approximate phone camera horizontal FOV
-const AR_RADIUS_METERS = 150
+const AR_RADIUS_METERS = 50
 const RELOAD_DISTANCE_METERS = 50
-
-// ─── TESTING: hardcoded overlays so the styling is visible without GPS/compass ───
-const TEST_OVERLAYS: ProjectedContainer[] = [
-  {
-    distance: 38,
-    screenX: 0, // filled in at render time
-    screenY: 0,
-    container: {
-      id: 'test-1',
-      publicNumber: 'RSR-00142',
-      location: [23.32, 42.7],
-      latitude: 42.7,
-      longitude: 23.32,
-      capacityVolume: 1.1,
-      capacitySize: 'standard',
-      wasteType: 'general',
-      status: 'active',
-      lastCleaned: '2026-03-20 08:00:00+00',
-      servicedBy: 'ДКС',
-      createdAt: '',
-      updatedAt: '',
-    },
-  },
-  {
-    distance: 95,
-    screenX: 0,
-    screenY: 0,
-    container: {
-      id: 'test-2',
-      publicNumber: 'RSR-00871',
-      location: [23.32, 42.7],
-      latitude: 42.7,
-      longitude: 23.32,
-      capacityVolume: 1.1,
-      capacitySize: 'standard',
-      wasteType: 'recyclables',
-      status: 'full',
-      state: ['full'],
-      lastCleaned: '2026-03-18 14:30:00+00',
-      createdAt: '',
-      updatedAt: '',
-    },
-  },
-  {
-    distance: 142,
-    screenX: 0,
-    screenY: 0,
-    container: {
-      id: 'test-3',
-      publicNumber: 'RSR-01055',
-      location: [23.32, 42.7],
-      latitude: 42.7,
-      longitude: 23.32,
-      capacityVolume: 0.24,
-      capacitySize: 'small',
-      wasteType: 'glass',
-      status: 'active',
-      state: ['damaged'],
-      lastCleaned: undefined,
-      createdAt: '',
-      updatedAt: '',
-    },
-  },
-]
-// ─────────────────────────────────────────────────────────────────────────────
+const OVERLAY_CARD_WIDTH = 220
+const OVERLAY_EDGE_GUTTER = 12
 
 // Normalise a PostgreSQL timestamp to valid ISO 8601 so new Date() parses it reliably.
 function normaliseTimestamp(ts: string): string {
@@ -131,15 +68,23 @@ interface ProjectedContainer {
   distance: number
   screenX: number
   screenY: number
+  zIndex: number
+  turnDirection: 'left' | 'right' | null
 }
 
 interface ContainerAROverlayProps {
   container: WasteContainer
   distance: number
+  turnDirection: 'left' | 'right' | null
   onPress: () => void
 }
 
-function ContainerAROverlay({container, distance, onPress}: ContainerAROverlayProps) {
+function ContainerAROverlay({
+  container,
+  distance,
+  turnDirection,
+  onPress,
+}: ContainerAROverlayProps) {
   const {t} = useTranslation()
   const color = getPinColor(container)
   const distanceLabel = ` ${Math.round(distance)}`
@@ -166,6 +111,15 @@ function ContainerAROverlay({container, distance, onPress}: ContainerAROverlayPr
         <Text style={[styles.overlayDistance, {color}]}>
           {t('arView.distance')}: {distanceLabel}
         </Text>
+        {turnDirection && (
+          <View style={styles.turnHintRow}>
+            {turnDirection === 'left' ? (
+              <ChevronLeft size={14} color="#fff" />
+            ) : (
+              <ChevronRight size={14} color="#fff" />
+            )}
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   )
@@ -264,50 +218,52 @@ export default function ArView({onClose}: ArViewProps) {
 
   // Project containers onto screen using bearing vs. compass heading
   const projected: ProjectedContainer[] = React.useMemo(() => {
-    // ── TEST MODE: when there's no real data yet, show hardcoded cards ──
-    if (!userLocation || heading === null) {
-      const spacing = screenWidth / (TEST_OVERLAYS.length + 1)
-      const testMapped = TEST_OVERLAYS.map((o, i) => ({
-        ...o,
-        screenX: spacing * (i + 1),
-        screenY: screenHeight * 0.25 + i * 20,
-      }))
-      // Most centred overlay renders last → on top
-      testMapped.sort(
-        (a, b) => Math.abs(b.screenX - screenWidth / 2) - Math.abs(a.screenX - screenWidth / 2)
-      )
-      return testMapped
-    }
-    // ────────────────────────────────────────────────────────────────────
+    if (!userLocation) return []
 
     const halfFov = HORIZONTAL_FOV / 2
+    const normalizedHeading = heading ?? 0
+    const leftEdgeCenter = OVERLAY_CARD_WIDTH / 2 + OVERLAY_EDGE_GUTTER
+    const rightEdgeCenter = screenWidth - OVERLAY_CARD_WIDTH / 2 - OVERLAY_EDGE_GUTTER
     const results: ProjectedContainer[] = []
 
-    containers.forEach((c) => {
-      const bearing = bearingTo(
-        userLocation.latitude,
-        userLocation.longitude,
-        c.latitude,
-        c.longitude
-      )
-      let angularDiff = ((bearing - heading + 540) % 360) - 180 // -180..+180
+    containers
+      .filter((c) => c.distance <= AR_RADIUS_METERS)
+      .forEach((c) => {
+        const bearing = bearingTo(
+          userLocation.latitude,
+          userLocation.longitude,
+          c.latitude,
+          c.longitude
+        )
+        const angularDiff = ((bearing - normalizedHeading + 540) % 360) - 180 // -180..+180
 
-      if (Math.abs(angularDiff) >= halfFov) return // not in view
+        const inVisibleDirection = Math.abs(angularDiff) <= halfFov
+        const mappedX = screenWidth / 2 + (angularDiff / halfFov) * (screenWidth / 2)
 
-      const screenX = screenWidth / 2 + (angularDiff / halfFov) * (screenWidth / 2)
+        const screenX = inVisibleDirection
+          ? Math.max(leftEdgeCenter, Math.min(rightEdgeCenter, mappedX))
+          : angularDiff < 0
+            ? leftEdgeCenter
+            : rightEdgeCenter
 
-      // Closer containers sit a bit lower in the frame
-      const baseY = screenHeight * 0.3
-      const depthOffset = Math.min(c.distance / 4, 100)
-      const screenY = baseY + depthOffset
+        // Closer containers sit a bit higher in the frame and must stay on top.
+        const baseY = screenHeight * 0.3
+        const depthOffset = Math.min(c.distance * 0.7, 40)
+        const screenY = baseY + depthOffset
+        const zIndex = Math.max(1, Math.round((AR_RADIUS_METERS - c.distance) * 10) + 1)
 
-      results.push({container: c, distance: c.distance, screenX, screenY})
-    })
+        results.push({
+          container: c,
+          distance: c.distance,
+          screenX,
+          screenY,
+          zIndex,
+          turnDirection: inVisibleDirection ? null : angularDiff < 0 ? 'left' : 'right',
+        })
+      })
 
-    // Sort by angular offset from centre: most off-centre first, most centred last → on top
-    results.sort(
-      (a, b) => Math.abs(b.screenX - screenWidth / 2) - Math.abs(a.screenX - screenWidth / 2)
-    )
+    // Render farthest first so nearest overlays are painted last (on top).
+    results.sort((a, b) => b.distance - a.distance)
 
     // Stagger overlapping cards vertically (±60 px threshold)
     for (let i = 0; i < results.length; i++) {
@@ -357,14 +313,16 @@ export default function ArView({onClose}: ArViewProps) {
       )}
 
       {/* AR overlay cards */}
-      {projected.map(({container, distance, screenX, screenY}) => (
+      {projected.map(({container, distance, screenX, screenY, zIndex, turnDirection}) => (
         <View
           key={container.id}
           style={[
             styles.overlayWrapper,
             {
-              left: screenX - 110, // centre the 220-wide card on screenX
+              left: screenX - OVERLAY_CARD_WIDTH / 2,
               top: screenY,
+              zIndex,
+              elevation: Math.min(24, zIndex),
             },
           ]}
           pointerEvents="box-none"
@@ -372,6 +330,7 @@ export default function ArView({onClose}: ArViewProps) {
           <ContainerAROverlay
             container={container}
             distance={distance}
+            turnDirection={turnDirection}
             onPress={() => setSelectedContainer(container)}
           />
         </View>
@@ -470,7 +429,7 @@ const styles = StyleSheet.create({
   },
   overlayWrapper: {
     position: 'absolute',
-    width: 220,
+    width: OVERLAY_CARD_WIDTH,
   },
   overlay: {
     flexDirection: 'row',
@@ -504,6 +463,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.semiBold,
     marginTop: 4,
+  },
+  turnHintRow: {
+    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   compassWarning: {
     position: 'absolute',
