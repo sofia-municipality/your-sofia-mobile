@@ -69,7 +69,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           title: t('common.home'),
           tabBarLabel: t('common.home'),
           tabBarIcon: ({color}) => <Home size={24} color={color} />,
-          headerTitle: () => <TabHeader title={t('common.goodMorning')} showActionIcon={true} />,
+          headerTitle: () => <TabHeader title={t('common.newsForYou')} showActionIcon={true} />,
         }}
       />
       <Tabs.Screen

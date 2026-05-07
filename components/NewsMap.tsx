@@ -71,13 +71,10 @@ export function NewsMap({news, onMarkerPress, onBoundsChange}: NewsMapProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 20,
-    height: 300,
     borderRadius: 12,
     overflow: 'hidden',
   },
   map: {
-    width: width - 40,
     height: 300,
   },
   markerContainer: {

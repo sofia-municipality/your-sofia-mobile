@@ -159,9 +159,13 @@ export default function HomeScreen() {
 
         {/* News For You */}
         <View ref={newsSectionRef} style={styles.section}>
+          <TopicFilter
+            selectedTopics={selectedTopics}
+            onTopicsChange={setSelectedTopics}
+            topics={filterChips}
+          />
           <View style={styles.sectionHeader}>
             <View>
-              <Text style={styles.sectionTitle}>{t('common.newsForYou')}</Text>
               <Text style={styles.sectionSubtitle}>{t('common.newsForYouSource')}</Text>
             </View>
             <TouchableOpacity
@@ -175,12 +179,6 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <TopicFilter
-            selectedTopics={selectedTopics}
-            onTopicsChange={setSelectedTopics}
-            topics={filterChips}
-          />
 
           {isMapView ? (
             <>
@@ -376,7 +374,8 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: spacing.md,
-    marginTop: spacing.md,
+    marginTop: spacing.xs,
+    gap: spacing['2xs'],
   },
   cityName: {
     fontFamily: fonts.extraBold,
@@ -457,7 +456,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginTop: spacing['2xs'],
   },
   viewToggleButton: {
     backgroundColor: colors.primaryTint,
@@ -471,7 +470,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   newsContainer: {
-    marginTop: spacing.md,
+    marginTop: spacing['xs'],
   },
   loadingContainer: {
     padding: 40,

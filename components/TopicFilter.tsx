@@ -70,8 +70,8 @@ export function TopicFilter({selectedTopics, onTopicsChange, topics}: TopicFilte
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.md,
     gap: spacing.xs,
+    marginTop: spacing['2xs'],
   },
   chip: {
     flexDirection: 'row',
