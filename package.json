@@ -15,7 +15,10 @@
     "prepare": "husky",
     "android": "expo run:android",
     "ios": "REACT_NATIVE_PACKAGER_HOSTNAME=localhost expo run:ios",
-    "test": "jest"
+    "test": "jest",
+    "update:development": "eas update --channel development",
+    "update:preview": "eas update --channel preview",
+    "update:production": "eas update --channel production"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",

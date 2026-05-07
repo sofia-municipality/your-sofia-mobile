@@ -8,6 +8,7 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "channel": "development",
       "environment": "development",
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
@@ -16,6 +17,7 @@
     "preview": {
       "distribution": "internal",
       "developmentClient": true,
+      "channel": "preview",
       "environment": "preview",
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
@@ -27,6 +29,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "environment": "production",
       "env": {
         "GOOGLE_MAPS_ANDROID_API_KEY": "${GOOGLE_MAPS_ANDROID_API_KEY}"
