@@ -467,6 +467,14 @@ export default {
     forgetMeAreYouSure: 'Are you sure?',
     forgetMeAreYouSureMessage:
       'This action is irreversible. Do you really want to delete your account?',
+    unverifiedAccountTitle: 'Email not verified',
+    unverifiedAccountMessage:
+      'Please verify your email address before signing in. Check your inbox or request a new verification link.',
+    resendVerificationEmail: 'Send new verification link',
+    resendVerificationSuccess:
+      'If the account exists and is unverified, a verification email has been sent.',
+    resendVerificationFailed: 'Failed to send verification email. Please try again.',
+    enterEmailToResendVerification: 'Enter your email address to receive a new verification link.',
   },
   newSignal: {
     title: 'New Signal',

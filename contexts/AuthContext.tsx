@@ -13,6 +13,15 @@ interface User {
   role: 'user' | 'admin' | 'containerAdmin' | 'inspector' | 'wasteCollector'
 }
 
+export class AuthApiError extends Error {
+  status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = 'AuthApiError'
+    this.status = status
+  }
+}
+
 interface AuthContextType {
   user: User | null
   token: string | null
@@ -21,6 +30,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   deleteAccount: () => Promise<void>
+  resendVerificationEmail: (email: string) => Promise<void>
   isAuthenticated: boolean
   isContainerAdmin: boolean
   isBulkUploadAllowed: boolean
@@ -115,7 +125,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
 
       if (!response.ok) {
         const message = await extractApiErrorMessage(response, 'Login failed')
-        throw new Error(message)
+        throw new AuthApiError(message, response.status)
       }
 
       const data = await response.json()
@@ -211,6 +221,21 @@ export function AuthProvider({children}: {children: ReactNode}) {
     }
   }
 
+  const resendVerificationEmail = async (email: string) => {
+    const response = await fetch(
+      `${environmentManager.getApiUrl()}/api/users/resend-verification-email`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email}),
+      }
+    )
+    if (!response.ok) {
+      const message = await extractApiErrorMessage(response, 'Failed to resend verification email')
+      throw new Error(message)
+    }
+  }
+
   const value: AuthContextType = {
     user,
     token,
@@ -219,6 +244,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
     register,
     logout,
     deleteAccount,
+    resendVerificationEmail,
     isAuthenticated: !!user && !!token && !isTokenExpired(token),
     isContainerAdmin: user?.role === 'containerAdmin' || user?.role === 'admin',
     isBulkUploadAllowed: user?.role === 'admin' || user?.role === 'inspector',

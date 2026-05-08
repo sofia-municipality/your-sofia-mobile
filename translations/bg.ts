@@ -469,6 +469,16 @@ export default {
     forgetMeAreYouSure: 'Сигурни ли сте?',
     forgetMeAreYouSureMessage:
       'Това действие е необратимо. Наистина ли искате да изтриете акаунта си?',
+    unverifiedAccountTitle: 'Имейлът не е потвърден',
+    unverifiedAccountMessage:
+      'Моля, потвърдете имейл адреса си, преди да влезете в акаунта. Проверете пощата си или поискайте нов линк за потвърждение.',
+    resendVerificationEmail: 'Изпрати нов линк за потвърждение',
+    resendVerificationSuccess:
+      'Ако акаунтът съществува и не е потвърден, ще получите имейл с линк за потвърждение.',
+    resendVerificationFailed:
+      'Грешка при изпращане на имейл за потвърждение. Моля, опитайте отново.',
+    enterEmailToResendVerification:
+      'Въведете имейл адреса си, за да получите нов линк за потвърждение.',
   },
   newSignal: {
     title: 'Нов сигнал',
