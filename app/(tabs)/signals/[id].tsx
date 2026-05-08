@@ -5,12 +5,12 @@ import {useLocalSearchParams, useNavigation} from 'expo-router'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {Edit3, Save, X} from 'lucide-react-native'
 import {fetchSignalById, updateSignal} from '../../../lib/payload'
-import {getUniqueReporterId} from '../../../lib/deviceId'
 import type {Signal} from '../../../types/signal'
 import {type ContainerState} from '../../../types/wasteContainer'
 import {SignalForm, type SignalFormData, styles} from '../../../forms/signal'
 import {colors} from '@/styles/tokens'
 import {useNotifications} from '../../../hooks/useNotifications'
+import {useAuth} from '@/contexts/AuthContext'
 
 export default function SignalDetailsScreen() {
   const {t, i18n} = useTranslation()
@@ -18,6 +18,7 @@ export default function SignalDetailsScreen() {
   const {id} = useLocalSearchParams<{id: string}>()
   const formRef = useRef<any>(null)
   const {removeUpdatedSignalId} = useNotifications()
+  const {user, token} = useAuth()
 
   const [signal, setSignal] = useState<Signal | null>(null)
   const [loading, setLoading] = useState(true)
@@ -25,12 +26,6 @@ export default function SignalDetailsScreen() {
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [canEdit, setCanEdit] = useState(false)
-  const [deviceId, setDeviceId] = useState<string>('')
-
-  const loadDeviceId = async () => {
-    const id = await getUniqueReporterId()
-    setDeviceId(id)
-  }
 
   const loadSignal = useCallback(async () => {
     if (!id) return
@@ -50,7 +45,6 @@ export default function SignalDetailsScreen() {
 
   useEffect(() => {
     loadSignal()
-    loadDeviceId()
   }, [loadSignal])
 
   // Clear the red-dot indicator once when this screen mounts for this signal ID
@@ -59,13 +53,15 @@ export default function SignalDetailsScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  // Check if user can edit this signal
+  // Check if the current user is the reporter who created this signal
   useEffect(() => {
-    if (signal && deviceId) {
-      const canUserEdit = signal.reporterUniqueId === deviceId
-      setCanEdit(canUserEdit)
+    if (signal && user) {
+      const reporterId = typeof signal.reporter === 'object' ? signal.reporter?.id : signal.reporter
+      setCanEdit(reporterId !== undefined && String(reporterId) === String(user.id))
+    } else {
+      setCanEdit(false)
     }
-  }, [signal, deviceId])
+  }, [signal, user])
 
   const handleEdit = useCallback(() => {
     setIsEditing(true)
@@ -77,7 +73,7 @@ export default function SignalDetailsScreen() {
 
   const handleFormSubmit = useCallback(
     async (data: SignalFormData) => {
-      if (!signal || !deviceId) return
+      if (!signal || !token) return
 
       try {
         setSaving(true)
@@ -100,7 +96,7 @@ export default function SignalDetailsScreen() {
           existingPhotoIds,
         }
 
-        const response = await updateSignal(signal.id, updateData, deviceId)
+        const response = await updateSignal(signal.id, updateData, token || undefined)
 
         const updatedSignal = (response as any).doc
 
@@ -117,7 +113,7 @@ export default function SignalDetailsScreen() {
         setSaving(false)
       }
     },
-    [signal, deviceId, i18n.language, t]
+    [signal, token, i18n.language, t]
   )
 
   const handleSave = useCallback(() => {

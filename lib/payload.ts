@@ -738,7 +738,7 @@ export async function updateSignal(
     newPhotos?: {uri: string; type: string; name: string}[]
     existingPhotoIds?: number[]
   },
-  reporterUniqueId?: string
+  authToken?: string
 ): Promise<Signal> {
   const {newPhotos, existingPhotoIds, ...updateData} = signalData
 
@@ -754,15 +754,9 @@ export async function updateSignal(
         name: photo.name,
       } as any)
 
-      formData.append(
-        '_payload',
-        JSON.stringify({
-          reporterUniqueId: reporterUniqueId || null,
-        })
-      )
-
       const uploadResponse = await fetch(`${getApiUrl()}/api/media`, {
         method: 'POST',
+        headers: authToken ? {Authorization: `JWT ${authToken}`} : {},
         body: formData,
       })
 
@@ -786,13 +780,13 @@ export async function updateSignal(
       ? {location: [updateData.location.longitude, updateData.location.latitude]}
       : {}),
     ...(existingPhotoIds !== undefined ? {images: allImageIds} : {}),
-    ...(reporterUniqueId !== undefined ? {reporterUniqueId} : {}),
   }
 
   const response = await fetch(`${getApiUrl()}/api/signals/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
+      ...(authToken ? {Authorization: `JWT ${authToken}`} : {}),
     },
     body: JSON.stringify(finalUpdateData),
   })

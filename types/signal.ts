@@ -31,6 +31,7 @@ export interface Signal {
   status: 'pending' | 'in-progress' | 'resolved' | 'rejected'
   adminNotes?: string
   reporterUniqueId?: string
+  reporter?: {id: number; email?: string; name?: string} | number
   createdAt: string
   updatedAt: string
 }
