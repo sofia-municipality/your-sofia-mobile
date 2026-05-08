@@ -22,7 +22,6 @@ import {useSubscription} from '../../../hooks/useSubscription'
 import {useNotifications} from '../../../hooks/useNotifications'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import type {AirQualityData} from '../../../types/airQuality'
-import type {MapBounds} from '../../../lib/mapBounds'
 import {SOFIA_DEFAULT_BOUNDS} from '../../../lib/mapBounds'
 
 const {width} = Dimensions.get('window')
@@ -42,8 +41,6 @@ export default function HomeScreen() {
   const [selectedTopics, setSelectedTopics] = useState<Set<string>>(new Set(['all']))
   const [isMapView, setIsMapView] = useState(false)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
-  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
-  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
   const scrollViewRef = useRef<ScrollView>(null)
   const newsSectionRef = useRef<View>(null)
   const bellScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -70,30 +67,11 @@ export default function HomeScreen() {
   const selectedCategories = isAllSelected ? undefined : Array.from(selectedTopics)
   const activePushToken = undefined
 
-  const {
-    news,
-    loading: newsLoading,
-    error: newsError,
-    refresh,
-  } = useUpdates({
+  const {news, loading, error, refresh} = useUpdates({
     pushToken: activePushToken,
     categories: selectedCategories,
-    limit: 20,
     bounds: SOFIA_DEFAULT_BOUNDS,
     zoom: 11,
-    enabled: !isMapView,
-  })
-  const {
-    news: mapNews,
-    loading: mapLoading,
-    error: mapError,
-    refresh: refreshMap,
-  } = useUpdates({
-    pushToken: activePushToken,
-    categories: selectedCategories,
-    bounds: isMapView ? mapBounds : null,
-    zoom: mapZoom,
-    enabled: isMapView,
   })
 
   // Setup push notifications
@@ -137,12 +115,8 @@ export default function HomeScreen() {
         setIsFirstFocus(false)
         return
       }
-      if (isMapView) {
-        refreshMap()
-      } else {
-        refresh()
-      }
-    }, [isFirstFocus, isMapView, refresh, refreshMap])
+      refresh()
+    }, [isFirstFocus, isMapView, refresh])
   )
 
   return (
@@ -183,28 +157,24 @@ export default function HomeScreen() {
           {isMapView ? (
             <>
               <NewsMap
-                news={mapNews}
+                news={news}
                 onMarkerPress={(item) => {
                   router.push(`/(tabs)/home/${item.id}`)
                 }}
-                onBoundsChange={(bounds, zoom) => {
-                  setMapBounds(bounds)
-                  setMapZoom(zoom)
-                }}
               />
 
-              {mapLoading ? (
+              {loading ? (
                 <View style={styles.loadingContainer}>
                   <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
                 </View>
               ) : null}
 
-              {mapError ? (
+              {error ? (
                 <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{mapError}</Text>
+                  <Text style={styles.errorText}>{error}</Text>
                   <TouchableOpacity
                     style={styles.retryButton}
-                    onPress={refreshMap}
+                    onPress={refresh}
                     accessibilityRole="button"
                     accessibilityLabel={t('common.retry')}
                   >
@@ -213,13 +183,13 @@ export default function HomeScreen() {
                 </View>
               ) : null}
             </>
-          ) : newsLoading ? (
+          ) : loading ? (
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
             </View>
-          ) : newsError ? (
+          ) : error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{newsError}</Text>
+              <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
                 style={styles.retryButton}
                 onPress={refresh}
