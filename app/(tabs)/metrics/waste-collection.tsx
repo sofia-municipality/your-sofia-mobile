@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react'
+import React, {useState} from 'react'
 import {
   ActivityIndicator,
   Pressable,
@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {CartesianChart, StackedBar, Bar, Line} from 'victory-native'
-import {Text as SkiaText, matchFont} from '@shopify/react-native-skia'
+import {Text as SkiaText, useFont} from '@shopify/react-native-skia'
 import {useCollectionMetrics, MetricsRange} from '../../../hooks/useCollectionMetrics'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
@@ -33,17 +33,9 @@ export default function WasteCollectionDashboard() {
     error: monthlyError,
     refresh: refreshMonthly,
   } = useCollectionMetrics('month')
-  const chartFont = useMemo(
-    () =>
-      matchFont({
-        fontFamily: fonts.monoMedium,
-        fontSize: 10,
-      }) ??
-      matchFont({
-        fontFamily: fonts.medium,
-        fontSize: 10,
-      }),
-    []
+  const chartFont = useFont(
+    require('@expo-google-fonts/jetbrains-mono/500Medium/JetBrainsMono_500Medium.ttf'),
+    10
   )
 
   const handleRefresh = () => {
