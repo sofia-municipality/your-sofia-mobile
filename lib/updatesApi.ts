@@ -15,6 +15,9 @@ let cachedSources: UpdateSource[] | null = null
 let cachedSourcesAt = 0
 let sourcesInFlight: Promise<UpdateSource[]> | null = null
 
+// Dedup identical concurrent /updates requests — keyed by full URL
+const updatesInFlight = new Map<string, Promise<UpdateMessage[]>>()
+
 const getUpdatesBaseUrl = () => `${environmentManager.getApiUrl()}/api`
 
 async function parseJsonResponse<T>(
@@ -61,14 +64,25 @@ export async function fetchNewsUpdates(options?: {
 
   const query = params.toString()
   const url = `${baseUrl}/updates${query ? `?${query}` : ''}`
-  const response = await fetch(url)
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch updates: ${response.status} ${response.statusText}`)
-  }
+  const inflight = updatesInFlight.get(url)
+  if (inflight) return inflight
 
-  const data = await parseJsonResponse(response, UpdatesResponseSchema, 'Updates list')
-  return data.messages
+  const request = (async () => {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch updates: ${response.status} ${response.statusText}`)
+      }
+      const data = await parseJsonResponse(response, UpdatesResponseSchema, 'Updates list')
+      return data.messages
+    } finally {
+      updatesInFlight.delete(url)
+    }
+  })()
+
+  updatesInFlight.set(url, request)
+  return request
 }
 
 export async function fetchUpdateById(id: string): Promise<UpdateMessage> {
