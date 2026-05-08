@@ -34,7 +34,10 @@ const GeoJsonFeatureCollectionSchema = z.object({
 })
 
 const TimespanSchema = z.object({
-  start: z.string(),
+  start: z
+    .string()
+    .nullable()
+    .transform((val): string => val ?? new Date().toISOString()),
   end: z.string().nullable(),
 })
 
