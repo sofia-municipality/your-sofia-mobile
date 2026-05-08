@@ -307,7 +307,7 @@ export default function ArView({onClose}: ArViewProps) {
     <View style={styles.container}>
       {/* Full-screen camera */}
       {showCamera ? (
-        <CameraView style={StyleSheet.absoluteFill} facing="back" />
+        <CameraView style={StyleSheet.absoluteFill} facing="back" flash="auto" />
       ) : (
         <View style={[StyleSheet.absoluteFill, {backgroundColor: '#000'}]} />
       )}
