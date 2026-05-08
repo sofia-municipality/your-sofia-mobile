@@ -436,7 +436,7 @@ export default function NewScreen() {
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
           {showCamera ? (
-            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
           ) : (
             // Keep a placeholder view to preserve layout while camera is hidden
             <View style={styles.camera} />

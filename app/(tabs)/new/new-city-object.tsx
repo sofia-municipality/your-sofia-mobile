@@ -306,7 +306,7 @@ export default function NewCityObjectScreen() {
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
           {showCamera && !isEditing ? (
-            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
           ) : (
             <View style={styles.camera} />
           )}
