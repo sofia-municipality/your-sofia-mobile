@@ -15,20 +15,20 @@ describe('createSignal auth regression', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    global.fetch = jest.fn() as unknown as typeof fetch
+    globalThis.fetch = jest.fn() as unknown as typeof fetch
   })
 
   it('sends JWT auth header when creating a signal without photos', async () => {
-    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+    ;(globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({id: 'sig-1'}),
     })
 
     await createSignal(signalData, undefined, 'device-123', 'jwt-token-123')
 
-    expect(global.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
 
-    const [url, options] = (global.fetch as jest.Mock).mock.calls[0]
+    const [url, options] = (globalThis.fetch as jest.Mock).mock.calls[0]
     expect(url).toContain('/api/signals')
     expect(options).toMatchObject({
       method: 'POST',
@@ -40,7 +40,7 @@ describe('createSignal auth regression', () => {
   })
 
   it('sends JWT auth header for both media upload and signal creation when photos are provided', async () => {
-    ;(global.fetch as jest.Mock)
+    ;(globalThis.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({doc: {id: 'img-1'}}),
@@ -57,9 +57,9 @@ describe('createSignal auth regression', () => {
       'jwt-token-123'
     )
 
-    expect(global.fetch).toHaveBeenCalledTimes(2)
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2)
 
-    const [mediaUrl, mediaOptions] = (global.fetch as jest.Mock).mock.calls[0]
+    const [mediaUrl, mediaOptions] = (globalThis.fetch as jest.Mock).mock.calls[0]
     expect(mediaUrl).toContain('/api/media')
     expect(mediaOptions).toMatchObject({
       method: 'POST',
@@ -68,7 +68,7 @@ describe('createSignal auth regression', () => {
       },
     })
 
-    const [signalUrl, signalOptions] = (global.fetch as jest.Mock).mock.calls[1]
+    const [signalUrl, signalOptions] = (globalThis.fetch as jest.Mock).mock.calls[1]
     expect(signalUrl).toContain('/api/signals')
     expect(signalOptions).toMatchObject({
       method: 'POST',
