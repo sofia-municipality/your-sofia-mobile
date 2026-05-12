@@ -89,7 +89,7 @@ interface ProfileSection {
 export default function ProfileScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
-  const {user, isAuthenticated, isContainerAdmin, logout, deleteAccount} = useAuth()
+  const {user, isAuthenticated, isContainerAdmin, isAdmin, logout, deleteAccount} = useAuth()
   const {expoPushToken, registerAndSendToken} = useNotifications()
   const [isRegisteringToken, setIsRegisteringToken] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')
@@ -223,32 +223,34 @@ export default function ProfileScreen() {
           <View style={styles.languageSwitchContainer}>
             <LanguageSwitch />
           </View>
-          <View style={styles.pushTokenContainer}>
-            <Text style={styles.pushTokenLabel}>Push Token</Text>
-            <Text style={styles.pushTokenText} selectable>
-              {expoPushToken ?? '—'}
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.registerTokenButton,
-                isRegisteringToken && styles.registerTokenButtonDisabled,
-              ]}
-              onPress={async () => {
-                setIsRegisteringToken(true)
-                try {
-                  await registerAndSendToken()
-                } finally {
-                  setIsRegisteringToken(false)
-                }
-              }}
-              disabled={isRegisteringToken}
-              accessibilityRole="button"
-            >
-              <Text style={styles.registerTokenButtonText}>
-                {isRegisteringToken ? '…' : 'Register Token'}
+          {isAdmin && (
+            <View style={styles.pushTokenContainer}>
+              <Text style={styles.pushTokenLabel}>Push Token</Text>
+              <Text style={styles.pushTokenText} selectable>
+                {expoPushToken ?? '—'}
               </Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={[
+                  styles.registerTokenButton,
+                  isRegisteringToken && styles.registerTokenButtonDisabled,
+                ]}
+                onPress={async () => {
+                  setIsRegisteringToken(true)
+                  try {
+                    await registerAndSendToken()
+                  } finally {
+                    setIsRegisteringToken(false)
+                  }
+                }}
+                disabled={isRegisteringToken}
+                accessibilityRole="button"
+              >
+                <Text style={styles.registerTokenButtonText}>
+                  {isRegisteringToken ? '…' : 'Register Token'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Authentication Section */}
@@ -375,16 +377,6 @@ export default function ProfileScreen() {
 
         {/* Environment Switcher - Dev Only */}
         <EnvironmentSwitcher />
-
-        <TouchableOpacity
-          style={styles.notificationBar}
-          onPress={() =>
-            Linking.openURL('https://github.com/sofia-municipality/your-sofia-mobile/')
-          }
-        >
-          <Text style={styles.notificationText}>{t('profile.staticScreenNotice')}</Text>
-          <GitHubIcon size={24} color={colors.primary} />
-        </TouchableOpacity>
 
         {/* Profile Sections */}
         {profileSections.map((section: ProfileSection) => (
