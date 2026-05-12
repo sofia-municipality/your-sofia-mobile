@@ -32,6 +32,7 @@ interface AuthContextType {
   deleteAccount: () => Promise<void>
   resendVerificationEmail: (email: string) => Promise<void>
   isAuthenticated: boolean
+  isAdmin: boolean
   isContainerAdmin: boolean
   isBulkUploadAllowed: boolean
 }
@@ -246,6 +247,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
     deleteAccount,
     resendVerificationEmail,
     isAuthenticated: !!user && !!token && !isTokenExpired(token),
+    isAdmin: user?.role === 'admin',
     isContainerAdmin: user?.role === 'containerAdmin' || user?.role === 'admin',
     isBulkUploadAllowed: user?.role === 'admin' || user?.role === 'inspector',
   }
