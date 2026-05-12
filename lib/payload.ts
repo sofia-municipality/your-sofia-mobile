@@ -470,6 +470,7 @@ export async function fetchSignals(options?: {
   limit?: number
   page?: number
   reporterUniqueId?: string
+  reporterUserId?: number
   containerReferenceId?: string
 }): Promise<PayloadResponse<Signal>> {
   const {
@@ -478,6 +479,7 @@ export async function fetchSignals(options?: {
     limit = 20,
     page = 1,
     reporterUniqueId,
+    reporterUserId,
     containerReferenceId,
   } = options || {}
 
@@ -502,6 +504,11 @@ export async function fetchSignals(options?: {
   // Add reporterUniqueId filter if specified
   if (reporterUniqueId) {
     params.append('where[reporterUniqueId][equals]', reporterUniqueId)
+  }
+
+  // Add reporterUserId filter if specified
+  if (reporterUserId !== undefined) {
+    params.append('where[reporter][equals]', String(reporterUserId))
   }
 
   // Add container reference ID filter if specified
