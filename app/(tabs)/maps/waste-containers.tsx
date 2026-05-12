@@ -770,6 +770,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
       {/* Action Buttons */}
       <View style={styles.actionButtonsContainer}>
+        {/* hidden for now - requires backend processes for managing arbitrary signals.
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
@@ -784,7 +785,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           }}
         >
           <Plus size={28} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={[styles.actionButton, followMe && styles.actionButtonActive]}
           onPress={toggleFollowMe}
