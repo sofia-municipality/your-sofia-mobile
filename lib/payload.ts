@@ -155,13 +155,18 @@ export function getMediaUrl(media: any): string | undefined {
 export async function fetchContainersWithSignals(options?: {
   limit?: number
   page?: number
+  districtId?: number
 }): Promise<PayloadResponse<WasteContainer & {signalCount: number; activeSignalCount: number}>> {
-  const {limit = 1000, page = 1} = options || {}
+  const {limit = 1000, page = 1, districtId} = options || {}
 
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
+    zoom: '16',
   })
+  if (districtId !== undefined) {
+    params.set('districtId', String(districtId))
+  }
 
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   console.log('[fetchContainersWithSignals] Request URL:', url)
@@ -217,6 +222,7 @@ export async function fetchContainerClusters(options: {
   minLng: number
   maxLng: number
   status?: ContainerStatus
+  districtId?: number
 }): Promise<{type: 'clusters'; docs: ContainerCluster[]; zoom: number}> {
   const params = new URLSearchParams({
     zoom: String(options.zoom),
@@ -227,6 +233,9 @@ export async function fetchContainerClusters(options: {
   })
   if (options.status) {
     params.set('status', options.status)
+  }
+  if (options.districtId !== undefined) {
+    params.set('districtId', String(options.districtId))
   }
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
