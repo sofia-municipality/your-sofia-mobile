@@ -28,10 +28,9 @@ import {WasteContainerCluster} from '../../../components/WasteContainerCluster'
 import {
   fetchWasteContainerById,
   fetchContainerClusters,
+  fetchContainersWithSignals,
   type ContainerCluster,
 } from '../../../lib/payload'
-import {loadNearbyContainers} from '../../../lib/containerUtils'
-import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 import {useAuth} from '../../../contexts/AuthContext'
 import {
@@ -72,9 +71,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
-  const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
-  const lastAttemptLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
-  const lastAttemptAtRef = useRef<number>(0)
   const isMountedRef = useRef(true)
   const watchRef = useRef<any>(null)
   const regionDeltaRef = useRef<{latitudeDelta: number; longitudeDelta: number}>({
@@ -122,7 +118,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           maxLng: region.longitude + region.longitudeDelta / 2,
         }
         const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
-        const data = await fetchContainerClusters({zoom: z, ...bounds, status: statusFilter})
+        const data = await fetchContainerClusters({
+          zoom: z,
+          ...bounds,
+          status: statusFilter,
+          districtId: 24,
+        })
         if (isMountedRef.current && data.type === 'clusters') {
           setClusters(data.docs)
         }
@@ -134,77 +135,20 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   )
 
   // Load nearby containers based on map center position
+  // Load all Triaditsa (district 24) containers once on mount for client-side filtering
   const loadContainers = useCallback(async () => {
-    const FAILURE_COOLDOWN_MS = 15000
-
-    // Prevent concurrent loading requests
-    if (loadingRef.current) {
-      return
-    }
-
-    // Don't load if component is unmounted
-    if (!isMountedRef.current) {
-      return
-    }
-
-    const searchLocation =
-      mapCenter ||
-      (location
-        ? {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }
-        : null)
-
-    if (!searchLocation) return
-
-    // Avoid rapid retries when previous attempts are failing
-    if (lastAttemptLocationRef.current) {
-      const distanceSinceLastAttempt = getDistanceFromLatLonInMeters(
-        lastAttemptLocationRef.current.latitude,
-        lastAttemptLocationRef.current.longitude,
-        searchLocation.latitude,
-        searchLocation.longitude
-      )
-
-      const withinCooldown = Date.now() - lastAttemptAtRef.current < FAILURE_COOLDOWN_MS
-      if (withinCooldown && distanceSinceLastAttempt < 300) {
-        return
-      }
-    }
-
-    // Check if we've moved significantly since last load (>250 meters)
-    // This creates a buffer zone so markers don't disappear on small movements
-    if (lastLoadLocationRef.current) {
-      const distance = getDistanceFromLatLonInMeters(
-        lastLoadLocationRef.current.latitude,
-        lastLoadLocationRef.current.longitude,
-        searchLocation.latitude,
-        searchLocation.longitude
-      )
-      if (distance < 500) {
-        return
-      }
-    }
-
+    if (loadingRef.current || !isMountedRef.current) return
     try {
       loadingRef.current = true
-      lastAttemptAtRef.current = Date.now()
-      lastAttemptLocationRef.current = searchLocation
       setContainersLoading(true)
       setContainersError(null)
-
-      const radiusMeters = 1000
-
-      const nearbyContainers = await loadNearbyContainers(searchLocation, radiusMeters)
-
-      // Only update state if component is still mounted
+      const result = await fetchContainersWithSignals({districtId: 24})
+      const docs = result.docs
       if (isMountedRef.current) {
-        setContainers(nearbyContainers)
-        lastLoadLocationRef.current = searchLocation
+        setContainers(docs)
       }
     } catch (error) {
-      console.error('Error loading nearby containers:', error)
+      console.error('Error loading containers:', error)
       if (isMountedRef.current) {
         setContainersError(t('wasteContainers.loadError'))
       }
@@ -216,15 +160,13 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         loadingRef.current = false
       }
     }
-  }, [mapCenter, location, t])
+  }, [t])
 
-  // Load containers when map center changes or location is available
+  // Load containers once on mount
   useEffect(() => {
-    if (mapCenter || location) {
-      loadContainers()
-    }
+    loadContainers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapCenter, location])
+  }, [])
 
   // Initial cluster fetch using the default region (before the user pans)
   useEffect(() => {
