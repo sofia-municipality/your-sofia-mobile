@@ -15,7 +15,6 @@ import {useTranslation} from 'react-i18next'
 import {
   Navigation,
   NavigationOff,
-  Plus,
   ChevronDown,
   ChevronUp,
   ZoomIn,
@@ -54,7 +53,7 @@ type ContainerFilter = 'all' | 'active' | 'uncollected' | ContainerState
 export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const {t} = useTranslation()
   const router = useRouter()
-  const {isAuthenticated} = useAuth()
+  useAuth()
   const params = useLocalSearchParams()
   const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
@@ -230,8 +229,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   // Initial cluster fetch using the default region (before the user pans)
   useEffect(() => {
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     fetchClusters({...center, latitudeDelta, longitudeDelta})
@@ -240,8 +239,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   useEffect(() => {
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     fetchClusters({...center, latitudeDelta, longitudeDelta})
@@ -336,8 +335,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const zoomIn = () => {
     if (!mapRef.current) return
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     mapRef.current.animateToRegion(
@@ -353,8 +352,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const zoomOut = () => {
     if (!mapRef.current) return
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     mapRef.current.animateToRegion(
@@ -398,68 +397,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       }
     }
   }
-
-  // Calculate counts for each state filter
-  const getStateFilterCount = useCallback(
-    (filterKey: ContainerFilter): number => {
-      if (filterKey === 'all') {
-        // If type filter is active, count only containers of that type
-        if (selectedTypeFilter !== 'all') {
-          return containers.filter((c) => c.wasteType === selectedTypeFilter).length
-        }
-        return containers.length
-      }
-      if (filterKey === 'active') {
-        return containers.filter((container) => {
-          const matchesStatus = isOperational(container)
-          const matchesType =
-            selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
-          return matchesStatus && matchesType
-        }).length
-      }
-      if (filterKey === 'uncollected') {
-        if (selectedTypeFilter !== 'all') {
-          return containers.filter((c) => c.wasteType === selectedTypeFilter).length
-        }
-        return containers.length
-      }
-      return containers.filter((container) => {
-        const matchesState = container.state?.includes(filterKey as ContainerState) ?? false
-        const matchesType =
-          selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
-        return matchesState && matchesType
-      }).length
-    },
-    [containers, selectedTypeFilter]
-  )
-
-  // Calculate counts for each type filter
-  const getTypeFilterCount = useCallback(
-    (typeKey: WasteType | 'all'): number => {
-      if (typeKey === 'all') {
-        // If state filter is active, count only operational containers
-        if (selectedStateFilter === 'active') {
-          return containers.filter((c) => isOperational(c)).length
-        }
-        if (selectedStateFilter !== 'all' && selectedStateFilter !== 'uncollected') {
-          return containers.filter(
-            (c) => c.state?.includes(selectedStateFilter as ContainerState) ?? false
-          ).length
-        }
-        return containers.length
-      }
-      return containers.filter((container) => {
-        const matchesType = container.wasteType === typeKey
-        const matchesState =
-          selectedStateFilter === 'all' ||
-          (selectedStateFilter === 'active' && isOperational(container)) ||
-          selectedStateFilter === 'uncollected' ||
-          (container.state?.includes(selectedStateFilter as ContainerState) ?? false)
-        return matchesType && matchesState
-      }).length
-    },
-    [containers, selectedStateFilter]
-  )
 
   const stateFilters: {key: ContainerFilter; label: string}[] = [
     {key: 'all', label: t('wasteContainers.filters.all')},
@@ -518,19 +455,50 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     }))
   }, [visibleContainers, selectedStateFilter])
 
-  const handleStateFilterChange = useCallback((filter: ContainerFilter) => {
-    // Force immediate state update without batching
-    React.startTransition(() => {
-      setSelectedStateFilter(filter)
-    })
-  }, [])
+  const handleStateFilterChange = useCallback(
+    (filter: ContainerFilter) => {
+      React.startTransition(() => {
+        setSelectedStateFilter(filter)
+      })
+      setShowStateFilters(false)
+      // Auto-zoom to individual marker mode when a specific state filter is selected
+      // so the client-side filtering is actually visible on the map
+      if (filter !== 'all' && filter !== 'active' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+        const center = mapCenter || {
+          latitude: location?.coords.latitude ?? 42.683,
+          longitude: location?.coords.longitude ?? 23.315,
+        }
+        const targetDelta = 360 / Math.pow(2, INDIVIDUAL_ZOOM)
+        mapRef.current.animateToRegion(
+          {...center, latitudeDelta: targetDelta, longitudeDelta: targetDelta},
+          400
+        )
+      }
+    },
+    [zoom, mapCenter, location]
+  )
 
-  const handleTypeFilterChange = useCallback((filter: WasteType | 'all') => {
-    // Force immediate state update without batching
-    React.startTransition(() => {
-      setSelectedTypeFilter(filter)
-    })
-  }, [])
+  const handleTypeFilterChange = useCallback(
+    (filter: WasteType | 'all') => {
+      React.startTransition(() => {
+        setSelectedTypeFilter(filter)
+      })
+      setShowTypeFilters(false)
+      // Auto-zoom to individual marker mode when a specific type filter is selected
+      if (filter !== 'all' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+        const center = mapCenter || {
+          latitude: location?.coords.latitude ?? 42.683,
+          longitude: location?.coords.longitude ?? 23.315,
+        }
+        const targetDelta = 360 / Math.pow(2, INDIVIDUAL_ZOOM)
+        mapRef.current.animateToRegion(
+          {...center, latitudeDelta: targetDelta, longitudeDelta: targetDelta},
+          400
+        )
+      }
+    },
+    [zoom, mapCenter, location]
+  )
 
   const handleContainerPress = async (container: WasteContainer) => {
     // Show the card immediately with basic info
@@ -602,8 +570,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   // Use user location if available, otherwise default to Sofia center
   const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
+    latitude: location?.coords.latitude || 42.683,
+    longitude: location?.coords.longitude || 23.315,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   }
@@ -704,7 +672,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {stateFilters.map((filter) => {
-                  const count = getStateFilterCount(filter.key)
                   const isActive = selectedStateFilter === filter.key
                   return (
                     <TouchableOpacity
@@ -715,7 +682,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
                       <Text
                         style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                       >
-                        {filter.label} ({count})
+                        {filter.label}
                       </Text>
                     </TouchableOpacity>
                   )
@@ -746,7 +713,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {typeFilters.map((filter) => {
-                  const count = getTypeFilterCount(filter.key)
                   const isActive = selectedTypeFilter === filter.key
                   return (
                     <TouchableOpacity
@@ -757,7 +723,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
                       <Text
                         style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                       >
-                        {filter.label} ({count})
+                        {filter.label}
                       </Text>
                     </TouchableOpacity>
                   )
