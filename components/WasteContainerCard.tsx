@@ -80,7 +80,10 @@ export function WasteContainerCard({
     active: signalsActive,
     loading: signalsLoading,
     error: signalsError,
-  } = useContainerSignals(container.publicNumber)
+  } = useContainerSignals(container.publicNumber, {
+    initialTotal: container.signalCount,
+    initialActive: container.activeSignalCount,
+  })
   const [isCleaning, setIsCleaning] = useState(false)
   const [notes, setNotes] = useState('')
   const [photoUri, setPhotoUri] = useState<string | null>(null)

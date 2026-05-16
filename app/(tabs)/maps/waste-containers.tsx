@@ -424,19 +424,9 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     [zoom, mapCenter, location]
   )
 
-  const handleContainerPress = async (container: WasteContainer) => {
-    // Show the card immediately with basic info
+  const handleContainerPress = (container: WasteContainer) => {
     setSelectedContainer(container)
     setShowContainerCard(true)
-
-    // Fetch full details with observations in the background
-    try {
-      const fullContainer = await fetchWasteContainerById(container.id)
-      setSelectedContainer(fullContainer)
-    } catch (error) {
-      console.error('Error fetching container details:', error)
-      // Keep showing basic container info even if detailed fetch fails
-    }
   }
 
   const handleCloseCard = () => {

@@ -212,6 +212,17 @@ export interface ContainerCluster {
 }
 
 /**
+ * Convert a PostgreSQL timestamp string ("2024-01-15 10:30:00.000000+00") to ISO 8601
+ * ("2024-01-15T10:30:00.000000Z") using only string operations. Hermes (React Native)
+ * cannot parse the space-separated format, but handles T-separated ISO 8601 fine.
+ * Already-ISO strings (containing T) are returned unchanged.
+ */
+function normalizePgTimestamp(val: unknown): unknown {
+  if (typeof val !== 'string' || val.includes('T')) return val
+  return val.replace(' ', 'T').replace('+00:00', 'Z').replace(/\+00$/, 'Z')
+}
+
+/**
  * Fetch server-side clustered container data for a viewport.
  * Returns clusters when zoom < 16, individual markers when zoom >= 16.
  */
@@ -251,6 +262,12 @@ export async function fetchContainerClusters(options: {
         ...doc,
         latitude: Array.isArray(doc.location) ? doc.location[1] : 0,
         longitude: Array.isArray(doc.location) ? doc.location[0] : 0,
+        // PostgreSQL returns "2024-01-15 10:30:00.000000+00" (space separator, no colon in tz).
+        // Hermes requires the T separator and full HH:MM timezone — fix with string ops only
+        // to avoid constructing a Date (which Hermes can't parse from that format).
+        createdAt: normalizePgTimestamp(doc.createdAt),
+        updatedAt: normalizePgTimestamp(doc.updatedAt),
+        lastCleaned: normalizePgTimestamp(doc.lastCleaned),
       })),
     }
   }
