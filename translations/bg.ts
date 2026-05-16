@@ -285,6 +285,8 @@ export default {
     cleanDescription:
       'Това действие ще маркира всички активни сигнали като решени и ще промени статуса на контейнера на активен.',
     takePhoto: 'Направи снимка',
+    pickFromLibrary: 'Избери от галерия',
+    mediaLibraryPermissionRequired: 'Приложението се нуждае от достъп до галерията.',
     skipPhoto: 'Пропусни снимката',
     retakePhoto: 'Направи нова снимка',
     photoOptional: 'Снимката е по желание',

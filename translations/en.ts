@@ -283,6 +283,8 @@ export default {
     cleanDescription:
       'This action will mark all active signals as resolved and set the container status to active.',
     takePhoto: 'Take Photo',
+    pickFromLibrary: 'Pick from Library',
+    mediaLibraryPermissionRequired: 'The app needs access to your photo library.',
     skipPhoto: 'Skip Photo',
     retakePhoto: 'Retake Photo',
     photoOptional: 'Photo is optional',

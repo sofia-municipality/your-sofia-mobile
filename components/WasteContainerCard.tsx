@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Camera,
+  ImageIcon,
   X,
   ChevronDown,
   ChevronUp,
@@ -234,6 +235,28 @@ export function WasteContainerCard({
     if (!hasPermission) return
 
     const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    })
+
+    if (!result.canceled) {
+      setPhotoUri(result.assets[0].uri)
+    }
+  }
+
+  const handlePickFromLibrary = async () => {
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (status !== 'granted') {
+      Alert.alert(
+        t('wasteContainers.permissionDenied'),
+        t('wasteContainers.mediaLibraryPermissionRequired')
+      )
+      return
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
@@ -808,15 +831,28 @@ export function WasteContainerCard({
                   </TouchableOpacity>
                 </View>
               ) : (
-                <TouchableOpacity
-                  style={styles.takePhotoButton}
-                  onPress={handleTakePhoto}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('wasteContainers.takePhoto')}
-                >
-                  <Camera size={20} color={colors.primary} />
-                  <Text style={styles.takePhotoButtonText}>{t('wasteContainers.takePhoto')}</Text>
-                </TouchableOpacity>
+                <View style={styles.photoButtonsRow}>
+                  <TouchableOpacity
+                    style={styles.takePhotoButton}
+                    onPress={handleTakePhoto}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('wasteContainers.takePhoto')}
+                  >
+                    <Camera size={20} color={colors.primary} />
+                    <Text style={styles.takePhotoButtonText}>{t('wasteContainers.takePhoto')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.takePhotoButton}
+                    onPress={handlePickFromLibrary}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('wasteContainers.pickFromLibrary')}
+                  >
+                    <ImageIcon size={20} color={colors.primary} />
+                    <Text style={styles.takePhotoButtonText}>
+                      {t('wasteContainers.pickFromLibrary')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
               {!photoUri && (
                 <Text style={styles.photoRequiredText}>{t('wasteContainers.photoRequired')}</Text>
@@ -937,6 +973,7 @@ const styles = StyleSheet.create({
   signalsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: spacing['2xs'],
     gap: 2,
   },
   signalsText: {
@@ -1142,7 +1179,12 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
+  photoButtonsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
   takePhotoButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
