@@ -98,7 +98,15 @@ export function WasteContainerCard({
   const handleReportIssue = () => {
     if (!isAuthenticated) {
       if (onClose) onClose()
-      router.push('/auth/login' as any)
+      const signalPath =
+        `/(tabs)/new/new-signal` +
+        `?containerId=${container.id}` +
+        `&containerPublicNumber=${encodeURIComponent(container.publicNumber)}` +
+        `&containerName=${encodeURIComponent(container.publicNumber)}` +
+        `&containerLocation=${encodeURIComponent(JSON.stringify({latitude: container.latitude, longitude: container.longitude}))}` +
+        `&prefilledObjectType=waste-container` +
+        `&returnTo=${encodeURIComponent('/(tabs)/maps/waste-containers')}`
+      router.push({pathname: '/auth/login', params: {returnTo: signalPath}} as any)
       return
     }
 

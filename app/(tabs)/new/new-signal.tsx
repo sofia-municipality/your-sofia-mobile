@@ -132,8 +132,15 @@ export default function NewSignal() {
     // Hide camera first to ensure native camera view is unmounted cleanly
     setShowCamera(false)
     // small delay to allow native unmount to complete
-    setTimeout(() => router.back(), 80)
-  }, [router])
+    const returnTo = params.returnTo as string | undefined
+    setTimeout(() => {
+      if (returnTo) {
+        router.replace(returnTo as any)
+      } else {
+        router.back()
+      }
+    }, 80)
+  }, [router, params.returnTo])
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},

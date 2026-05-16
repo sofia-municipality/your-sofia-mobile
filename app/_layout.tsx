@@ -103,16 +103,14 @@ function AppShell() {
               <Stack.Screen
                 name="auth/login"
                 options={{
-                  headerTitle: t('auth.login'),
-                  headerLeft: undefined,
+                  headerBackTitle: t('common.back'),
                   headerBackVisible: true,
                 }}
               />
               <Stack.Screen
                 name="auth/register"
                 options={{
-                  headerTitle: t('auth.register'),
-                  headerLeft: undefined,
+                  headerBackTitle: t('common.back'),
                   headerBackVisible: true,
                 }}
               />
