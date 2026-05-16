@@ -223,7 +223,10 @@ export async function fetchContainerClusters(options: {
   maxLng: number
   status?: ContainerStatus
   districtId?: number
-}): Promise<{type: 'clusters'; docs: ContainerCluster[]; zoom: number}> {
+}): Promise<
+  | {type: 'clusters'; docs: ContainerCluster[]; zoom: number}
+  | {type: 'markers'; docs: WasteContainer[]; zoom: number}
+> {
   const params = new URLSearchParams({
     zoom: String(options.zoom),
     minLat: String(options.minLat),
@@ -240,7 +243,18 @@ export async function fetchContainerClusters(options: {
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
   if (!response.ok) throw new Error(`Failed to fetch clusters: ${response.statusText}`)
-  return response.json()
+  const data = await response.json()
+  if (data.type === 'markers') {
+    return {
+      ...data,
+      docs: (data.docs ?? []).map((doc: any) => ({
+        ...doc,
+        latitude: Array.isArray(doc.location) ? doc.location[1] : 0,
+        longitude: Array.isArray(doc.location) ? doc.location[0] : 0,
+      })),
+    }
+  }
+  return data
 }
 
 /**

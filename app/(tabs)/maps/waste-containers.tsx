@@ -28,7 +28,6 @@ import {WasteContainerCluster} from '../../../components/WasteContainerCluster'
 import {
   fetchWasteContainerById,
   fetchContainerClusters,
-  fetchContainersWithSignals,
   type ContainerCluster,
 } from '../../../lib/payload'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
@@ -93,7 +92,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     }
   }, [])
 
-  // Fetch server-side clusters for the current viewport (zoom < INDIVIDUAL_ZOOM)
+  // Fetch server-side data for the current viewport — clusters when zoomed out, markers when zoomed in
   const fetchClusters = useCallback(
     async (region: {
       latitude: number
@@ -104,20 +103,37 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       const z = latDeltaToZoom(region.latitudeDelta)
       setZoom(z)
 
+      const bounds = {
+        minLat: region.latitude - region.latitudeDelta / 2,
+        maxLat: region.latitude + region.latitudeDelta / 2,
+        minLng: region.longitude - region.longitudeDelta / 2,
+        maxLng: region.longitude + region.longitudeDelta / 2,
+      }
+
       if (z >= INDIVIDUAL_ZOOM) {
-        // Individual marker mode — clusters not needed
+        // Individual marker mode — viewport-bounded server fetch
         setClusters([])
+        setContainersLoading(true)
+        setContainersError(null)
+        try {
+          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: 24})
+          if (isMountedRef.current && data.type === 'markers') {
+            setContainers(data.docs)
+          }
+        } catch (err) {
+          console.error('[fetchClusters] Error:', err)
+          if (isMountedRef.current) {
+            setContainersError(t('wasteContainers.loadError'))
+          }
+        } finally {
+          if (isMountedRef.current) setContainersLoading(false)
+        }
         return
       }
 
+      setContainers([])
+      const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
       try {
-        const bounds = {
-          minLat: region.latitude - region.latitudeDelta / 2,
-          maxLat: region.latitude + region.latitudeDelta / 2,
-          minLng: region.longitude - region.longitudeDelta / 2,
-          maxLng: region.longitude + region.longitudeDelta / 2,
-        }
-        const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
         const data = await fetchContainerClusters({
           zoom: z,
           ...bounds,
@@ -131,42 +147,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         console.error('[fetchClusters] Error:', err)
       }
     },
-    [selectedStateFilter]
+    [selectedStateFilter, t]
   )
-
-  // Load nearby containers based on map center position
-  // Load all Triaditsa (district 24) containers once on mount for client-side filtering
-  const loadContainers = useCallback(async () => {
-    if (loadingRef.current || !isMountedRef.current) return
-    try {
-      loadingRef.current = true
-      setContainersLoading(true)
-      setContainersError(null)
-      const result = await fetchContainersWithSignals({districtId: 24})
-      const docs = result.docs
-      if (isMountedRef.current) {
-        setContainers(docs)
-      }
-    } catch (error) {
-      console.error('Error loading containers:', error)
-      if (isMountedRef.current) {
-        setContainersError(t('wasteContainers.loadError'))
-      }
-    } finally {
-      if (isMountedRef.current) {
-        loadingRef.current = false
-        setContainersLoading(false)
-      } else {
-        loadingRef.current = false
-      }
-    }
-  }, [t])
-
-  // Load containers once on mount
-  useEffect(() => {
-    loadContainers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Initial cluster fetch using the default region (before the user pans)
   useEffect(() => {
@@ -479,11 +461,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setSelectedContainer(updatedContainer)
       } catch (error) {
         console.error('Error refreshing container:', error)
-        // Fallback to full refresh if single container fetch fails
-        loadContainers()
+        // Fallback: re-fetch the current viewport
+        const center = mapCenter || {latitude: 42.683, longitude: 23.315}
+        fetchClusters({...center, ...regionDeltaRef.current})
       }
     },
-    [selectedContainer, loadContainers]
+    [selectedContainer, mapCenter, fetchClusters]
   )
 
   // Handle refreshContainerId param from navigation
