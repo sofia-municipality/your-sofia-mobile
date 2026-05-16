@@ -168,7 +168,11 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     fetchClusters({...center, latitudeDelta, longitudeDelta})
-  }, [selectedStateFilter, mapCenter, location, fetchClusters])
+    // mapCenter and location are intentionally excluded: map-move fetches are already
+    // handled by the debounced onRegionChangeComplete handler. Including them here
+    // would fire a duplicate identical request on every pan.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStateFilter, fetchClusters])
 
   useEffect(() => {
     ;(async () => {
