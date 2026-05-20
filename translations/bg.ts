@@ -321,6 +321,7 @@ export default {
     collectionTomorrow: 'Утре',
     collectionFrequency_one: '{{count}} път/седмица',
     collectionFrequency_other: '{{count}} пъти/седмица',
+    triaditsaOnlyAvailability: 'Контейнерите са активирани само за район Триадица.',
     collectionDay: {
       '1': 'Понеделник',
       '2': 'Вторник',
