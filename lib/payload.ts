@@ -1119,7 +1119,7 @@ export function calculateAssignmentProgress(assignment: Assignment): AssignmentP
 // ─── Collection Metrics ───────────────────────────────────────────────────────
 
 export interface DistrictStat {
-  districtId: string
+  districtId: number
   districtName: string
   totalContainers: number
   collectedContainers: number
