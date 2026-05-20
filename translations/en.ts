@@ -318,6 +318,7 @@ export default {
     collectionTomorrow: 'Tomorrow',
     collectionFrequency_one: '{{count}} time/week',
     collectionFrequency_other: '{{count}} times/week',
+    triaditsaOnlyAvailability: 'The containers are enabled only for Triaditsa.',
     collectionDay: {
       '1': 'Monday',
       '2': 'Tuesday',

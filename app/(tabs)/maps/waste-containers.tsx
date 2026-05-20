@@ -497,6 +497,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.availabilityBanner}>
+        <Text style={styles.availabilityBannerText}>
+          {t('wasteContainers.triaditsaOnlyAvailability')}
+        </Text>
+      </View>
+
       {/* Map */}
       <MapView
         ref={mapRef}
@@ -931,7 +937,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -945,12 +951,34 @@ const styles = StyleSheet.create({
   errorOverlayText: {
     flex: 1,
     fontSize: fontSizes.label,
-    color: '#B91C1C',
+    color: colors.error,
   },
   errorOverlayDismiss: {
     fontSize: fontSizes.caption,
     fontFamily: fonts.semiBold,
     color: colors.primary,
+  },
+  availabilityBanner: {
+    top: 48,
+    zIndex: 20,
+    backgroundColor: colors.accentGoldLight,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.accentGold,
+    marginHorizontal: 12,
+    paddingHorizontal: 2,
+    paddingVertical: 10,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  availabilityBannerText: {
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.regular,
+    color: colors.warning,
+    lineHeight: 18,
   },
   actionButtonsContainer: {
     position: 'absolute',
