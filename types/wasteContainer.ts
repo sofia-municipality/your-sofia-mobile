@@ -102,6 +102,10 @@ export interface WasteContainer {
   collectionDaysOfWeek?: string[]
   collectionTimesPerDay?: number
   scheduleSource?: string | null
+  /** Total signal count — populated by the containers-with-signal-count endpoint */
+  signalCount?: number
+  /** Active (non-resolved/non-rejected) signal count — populated by containers-with-signal-count */
+  activeSignalCount?: number
   createdAt: string
   updatedAt: string
 }

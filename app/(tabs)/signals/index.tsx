@@ -15,6 +15,7 @@ import {useBellAction} from '../../../contexts/BellActionContext'
 import {fetchSignals} from '../../../lib/payload'
 import {getUniqueReporterId} from '../../../lib/deviceId'
 import {useNotifications} from '../../../hooks/useNotifications'
+import {useAuth} from '@/contexts/AuthContext'
 import type {Signal} from '../../../types/signal'
 import {AlertCircle, Clock, CheckCircle, XCircle} from 'lucide-react-native'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
@@ -23,6 +24,7 @@ export default function SignalsScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
   const {containerReferenceId} = useLocalSearchParams<{containerReferenceId?: string}>()
+  const {user, isAuthenticated} = useAuth()
   const {registerBellAction} = useBellAction()
   const {updatedSignalIds, removeUpdatedSignalId} = useNotifications()
   const [signals, setSignals] = useState<Signal[]>([])
@@ -55,10 +57,14 @@ export default function SignalsScreen() {
       try {
         if (!isRefreshing) setLoading(true)
         setError(null)
+        if (filter === 'mine' && !isAuthenticated) {
+          setSignals([])
+          return
+        }
         const response = await fetchSignals({
           limit: 50,
           containerReferenceId: containerReferenceId,
-          ...(filter === 'mine' && deviceId ? {reporterUniqueId: deviceId} : {}),
+          ...(filter === 'mine' ? {reporterUserId: user?.id} : {}),
         })
         setSignals(response.docs)
       } catch (err) {
@@ -69,7 +75,7 @@ export default function SignalsScreen() {
         setRefreshing(false)
       }
     },
-    [t, containerReferenceId, filter, deviceId]
+    [t, containerReferenceId, filter, isAuthenticated, user]
   )
 
   useEffect(() => {

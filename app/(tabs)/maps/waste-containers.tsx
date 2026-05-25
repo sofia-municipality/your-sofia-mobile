@@ -15,7 +15,6 @@ import {useTranslation} from 'react-i18next'
 import {
   Navigation,
   NavigationOff,
-  Plus,
   ChevronDown,
   ChevronUp,
   ZoomIn,
@@ -31,8 +30,6 @@ import {
   fetchContainerClusters,
   type ContainerCluster,
 } from '../../../lib/payload'
-import {loadNearbyContainers} from '../../../lib/containerUtils'
-import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 import {useAuth} from '../../../contexts/AuthContext'
 import {
@@ -54,7 +51,7 @@ type ContainerFilter = 'all' | 'active' | 'uncollected' | ContainerState
 export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const {t} = useTranslation()
   const router = useRouter()
-  const {isAuthenticated} = useAuth()
+  useAuth()
   const params = useLocalSearchParams()
   const mapRef = useRef<MapView>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
@@ -73,9 +70,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const [mapCenter, setMapCenter] = useState<{latitude: number; longitude: number} | null>(null)
   const [followMe, setFollowMe] = useState(true)
   const loadingRef = useRef(false)
-  const lastLoadLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
-  const lastAttemptLocationRef = useRef<{latitude: number; longitude: number} | null>(null)
-  const lastAttemptAtRef = useRef<number>(0)
   const isMountedRef = useRef(true)
   const watchRef = useRef<any>(null)
   const regionDeltaRef = useRef<{latitudeDelta: number; longitudeDelta: number}>({
@@ -98,7 +92,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     }
   }, [])
 
-  // Fetch server-side clusters for the current viewport (zoom < INDIVIDUAL_ZOOM)
+  // Fetch server-side data for the current viewport — clusters when zoomed out, markers when zoomed in
   const fetchClusters = useCallback(
     async (region: {
       latitude: number
@@ -109,21 +103,43 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       const z = latDeltaToZoom(region.latitudeDelta)
       setZoom(z)
 
+      const bounds = {
+        minLat: region.latitude - region.latitudeDelta / 2,
+        maxLat: region.latitude + region.latitudeDelta / 2,
+        minLng: region.longitude - region.longitudeDelta / 2,
+        maxLng: region.longitude + region.longitudeDelta / 2,
+      }
+
       if (z >= INDIVIDUAL_ZOOM) {
-        // Individual marker mode — clusters not needed
+        // Individual marker mode — viewport-bounded server fetch
         setClusters([])
+        setContainersLoading(true)
+        setContainersError(null)
+        try {
+          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: 24})
+          if (isMountedRef.current && data.type === 'markers') {
+            setContainers(data.docs)
+          }
+        } catch (err) {
+          console.error('[fetchClusters] Error:', err)
+          if (isMountedRef.current) {
+            setContainersError(t('wasteContainers.loadError'))
+          }
+        } finally {
+          if (isMountedRef.current) setContainersLoading(false)
+        }
         return
       }
 
+      setContainers([])
+      const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
       try {
-        const bounds = {
-          minLat: region.latitude - region.latitudeDelta / 2,
-          maxLat: region.latitude + region.latitudeDelta / 2,
-          minLng: region.longitude - region.longitudeDelta / 2,
-          maxLng: region.longitude + region.longitudeDelta / 2,
-        }
-        const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
-        const data = await fetchContainerClusters({zoom: z, ...bounds, status: statusFilter})
+        const data = await fetchContainerClusters({
+          zoom: z,
+          ...bounds,
+          status: statusFilter,
+          districtId: 24,
+        })
         if (isMountedRef.current && data.type === 'clusters') {
           setClusters(data.docs)
         }
@@ -131,107 +147,14 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         console.error('[fetchClusters] Error:', err)
       }
     },
-    [selectedStateFilter]
+    [selectedStateFilter, t]
   )
-
-  // Load nearby containers based on map center position
-  const loadContainers = useCallback(async () => {
-    const FAILURE_COOLDOWN_MS = 15000
-
-    // Prevent concurrent loading requests
-    if (loadingRef.current) {
-      return
-    }
-
-    // Don't load if component is unmounted
-    if (!isMountedRef.current) {
-      return
-    }
-
-    const searchLocation =
-      mapCenter ||
-      (location
-        ? {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }
-        : null)
-
-    if (!searchLocation) return
-
-    // Avoid rapid retries when previous attempts are failing
-    if (lastAttemptLocationRef.current) {
-      const distanceSinceLastAttempt = getDistanceFromLatLonInMeters(
-        lastAttemptLocationRef.current.latitude,
-        lastAttemptLocationRef.current.longitude,
-        searchLocation.latitude,
-        searchLocation.longitude
-      )
-
-      const withinCooldown = Date.now() - lastAttemptAtRef.current < FAILURE_COOLDOWN_MS
-      if (withinCooldown && distanceSinceLastAttempt < 300) {
-        return
-      }
-    }
-
-    // Check if we've moved significantly since last load (>250 meters)
-    // This creates a buffer zone so markers don't disappear on small movements
-    if (lastLoadLocationRef.current) {
-      const distance = getDistanceFromLatLonInMeters(
-        lastLoadLocationRef.current.latitude,
-        lastLoadLocationRef.current.longitude,
-        searchLocation.latitude,
-        searchLocation.longitude
-      )
-      if (distance < 500) {
-        return
-      }
-    }
-
-    try {
-      loadingRef.current = true
-      lastAttemptAtRef.current = Date.now()
-      lastAttemptLocationRef.current = searchLocation
-      setContainersLoading(true)
-      setContainersError(null)
-
-      const radiusMeters = 1000
-
-      const nearbyContainers = await loadNearbyContainers(searchLocation, radiusMeters)
-
-      // Only update state if component is still mounted
-      if (isMountedRef.current) {
-        setContainers(nearbyContainers)
-        lastLoadLocationRef.current = searchLocation
-      }
-    } catch (error) {
-      console.error('Error loading nearby containers:', error)
-      if (isMountedRef.current) {
-        setContainersError(t('wasteContainers.loadError'))
-      }
-    } finally {
-      if (isMountedRef.current) {
-        loadingRef.current = false
-        setContainersLoading(false)
-      } else {
-        loadingRef.current = false
-      }
-    }
-  }, [mapCenter, location, t])
-
-  // Load containers when map center changes or location is available
-  useEffect(() => {
-    if (mapCenter || location) {
-      loadContainers()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapCenter, location])
 
   // Initial cluster fetch using the default region (before the user pans)
   useEffect(() => {
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     fetchClusters({...center, latitudeDelta, longitudeDelta})
@@ -240,12 +163,16 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   useEffect(() => {
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     fetchClusters({...center, latitudeDelta, longitudeDelta})
-  }, [selectedStateFilter, mapCenter, location, fetchClusters])
+    // mapCenter and location are intentionally excluded: map-move fetches are already
+    // handled by the debounced onRegionChangeComplete handler. Including them here
+    // would fire a duplicate identical request on every pan.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStateFilter, fetchClusters])
 
   useEffect(() => {
     ;(async () => {
@@ -336,8 +263,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const zoomIn = () => {
     if (!mapRef.current) return
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     mapRef.current.animateToRegion(
@@ -353,8 +280,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const zoomOut = () => {
     if (!mapRef.current) return
     const center = mapCenter || {
-      latitude: location?.coords.latitude ?? 42.6977,
-      longitude: location?.coords.longitude ?? 23.3219,
+      latitude: location?.coords.latitude ?? 42.683,
+      longitude: location?.coords.longitude ?? 23.315,
     }
     const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
     mapRef.current.animateToRegion(
@@ -398,68 +325,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       }
     }
   }
-
-  // Calculate counts for each state filter
-  const getStateFilterCount = useCallback(
-    (filterKey: ContainerFilter): number => {
-      if (filterKey === 'all') {
-        // If type filter is active, count only containers of that type
-        if (selectedTypeFilter !== 'all') {
-          return containers.filter((c) => c.wasteType === selectedTypeFilter).length
-        }
-        return containers.length
-      }
-      if (filterKey === 'active') {
-        return containers.filter((container) => {
-          const matchesStatus = isOperational(container)
-          const matchesType =
-            selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
-          return matchesStatus && matchesType
-        }).length
-      }
-      if (filterKey === 'uncollected') {
-        if (selectedTypeFilter !== 'all') {
-          return containers.filter((c) => c.wasteType === selectedTypeFilter).length
-        }
-        return containers.length
-      }
-      return containers.filter((container) => {
-        const matchesState = container.state?.includes(filterKey as ContainerState) ?? false
-        const matchesType =
-          selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
-        return matchesState && matchesType
-      }).length
-    },
-    [containers, selectedTypeFilter]
-  )
-
-  // Calculate counts for each type filter
-  const getTypeFilterCount = useCallback(
-    (typeKey: WasteType | 'all'): number => {
-      if (typeKey === 'all') {
-        // If state filter is active, count only operational containers
-        if (selectedStateFilter === 'active') {
-          return containers.filter((c) => isOperational(c)).length
-        }
-        if (selectedStateFilter !== 'all' && selectedStateFilter !== 'uncollected') {
-          return containers.filter(
-            (c) => c.state?.includes(selectedStateFilter as ContainerState) ?? false
-          ).length
-        }
-        return containers.length
-      }
-      return containers.filter((container) => {
-        const matchesType = container.wasteType === typeKey
-        const matchesState =
-          selectedStateFilter === 'all' ||
-          (selectedStateFilter === 'active' && isOperational(container)) ||
-          selectedStateFilter === 'uncollected' ||
-          (container.state?.includes(selectedStateFilter as ContainerState) ?? false)
-        return matchesType && matchesState
-      }).length
-    },
-    [containers, selectedStateFilter]
-  )
 
   const stateFilters: {key: ContainerFilter; label: string}[] = [
     {key: 'all', label: t('wasteContainers.filters.all')},
@@ -518,33 +383,54 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     }))
   }, [visibleContainers, selectedStateFilter])
 
-  const handleStateFilterChange = useCallback((filter: ContainerFilter) => {
-    // Force immediate state update without batching
-    React.startTransition(() => {
-      setSelectedStateFilter(filter)
-    })
-  }, [])
+  const handleStateFilterChange = useCallback(
+    (filter: ContainerFilter) => {
+      React.startTransition(() => {
+        setSelectedStateFilter(filter)
+      })
+      setShowStateFilters(false)
+      // Auto-zoom to individual marker mode when a specific state filter is selected
+      // so the client-side filtering is actually visible on the map
+      if (filter !== 'all' && filter !== 'active' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+        const center = mapCenter || {
+          latitude: location?.coords.latitude ?? 42.683,
+          longitude: location?.coords.longitude ?? 23.315,
+        }
+        const targetDelta = 360 / Math.pow(2, INDIVIDUAL_ZOOM)
+        mapRef.current.animateToRegion(
+          {...center, latitudeDelta: targetDelta, longitudeDelta: targetDelta},
+          400
+        )
+      }
+    },
+    [zoom, mapCenter, location]
+  )
 
-  const handleTypeFilterChange = useCallback((filter: WasteType | 'all') => {
-    // Force immediate state update without batching
-    React.startTransition(() => {
-      setSelectedTypeFilter(filter)
-    })
-  }, [])
+  const handleTypeFilterChange = useCallback(
+    (filter: WasteType | 'all') => {
+      React.startTransition(() => {
+        setSelectedTypeFilter(filter)
+      })
+      setShowTypeFilters(false)
+      // Auto-zoom to individual marker mode when a specific type filter is selected
+      if (filter !== 'all' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+        const center = mapCenter || {
+          latitude: location?.coords.latitude ?? 42.683,
+          longitude: location?.coords.longitude ?? 23.315,
+        }
+        const targetDelta = 360 / Math.pow(2, INDIVIDUAL_ZOOM)
+        mapRef.current.animateToRegion(
+          {...center, latitudeDelta: targetDelta, longitudeDelta: targetDelta},
+          400
+        )
+      }
+    },
+    [zoom, mapCenter, location]
+  )
 
-  const handleContainerPress = async (container: WasteContainer) => {
-    // Show the card immediately with basic info
+  const handleContainerPress = (container: WasteContainer) => {
     setSelectedContainer(container)
     setShowContainerCard(true)
-
-    // Fetch full details with observations in the background
-    try {
-      const fullContainer = await fetchWasteContainerById(container.id)
-      setSelectedContainer(fullContainer)
-    } catch (error) {
-      console.error('Error fetching container details:', error)
-      // Keep showing basic container info even if detailed fetch fails
-    }
   }
 
   const handleCloseCard = () => {
@@ -569,11 +455,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setSelectedContainer(updatedContainer)
       } catch (error) {
         console.error('Error refreshing container:', error)
-        // Fallback to full refresh if single container fetch fails
-        loadContainers()
+        // Fallback: re-fetch the current viewport
+        const center = mapCenter || {latitude: 42.683, longitude: 23.315}
+        fetchClusters({...center, ...regionDeltaRef.current})
       }
     },
-    [selectedContainer, loadContainers]
+    [selectedContainer, mapCenter, fetchClusters]
   )
 
   // Handle refreshContainerId param from navigation
@@ -602,14 +489,20 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   // Use user location if available, otherwise default to Sofia center
   const region = {
-    latitude: location?.coords.latitude || 42.6977,
-    longitude: location?.coords.longitude || 23.3219,
+    latitude: location?.coords.latitude || 42.683,
+    longitude: location?.coords.longitude || 23.315,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   }
 
   return (
     <View style={styles.container}>
+      <View style={styles.availabilityBanner}>
+        <Text style={styles.availabilityBannerText}>
+          {t('wasteContainers.triaditsaOnlyAvailability')}
+        </Text>
+      </View>
+
       {/* Map */}
       <MapView
         ref={mapRef}
@@ -704,7 +597,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {stateFilters.map((filter) => {
-                  const count = getStateFilterCount(filter.key)
                   const isActive = selectedStateFilter === filter.key
                   return (
                     <TouchableOpacity
@@ -715,7 +607,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
                       <Text
                         style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                       >
-                        {filter.label} ({count})
+                        {filter.label}
                       </Text>
                     </TouchableOpacity>
                   )
@@ -746,7 +638,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {typeFilters.map((filter) => {
-                  const count = getTypeFilterCount(filter.key)
                   const isActive = selectedTypeFilter === filter.key
                   return (
                     <TouchableOpacity
@@ -757,7 +648,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
                       <Text
                         style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                       >
-                        {filter.label} ({count})
+                        {filter.label}
                       </Text>
                     </TouchableOpacity>
                   )
@@ -770,6 +661,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
       {/* Action Buttons */}
       <View style={styles.actionButtonsContainer}>
+        {/* hidden for now - requires backend processes for managing arbitrary signals.
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
@@ -784,7 +676,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           }}
         >
           <Plus size={28} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={[styles.actionButton, followMe && styles.actionButtonActive]}
           onPress={toggleFollowMe}
@@ -1045,7 +937,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1059,12 +951,34 @@ const styles = StyleSheet.create({
   errorOverlayText: {
     flex: 1,
     fontSize: fontSizes.label,
-    color: '#B91C1C',
+    color: colors.error,
   },
   errorOverlayDismiss: {
     fontSize: fontSizes.caption,
     fontFamily: fonts.semiBold,
     color: colors.primary,
+  },
+  availabilityBanner: {
+    top: 48,
+    zIndex: 20,
+    backgroundColor: colors.accentGoldLight,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.accentGold,
+    marginHorizontal: 12,
+    paddingHorizontal: 2,
+    paddingVertical: 10,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  availabilityBannerText: {
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.regular,
+    color: colors.warning,
+    lineHeight: 18,
   },
   actionButtonsContainer: {
     position: 'absolute',

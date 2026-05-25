@@ -40,7 +40,7 @@ interface MapObject {
   distance: number
 }
 
-export default function NewScreen() {
+export default function NewSignal() {
   const {t} = useTranslation()
   const router = useRouter()
   const params = useLocalSearchParams()
@@ -132,8 +132,15 @@ export default function NewScreen() {
     // Hide camera first to ensure native camera view is unmounted cleanly
     setShowCamera(false)
     // small delay to allow native unmount to complete
-    setTimeout(() => router.back(), 80)
-  }, [router])
+    const returnTo = params.returnTo as string | undefined
+    setTimeout(() => {
+      if (returnTo) {
+        router.replace(returnTo as any)
+      } else {
+        router.back()
+      }
+    }, 80)
+  }, [router, params.returnTo])
 
   const objectTypes = [
     {id: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
@@ -506,16 +513,18 @@ export default function NewScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.nearbyObjects')}</Text>
 
-          {/* New Object Option */}
-          <TouchableOpacity
-            style={[styles.objectCard, !selectedObject && styles.objectCardSelected]}
-            onPress={() => setSelectedObject(null)}
-          >
-            <View style={styles.objectInfo}>
-              <MapPinIcon size={20} color={colors.primary} />
-              <Text style={styles.objectName}>{t('newSignal.newObject')}</Text>
-            </View>
-          </TouchableOpacity>
+          {/* New Object Option - hidden when launched from a container card */}
+          {!prefilledMapObject && (
+            <TouchableOpacity
+              style={[styles.objectCard, !selectedObject && styles.objectCardSelected]}
+              onPress={() => setSelectedObject(null)}
+            >
+              <View style={styles.objectInfo}>
+                <MapPinIcon size={20} color={colors.primary} />
+                <Text style={styles.objectName}>{t('newSignal.newObject')}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
 
           {/* Nearby Objects List */}
           {loadingNearbyObjects ? (

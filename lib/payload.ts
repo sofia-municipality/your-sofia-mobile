@@ -155,13 +155,18 @@ export function getMediaUrl(media: any): string | undefined {
 export async function fetchContainersWithSignals(options?: {
   limit?: number
   page?: number
+  districtId?: number
 }): Promise<PayloadResponse<WasteContainer & {signalCount: number; activeSignalCount: number}>> {
-  const {limit = 1000, page = 1} = options || {}
+  const {limit = 1000, page = 1, districtId} = options || {}
 
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
+    zoom: '16',
   })
+  if (districtId !== undefined) {
+    params.set('districtId', String(districtId))
+  }
 
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   console.log('[fetchContainersWithSignals] Request URL:', url)
@@ -207,6 +212,17 @@ export interface ContainerCluster {
 }
 
 /**
+ * Convert a PostgreSQL timestamp string ("2024-01-15 10:30:00.000000+00") to ISO 8601
+ * ("2024-01-15T10:30:00.000000Z") using only string operations. Hermes (React Native)
+ * cannot parse the space-separated format, but handles T-separated ISO 8601 fine.
+ * Already-ISO strings (containing T) are returned unchanged.
+ */
+function normalizePgTimestamp(val: unknown): unknown {
+  if (typeof val !== 'string' || val.includes('T')) return val
+  return val.replace(' ', 'T').replace('+00:00', 'Z').replace(/\+00$/, 'Z')
+}
+
+/**
  * Fetch server-side clustered container data for a viewport.
  * Returns clusters when zoom < 16, individual markers when zoom >= 16.
  */
@@ -217,7 +233,11 @@ export async function fetchContainerClusters(options: {
   minLng: number
   maxLng: number
   status?: ContainerStatus
-}): Promise<{type: 'clusters'; docs: ContainerCluster[]; zoom: number}> {
+  districtId?: number
+}): Promise<
+  | {type: 'clusters'; docs: ContainerCluster[]; zoom: number}
+  | {type: 'markers'; docs: WasteContainer[]; zoom: number}
+> {
   const params = new URLSearchParams({
     zoom: String(options.zoom),
     minLat: String(options.minLat),
@@ -228,10 +248,30 @@ export async function fetchContainerClusters(options: {
   if (options.status) {
     params.set('status', options.status)
   }
+  if (options.districtId !== undefined) {
+    params.set('districtId', String(options.districtId))
+  }
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
   if (!response.ok) throw new Error(`Failed to fetch clusters: ${response.statusText}`)
-  return response.json()
+  const data = await response.json()
+  if (data.type === 'markers') {
+    return {
+      ...data,
+      docs: (data.docs ?? []).map((doc: any) => ({
+        ...doc,
+        latitude: Array.isArray(doc.location) ? doc.location[1] : 0,
+        longitude: Array.isArray(doc.location) ? doc.location[0] : 0,
+        // PostgreSQL returns "2024-01-15 10:30:00.000000+00" (space separator, no colon in tz).
+        // Hermes requires the T separator and full HH:MM timezone — fix with string ops only
+        // to avoid constructing a Date (which Hermes can't parse from that format).
+        createdAt: normalizePgTimestamp(doc.createdAt),
+        updatedAt: normalizePgTimestamp(doc.updatedAt),
+        lastCleaned: normalizePgTimestamp(doc.lastCleaned),
+      })),
+    }
+  }
+  return data
 }
 
 /**
@@ -470,6 +510,7 @@ export async function fetchSignals(options?: {
   limit?: number
   page?: number
   reporterUniqueId?: string
+  reporterUserId?: number
   containerReferenceId?: string
 }): Promise<PayloadResponse<Signal>> {
   const {
@@ -478,6 +519,7 @@ export async function fetchSignals(options?: {
     limit = 20,
     page = 1,
     reporterUniqueId,
+    reporterUserId,
     containerReferenceId,
   } = options || {}
 
@@ -502,6 +544,11 @@ export async function fetchSignals(options?: {
   // Add reporterUniqueId filter if specified
   if (reporterUniqueId) {
     params.append('where[reporterUniqueId][equals]', reporterUniqueId)
+  }
+
+  // Add reporterUserId filter if specified
+  if (reporterUserId !== undefined) {
+    params.append('where[reporter][equals]', String(reporterUserId))
   }
 
   // Add container reference ID filter if specified
@@ -1072,7 +1119,7 @@ export function calculateAssignmentProgress(assignment: Assignment): AssignmentP
 // ─── Collection Metrics ───────────────────────────────────────────────────────
 
 export interface DistrictStat {
-  districtId: string
+  districtId: number
   districtName: string
   totalContainers: number
   collectedContainers: number

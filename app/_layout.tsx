@@ -1,7 +1,7 @@
 import {useEffect} from 'react'
 import {Stack, useRouter} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
-import {Image, TouchableOpacity, View} from 'react-native'
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {User} from 'lucide-react-native'
 import {useFrameworkReady} from '@/hooks/useFrameworkReady'
 import {useTranslation} from 'react-i18next'
@@ -23,7 +23,7 @@ import {
   JetBrainsMono_500Medium,
   JetBrainsMono_600SemiBold,
 } from '@expo-google-fonts/jetbrains-mono'
-import {colors} from '@/styles/tokens'
+import {colors, fonts, fontSizes, radius} from '@/styles/tokens'
 import '../i18n'
 
 export default function RootLayout() {
@@ -69,7 +69,14 @@ function AppShell() {
             <Stack
               screenOptions={{
                 headerShown: true,
-                headerTitle: t('common.header'),
+                headerTitle: () => (
+                  <View style={headerStyles.titleContainer}>
+                    <Text style={headerStyles.title}>{t('common.header')}</Text>
+                    <View style={headerStyles.betaBadge}>
+                      <Text style={headerStyles.betaBadgeText}>BETA</Text>
+                    </View>
+                  </View>
+                ),
                 headerShadowVisible: true,
                 headerLeft: () => (
                   <Image
@@ -96,16 +103,14 @@ function AppShell() {
               <Stack.Screen
                 name="auth/login"
                 options={{
-                  headerTitle: t('auth.login'),
-                  headerLeft: undefined,
+                  headerBackTitle: t('common.back'),
                   headerBackVisible: true,
                 }}
               />
               <Stack.Screen
                 name="auth/register"
                 options={{
-                  headerTitle: t('auth.register'),
-                  headerLeft: undefined,
+                  headerBackTitle: t('common.back'),
                   headerBackVisible: true,
                 }}
               />
@@ -126,3 +131,29 @@ function AppShell() {
     </EnvironmentProvider>
   )
 }
+
+const headerStyles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 4,
+  },
+  title: {
+    fontFamily: fonts.bold,
+    fontSize: fontSizes.h2,
+    color: colors.textPrimary,
+  },
+  betaBadge: {
+    backgroundColor: colors.error,
+    borderRadius: radius.sm,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    marginTop: 1,
+  },
+  betaBadgeText: {
+    fontFamily: fonts.extraBold,
+    fontSize: 8,
+    color: colors.surface,
+    letterSpacing: 0.8,
+  },
+})

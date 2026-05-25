@@ -99,7 +99,7 @@ export default {
     staticScreenNotice:
       'This is a sample static screen. If you want to make it functional, come to GitHub.',
     anonymity:
-      "The main functionality of the app works without registration. For extended features, you'll need to register.",
+      "The main features of the app work without registration. For submitting signals or using personalized functions, you'll need to register.",
     accountSettings: 'Account Settings',
     personalInfo: 'Personal Information',
     updateProfile: 'Update your profile details',
@@ -283,6 +283,8 @@ export default {
     cleanDescription:
       'This action will mark all active signals as resolved and set the container status to active.',
     takePhoto: 'Take Photo',
+    pickFromLibrary: 'Pick from Library',
+    mediaLibraryPermissionRequired: 'The app needs access to your photo library.',
     skipPhoto: 'Skip Photo',
     retakePhoto: 'Retake Photo',
     photoOptional: 'Photo is optional',
@@ -316,6 +318,7 @@ export default {
     collectionTomorrow: 'Tomorrow',
     collectionFrequency_one: '{{count}} time/week',
     collectionFrequency_other: '{{count}} times/week',
+    triaditsaOnlyAvailability: 'The containers are enabled only for Triaditsa.',
     collectionDay: {
       '1': 'Monday',
       '2': 'Tuesday',
@@ -337,7 +340,7 @@ export default {
     details: 'Details',
     notFound: 'Signal not found',
     adminNotes: 'Admin Notes',
-    cannotEdit: 'You can only edit signals created from this device.',
+    cannotEdit: 'You can only edit signals created by you.',
     updateSuccess: 'Signal updated successfully!',
     updateError: 'Error updating signal',
     duplicateTitle: 'You already have an active signal',

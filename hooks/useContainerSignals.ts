@@ -2,11 +2,18 @@ import {useState, useEffect, useCallback} from 'react'
 import {fetchSignals} from '../lib/payload'
 
 /**
- * Hook to fetch signal counts for a container reference id (publicNumber)
+ * Hook to fetch signal counts for a container reference id (publicNumber).
+ * If `initialTotal` and `initialActive` are provided (e.g. from the map viewport
+ * fetch which already includes these counts), the fetch is skipped entirely.
  */
-export function useContainerSignals(containerReferenceId?: string) {
-  const [total, setTotal] = useState<number | null>(null)
-  const [active, setActive] = useState<number>(0)
+export function useContainerSignals(
+  containerReferenceId?: string,
+  initialCounts?: {initialTotal?: number; initialActive?: number}
+) {
+  const hasInitialCounts =
+    initialCounts?.initialTotal !== undefined && initialCounts?.initialActive !== undefined
+  const [total, setTotal] = useState<number | null>(initialCounts?.initialTotal ?? null)
+  const [active, setActive] = useState<number>(initialCounts?.initialActive ?? 0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,8 +49,9 @@ export function useContainerSignals(containerReferenceId?: string) {
   }, [containerReferenceId])
 
   useEffect(() => {
+    if (hasInitialCounts) return
     load()
-  }, [load])
+  }, [load, hasInitialCounts])
 
   return {
     total,
