@@ -144,6 +144,8 @@ export default function RegisterScreen() {
                 autoCorrect={false}
                 spellCheck={false}
                 importantForAutofill="no"
+                returnKeyType="done"
+                returnKeyLabel="OK"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.confirmPassword')}
               />
