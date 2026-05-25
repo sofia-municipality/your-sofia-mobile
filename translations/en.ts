@@ -194,7 +194,8 @@ export default {
     },
     permissions: {
       title: 'Location Permission Required',
-      message: 'Please allow access to your location to view the map.',
+      message:
+        'Please allow access to your location so the map can show nearby containers, events, and your current position.',
       button: 'Allow Access',
     },
     loading: 'Loading map...',
@@ -412,7 +413,7 @@ export default {
     success: 'Signal submitted successfully!',
     error: 'Error submitting signal',
     locationPermissionRequired:
-      'To report a container signal, you must allow access to your location.',
+      'To report a container signal, allow access to your location so we can place the report on the correct container and show it on the map.',
     locationError: 'We could not get your current location. Please try again.',
     proximityError: 'You must be within 30 meters of the container to report a signal.',
   },
@@ -483,8 +484,9 @@ export default {
     title: 'New Signal',
     loading: 'Loading...',
     loadingNearbyObjects: 'Searching for nearby objects...',
-    cameraPermissionRequired: 'Camera access is required',
-    galleryPermissionRequired: 'Gallery access is required',
+    cameraPermissionRequired:
+      'Camera access is required to take a photo of the container for your report.',
+    galleryPermissionRequired: 'Gallery access is required to choose a photo for your report.',
     allowAccess: 'Allow Access',
     photo: 'Photo',
     nearbyObjects: 'Choose nearby Objects',

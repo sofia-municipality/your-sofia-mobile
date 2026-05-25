@@ -46,7 +46,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Your Sofia to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow Your Sofia to use your location so it can show nearby events and city objects on the map."
         }
       ],
       "expo-secure-store",
