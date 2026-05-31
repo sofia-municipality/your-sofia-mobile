@@ -134,6 +134,16 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.forgotPasswordLink}
+            onPress={() => router.push('/auth/forgot-password')}
+            disabled={isLoading}
+            accessibilityRole="button"
+            accessibilityLabel={t('auth.forgotPassword')}
+          >
+            <Text style={styles.forgotPasswordText}>{t('auth.forgotPassword')}</Text>
+          </TouchableOpacity>
+
           {isUnverified && (
             <View style={styles.unverifiedPanel}>
               <MailWarning size={24} color={colors.warning} style={styles.unverifiedIcon} />
@@ -198,6 +208,9 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
+    lineHeight: 24,
+    maxWidth: 320,
+    alignSelf: 'center',
   },
   form: {
     width: '100%',
@@ -271,6 +284,15 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  forgotPasswordLink: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  forgotPasswordText: {
+    fontSize: fontSizes.bodySm,
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
   },
   resendButton: {
     marginTop: 8,
