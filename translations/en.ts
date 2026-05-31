@@ -479,6 +479,14 @@ export default {
       'If the account exists and is unverified, a verification email has been sent.',
     resendVerificationFailed: 'Failed to send verification email. Please try again.',
     enterEmailToResendVerification: 'Enter your email address to receive a new verification link.',
+    forgotPassword: 'Forgot password?',
+    forgotPasswordSubtitle:
+      'Enter the email address for your account and we’ll send you a reset link.',
+    forgotPasswordButton: 'Send reset link',
+    forgotPasswordSuccess:
+      'If the account exists, you will receive an email with reset instructions.',
+    forgotPasswordFailed: 'Failed to send reset email. Please try again.',
+    enterEmailToResetPassword: 'Enter your email to receive password reset instructions.',
   },
   newSignal: {
     title: 'New Signal',
