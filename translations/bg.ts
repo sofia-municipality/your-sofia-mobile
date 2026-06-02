@@ -244,6 +244,7 @@ export default {
       full: 'Пълен',
       maintenance: 'Поддръжка',
       inactive: 'Неактивен',
+      pending: 'Предстоящ',
     },
     filters: {
       all: 'Всички',
@@ -318,7 +319,7 @@ export default {
     createdAt: 'Създаден на',
     updatedAt: 'Актуализиран на',
     loadError: 'Грешка при зареждане на контейнерите',
-    nextCollection: 'Следващо сваляне',
+    nextCollection: 'Следващо събиране',
     collectionToday: 'Днес',
     collectionTomorrow: 'Утре',
     collectionFrequency_one: '{{count}} път/седмица',
