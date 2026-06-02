@@ -748,7 +748,7 @@ function getContainerPinColor(container: WasteContainer, uncollectedMode = false
     if (!container.lastCleaned) return 'red'
     // PostgreSQL timestamps use a space separator and short tz offset: "2026-03-11 07:46:30+00"
     // Normalise to valid ISO 8601: space → T, and expand +HH / -HH offsets to +HH:00.
-    const normalized = container.lastCleaned.replace(' ', 'T').concat(':00')
+    const normalized = container.lastCleaned.replace(' ', 'T')
     const hoursSince = (Date.now() - new Date(normalized).getTime()) / (1000 * 60 * 60)
     if (hoursSince <= 24) return 'green'
     if (hoursSince <= 36) return 'orange'
