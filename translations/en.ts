@@ -241,6 +241,7 @@ export default {
       full: 'Full',
       maintenance: 'Maintenance',
       inactive: 'Inactive',
+      pending: 'Pending',
     },
     filters: {
       all: 'All',
