@@ -46,6 +46,7 @@ export default function WhatsNewScreen() {
             <Image
               source={require('../assets/images/sofia-gerb.png')}
               style={styles.logo}
+              resizeMode="contain"
               accessibilityLabel="Твоята София"
             />
             <Text style={styles.wordmark}>Твоята София</Text>
@@ -129,10 +130,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   logo: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.full,
-    marginBottom: spacing.sm,
+    width: 56,
+    height: 56,
+    marginBottom: spacing.xs,
   },
   wordmark: {
     fontFamily: fonts.bold,
