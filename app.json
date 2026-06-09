@@ -4,13 +4,13 @@
     "slug": "your-sofia",
     "version": "0.6.1",
     "orientation": "portrait",
-    "icon": "./assets/images/sofia-gerb.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/sofia-gerb.png",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "bg.sofia.yoursofia",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
