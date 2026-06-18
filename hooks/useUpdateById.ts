@@ -8,7 +8,7 @@ import {
 } from '@/lib/updatesApi'
 import type {NewsItem} from '@/types/news'
 
-const MAX_MARKDOWN_LENGTH = 1
+const MAX_MARKDOWN_LENGTH = 50_000
 
 function sanitizeNewsItemMarkdown(newsItem: NewsItem, t: (key: string) => string): NewsItem {
   if (!newsItem.markdownText || newsItem.markdownText.length <= MAX_MARKDOWN_LENGTH) {
