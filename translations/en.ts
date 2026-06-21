@@ -198,6 +198,7 @@ export default {
         'Please allow access to your location so the map can show nearby containers, events, and your current position.',
       button: 'Allow Access',
     },
+    locationError: 'We could not get your current location. Please try again.',
     loading: 'Loading map...',
   },
 
