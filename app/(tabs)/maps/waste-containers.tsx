@@ -192,7 +192,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
+        Alert.alert(t('common.error'), t('map.locationError'))
       }
     })()
   }, [t])
