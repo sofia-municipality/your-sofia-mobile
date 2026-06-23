@@ -815,6 +815,7 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     gap: 8,
+    zIndex: 30,
   },
   filterColumn: {
     flex: 1,
