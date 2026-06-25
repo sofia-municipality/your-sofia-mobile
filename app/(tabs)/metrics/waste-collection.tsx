@@ -75,12 +75,12 @@ export default function WasteCollectionDashboard() {
     ? [
         {
           status: t('metrics.complianceOnTime'),
-          count: Math.max(0, compliance.scheduledToday - compliance.delayed),
+          count: Math.max(0, compliance.scheduledToday - compliance.delayed - compliance.missed),
           color: colors.success,
         },
         {
           status: t('metrics.complianceDelayed'),
-          count: Math.max(0, compliance.delayed - compliance.missed),
+          count: compliance.delayed,
           color: colors.warning,
         },
         {
