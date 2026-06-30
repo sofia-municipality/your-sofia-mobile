@@ -6,7 +6,7 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start --dev-client",
+    "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start --dev-client",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
@@ -85,6 +85,7 @@
     "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
+    "cross-env": "^10.1.0",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
