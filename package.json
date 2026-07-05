@@ -6,7 +6,7 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start --dev-client",
+    "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start --dev-client",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
@@ -80,11 +80,12 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.29.7",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
+    "cross-env": "^10.1.0",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
@@ -110,13 +111,15 @@
       "brace-expansion": "^5.0.6",
       "node-forge": ">=1.4.0",
       "undici": "^7.24.0",
-      "tar": ">=7.5.11",
+      "tar": ">=7.5.16",
       "@xmldom/xmldom": "~0.8.12",
       "lodash": ">=4.18.0",
       "flatted": ">=3.4.2",
       "minimatch": ">=9.0.1",
       "shell-quote": ">=1.8.4",
-      "form-data": "^4.0.6"
+      "form-data": "^4.0.6",
+      "ws": ">=8.21.0",
+      "markdown-it": ">=12.3.2"
     }
   }
 }
