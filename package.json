@@ -117,6 +117,7 @@
       "flatted": ">=3.4.2",
       "minimatch": ">=9.0.1",
       "shell-quote": ">=1.8.4",
+      "ws": ">=8.21.0",
       "markdown-it": ">=12.3.2"
     }
   }
