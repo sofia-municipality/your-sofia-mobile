@@ -517,6 +517,9 @@ export default {
     metadataFound: 'Намерени метаданни',
     metadataLocationUpdated: 'Местоположението е актуализирано от снимката',
     metadataDateTimeUpdated: 'Датата и времето са актуализирани от снимката',
+    locationRequiredBanner:
+      'За да подадете сигнал, е необходимо местоположение. Разрешете достъп до местоположението, за да бъде докладът поставен на картата.',
+    enableLocation: 'Разреши местоположение',
     objectTypes: {
       wasteContainer: 'Контейнер за отпадъци',
       streetLight: 'Улично осветление',
