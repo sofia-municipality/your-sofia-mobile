@@ -198,6 +198,7 @@ export default {
         'Please allow access to your location so the map can show nearby containers, events, and your current position.',
       button: 'Allow Access',
     },
+    locationError: 'We could not get your current location. Please try again.',
     loading: 'Loading map...',
   },
 
@@ -445,6 +446,10 @@ export default {
     fillAllFields: 'Please fill all fields',
     passwordsDoNotMatch: 'Passwords do not match',
     passwordTooShort: 'Password must be at least 6 characters',
+    passwordNeedsLowercase: 'Password must contain a lowercase letter',
+    passwordNeedsUppercase: 'Password must contain an uppercase letter',
+    passwordNeedsDigit: 'Password must contain a digit',
+    passwordNeedsSpecialChar: 'Password must contain a special character',
     loginFailed: 'Login failed',
     registerSuccess: 'Registered successfully',
     verifyEmailTitle: 'Verify your email',
