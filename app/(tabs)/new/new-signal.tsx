@@ -12,8 +12,10 @@ import {
   ActivityIndicator,
   Image,
   Platform,
+  Modal,
   Linking,
 } from 'react-native'
+import MapView, {Marker, type Region} from 'react-native-maps'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
@@ -33,6 +35,13 @@ import {getDistanceFromLatLonInMeters} from '@/lib/mapUtils'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
 const {height} = Dimensions.get('window')
+
+const SOFIA_DEFAULT_REGION: Region = {
+  latitude: 42.6977,
+  longitude: 23.3219,
+  latitudeDelta: 0.01,
+  longitudeDelta: 0.01,
+}
 
 interface MapObject {
   id: string
@@ -79,6 +88,11 @@ export default function NewSignal() {
     total: number
   }>({stage: null, current: 0, total: 0})
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null)
+  const [showObjectLocationMap, setShowObjectLocationMap] = useState(false)
+  const [pendingPinCoord, setPendingPinCoord] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null)
 
   // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
   const [showCamera, setShowCamera] = useState(true)
@@ -541,7 +555,11 @@ export default function NewSignal() {
           {!prefilledMapObject && (
             <TouchableOpacity
               style={[styles.objectCard, !selectedObject && styles.objectCardSelected]}
-              onPress={() => setSelectedObject(null)}
+              onPress={() => {
+                setSelectedObject(null)
+                setPendingPinCoord(currentLocation)
+                setShowObjectLocationMap(true)
+              }}
             >
               <View style={styles.objectInfo}>
                 <MapPinIcon size={20} color={colors.primary} />
@@ -714,6 +732,66 @@ export default function NewSignal() {
         photoUri={viewingPhoto}
         onClose={() => setViewingPhoto(null)}
       />
+
+      {/* New Object Location Map Modal */}
+      <Modal
+        visible={showObjectLocationMap}
+        animationType="slide"
+        onRequestClose={() => setShowObjectLocationMap(false)}
+      >
+        <SafeAreaView style={styles.mapModalContainer}>
+          <View style={styles.mapModalHeader}>
+            <Text style={styles.mapModalTitle}>{t('newSignal.selectObjectLocation')}</Text>
+            <TouchableOpacity
+              onPress={() => setShowObjectLocationMap(false)}
+              style={styles.mapModalCloseButton}
+            >
+              <X size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+          <MapView
+            style={styles.mapModalMap}
+            initialRegion={
+              pendingPinCoord
+                ? {
+                    latitude: pendingPinCoord.latitude,
+                    longitude: pendingPinCoord.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }
+                : SOFIA_DEFAULT_REGION
+            }
+            onPress={(e) => setPendingPinCoord(e.nativeEvent.coordinate)}
+          >
+            {pendingPinCoord && (
+              <Marker
+                coordinate={pendingPinCoord}
+                draggable
+                onDragEnd={(e) => setPendingPinCoord(e.nativeEvent.coordinate)}
+              />
+            )}
+          </MapView>
+          <View style={styles.mapModalFooter}>
+            <Text style={styles.mapModalHint}>
+              {pendingPinCoord
+                ? `${pendingPinCoord.latitude.toFixed(5)}, ${pendingPinCoord.longitude.toFixed(5)}`
+                : t('newSignal.tapMapToSetLocation')}
+            </Text>
+            <TouchableOpacity
+              style={[styles.mapModalConfirmButton, !pendingPinCoord && styles.buttonDisabled]}
+              disabled={!pendingPinCoord}
+              onPress={() => {
+                if (pendingPinCoord) {
+                  setCurrentLocation(pendingPinCoord)
+                }
+                setShowObjectLocationMap(false)
+              }}
+            >
+              <Text style={styles.primaryButtonText}>{t('newSignal.confirmObjectLocation')}</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -1090,5 +1168,50 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     padding: 4,
+  },
+  mapModalContainer: {
+    flex: 1,
+    backgroundColor: colors.surface,
+  },
+  mapModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: '#fff',
+  },
+  mapModalTitle: {
+    fontSize: 17,
+    fontFamily: fonts.bold,
+    color: colors.textPrimary,
+  },
+  mapModalCloseButton: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
+  },
+  mapModalMap: {
+    flex: 1,
+  },
+  mapModalFooter: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: 12,
+  },
+  mapModalHint: {
+    fontSize: fontSizes.bodySm,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  mapModalConfirmButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
   },
 })
