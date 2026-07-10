@@ -18,6 +18,7 @@ overrides:
   form-data: ^4.0.6
   ws: '>=8.21.0'
   markdown-it: '>=12.3.2'
+  '@tootallnate/once': '>=2.0.1'
   postcss: '>=8.5.10'
   uuid: '>=11.1.1'
   js-yaml: '>=4.2.0'
@@ -1566,8 +1567,8 @@ packages:
       jest:
         optional: true
 
-  '@tootallnate/once@2.0.0':
-    resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
+  '@tootallnate/once@3.0.1':
+    resolution: {integrity: sha512-VyMVKRrpHTT8PnotUeV8L/mDaMwD5DaAKCFLP73zAqAtvF0FCqky+Ki7BYbFCYQmqFyTe9316Ed5zS70QUR9eg==}
     engines: {node: '>= 10'}
 
   '@tybys/wasm-util@0.10.1':
@@ -7286,7 +7287,7 @@ snapshots:
     optionalDependencies:
       jest: 29.7.0(@types/node@24.5.2)
 
-  '@tootallnate/once@2.0.0': {}
+  '@tootallnate/once@3.0.1': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -9335,7 +9336,7 @@ snapshots:
 
   http-proxy-agent@5.0.0:
     dependencies:
-      '@tootallnate/once': 2.0.0
+      '@tootallnate/once': 3.0.1
       agent-base: 6.0.2
       debug: 4.4.3
     transitivePeerDependencies:
