@@ -184,10 +184,12 @@ export default function NotificationsScreen() {
             <Text style={styles.sectionTitle}>{t('notifications.categories')}</Text>
             <TouchableOpacity
               onPress={toggleAll}
+              disabled={!notificationsEnabled}
               accessibilityRole="button"
               accessibilityLabel={
                 allSelected ? t('notifications.deselectAll') : t('notifications.selectAll')
               }
+              accessibilityState={{disabled: !notificationsEnabled}}
             >
               <Text style={styles.toggleAll}>
                 {allSelected ? t('notifications.deselectAll') : t('notifications.selectAll')}
@@ -204,6 +206,7 @@ export default function NotificationsScreen() {
                 <Pressable
                   key={slug}
                   onPress={() => toggleCategory(slug)}
+                  disabled={!notificationsEnabled}
                   style={[
                     styles.categoryChip,
                     selected && {backgroundColor: color, borderColor: color},
@@ -211,7 +214,7 @@ export default function NotificationsScreen() {
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel={t(`categories.${slug}`)}
-                  accessibilityState={{selected}}
+                  accessibilityState={{selected, disabled: !notificationsEnabled}}
                 >
                   <Icon size={16} color={selected ? colors.surface : color} />
                   <Text
@@ -244,9 +247,11 @@ export default function NotificationsScreen() {
                 </Text>
                 <TouchableOpacity
                   onPress={() => removeLocationFilter(index)}
+                  disabled={!notificationsEnabled}
                   style={styles.removeBtn}
                   accessibilityRole="button"
                   accessibilityLabel={t('notifications.removeFilter')}
+                  accessibilityState={{disabled: !notificationsEnabled}}
                 >
                   <Trash2 size={16} color={colors.error} />
                 </TouchableOpacity>
@@ -257,8 +262,10 @@ export default function NotificationsScreen() {
           <TouchableOpacity
             style={styles.addFilterBtn}
             onPress={handleAddLocation}
+            disabled={!notificationsEnabled}
             accessibilityRole="button"
             accessibilityLabel={t('notifications.addLocation')}
+            accessibilityState={{disabled: !notificationsEnabled}}
           >
             <Plus size={18} color={colors.primary} />
             <Text style={styles.addFilterText}>{t('notifications.addLocation')}</Text>
