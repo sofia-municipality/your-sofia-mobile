@@ -23,6 +23,7 @@ export function useNearbyObjects({selectedObject, containerLocation}: UseNearbyO
     latitude: number
     longitude: number
   } | null>(containerLocation || null)
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false)
 
   const loadNearbyObjectsCallback = useCallback(
     (currentSelectedObject: MapObject | null) => {
@@ -37,8 +38,10 @@ export function useNearbyObjects({selectedObject, containerLocation}: UseNearbyO
           setLoadingNearbyObjects(true)
           const {status} = await Location.requestForegroundPermissionsAsync()
           if (status !== 'granted') {
+            setLocationPermissionDenied(true)
             return
           }
+          setLocationPermissionDenied(false)
 
           // For testing: use containerLocation if available, otherwise use current location
           let searchLocation
@@ -94,6 +97,7 @@ export function useNearbyObjects({selectedObject, containerLocation}: UseNearbyO
     loadingNearbyObjects,
     currentLocation,
     setCurrentLocation,
+    locationPermissionDenied,
     loadNearbyObjects: loadNearbyObjectsCallback,
   }
 }

@@ -511,6 +511,9 @@ export default {
     metadataFound: 'Metadata Found',
     metadataLocationUpdated: 'Location updated from photo',
     metadataDateTimeUpdated: 'Date and time updated from photo',
+    locationRequiredBanner:
+      'Location is required to submit a signal. Allow location access so the report can be placed on the map.',
+    enableLocation: 'Enable location',
     objectTypes: {
       wasteContainer: 'Waste Container',
       streetLight: 'Street Light',
