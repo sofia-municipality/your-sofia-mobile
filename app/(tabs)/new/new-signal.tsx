@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Image,
   Platform,
+  Linking,
 } from 'react-native'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
@@ -89,6 +90,7 @@ export default function NewSignal() {
     loadingNearbyObjects,
     currentLocation,
     setCurrentLocation,
+    locationPermissionDenied,
     loadNearbyObjects: loadNearbyObjectsCallback,
   } = useNearbyObjects({
     selectedObject,
@@ -509,6 +511,28 @@ export default function NewSignal() {
           </View>
         )}
 
+        {/* Location Required Banner */}
+        {!currentLocation && !loadingNearbyObjects && (
+          <View style={styles.locationBanner}>
+            <MapPinIcon size={20} color={colors.error} />
+            <View style={styles.locationBannerContent}>
+              <Text style={styles.locationBannerText}>{t('newSignal.locationRequiredBanner')}</Text>
+              <TouchableOpacity
+                style={styles.locationBannerButton}
+                onPress={() => {
+                  if (locationPermissionDenied) {
+                    Linking.openSettings()
+                  } else {
+                    loadNearbyObjectsCallback(null)
+                  }
+                }}
+              >
+                <Text style={styles.locationBannerButtonText}>{t('newSignal.enableLocation')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {/* Nearby Objects Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.nearbyObjects')}</Text>
@@ -671,9 +695,9 @@ export default function NewSignal() {
             <Text style={styles.secondaryButtonText}>{t('newSignal.cancel')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.buttonDisabled]}
+            style={[styles.primaryButton, (loading || !currentLocation) && styles.buttonDisabled]}
             onPress={handleSubmit}
-            disabled={loading}
+            disabled={loading || !currentLocation}
           >
             <Text style={styles.primaryButtonText}>
               {loading ? t('newSignal.submitting') : t('newSignal.submit')}
@@ -833,6 +857,38 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: fonts.semiBold,
     textAlign: 'right',
+  },
+  locationBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.error,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  locationBannerContent: {
+    flex: 1,
+    gap: 10,
+  },
+  locationBannerText: {
+    fontSize: fontSizes.bodySm,
+    color: colors.textPrimary,
+  },
+  locationBannerButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  locationBannerButtonText: {
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.semiBold,
+    color: '#fff',
   },
   section: {
     padding: 16,
