@@ -67,12 +67,32 @@ function getFrequencyLabel(
   return t('wasteContainers.collectionFrequency', {count: perWeek})
 }
 
+function formatDate(dateStr: string, language: string): string {
+  const locale = language === 'bg' ? 'bg-BG' : 'en-US'
+  return new Date(dateStr).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+function formatDateTime(dateStr: string, language: string): string {
+  const locale = language === 'bg' ? 'bg-BG' : 'en-US'
+  return new Date(dateStr).toLocaleString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function WasteContainerCard({
   container,
   onClose,
   onContainerUpdated,
 }: WasteContainerCardProps) {
-  const {t} = useTranslation()
+  const {t, i18n} = useTranslation()
   const router = useRouter()
   const {isContainerAdmin, token, isAuthenticated} = useAuth()
   const {
@@ -457,7 +477,7 @@ export function WasteContainerCard({
                   }}
                   style={styles.lastPhotoItem}
                   accessibilityRole="button"
-                  accessibilityLabel={`${t(`wasteContainers.${photo.type}`)}: ${new Date(photo.createdAt).toLocaleDateString()}`}
+                  accessibilityLabel={`${t(`wasteContainers.${photo.type}`)}: ${formatDate(photo.createdAt, i18n.language)}`}
                 >
                   <Image
                     source={{uri: photo.url}}
@@ -468,7 +488,7 @@ export function WasteContainerCard({
                   />
                   <Text style={styles.lastPhotoDate}>
                     {t(`wasteContainers.${photo.type}`)}:
-                    {new Date(photo.createdAt).toLocaleDateString()}
+                    {formatDate(photo.createdAt, i18n.language)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -584,7 +604,7 @@ export function WasteContainerCard({
                   accessibilityLabel={t('wasteContainers.lastCleaned')}
                 >
                   <Text style={[styles.extendedInfoValue, styles.linkText]}>
-                    {new Date(container.lastCleaned).toLocaleString()}
+                    {formatDateTime(container.lastCleaned, i18n.language)}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -608,14 +628,14 @@ export function WasteContainerCard({
             <View style={styles.extendedInfoRow}>
               <Text style={styles.extendedInfoLabel}>{t('wasteContainers.createdAt')}:</Text>
               <Text style={styles.extendedInfoValue}>
-                {new Date(container.createdAt).toLocaleString()}
+                {formatDateTime(container.createdAt, i18n.language)}
               </Text>
             </View>
 
             <View style={styles.extendedInfoRow}>
               <Text style={styles.extendedInfoLabel}>{t('wasteContainers.updatedAt')}:</Text>
               <Text style={styles.extendedInfoValue}>
-                {new Date(container.updatedAt).toLocaleString()}
+                {formatDateTime(container.updatedAt, i18n.language)}
               </Text>
             </View>
           </View>
@@ -729,7 +749,7 @@ export function WasteContainerCard({
                           setShowPhotoModal(true)
                         }}
                         accessibilityRole="imagebutton"
-                        accessibilityLabel={new Date(obs.cleanedAt).toLocaleString()}
+                        accessibilityLabel={formatDateTime(obs.cleanedAt, i18n.language)}
                       >
                         <Image
                           source={{uri: photoUrl}}
@@ -743,7 +763,7 @@ export function WasteContainerCard({
                       </View>
                     )}
                     <Text style={styles.observationDate}>
-                      {new Date(obs.cleanedAt).toLocaleString()}
+                      {formatDateTime(obs.cleanedAt, i18n.language)}
                     </Text>
                   </View>
                 )

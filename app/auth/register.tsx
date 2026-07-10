@@ -42,6 +42,22 @@ export default function RegisterScreen() {
       Alert.alert(t('common.error'), t('auth.passwordTooShort'))
       return
     }
+    if (!/[a-z]/.test(password)) {
+      Alert.alert(t('common.error'), t('auth.passwordNeedsLowercase'))
+      return
+    }
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert(t('common.error'), t('auth.passwordNeedsUppercase'))
+      return
+    }
+    if (!/[0-9]/.test(password)) {
+      Alert.alert(t('common.error'), t('auth.passwordNeedsDigit'))
+      return
+    }
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+      Alert.alert(t('common.error'), t('auth.passwordNeedsSpecialChar'))
+      return
+    }
 
     setIsLoading(true)
     try {

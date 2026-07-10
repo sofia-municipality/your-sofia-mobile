@@ -198,6 +198,7 @@ export default {
         'Please allow access to your location so the map can show nearby containers, events, and your current position.',
       button: 'Allow Access',
     },
+    locationError: 'We could not get your current location. Please try again.',
     loading: 'Loading map...',
   },
 
@@ -500,6 +501,9 @@ export default {
     photo: 'Photo',
     nearbyObjects: 'Choose nearby Objects',
     newObject: 'New Object',
+    selectObjectLocation: 'Set New Object Location',
+    tapMapToSetLocation: 'Tap the map to set the location of the new object',
+    confirmObjectLocation: 'Confirm Location',
     distance: 'm away',
     noNearbyObjects: 'No nearby objects',
     objectType: 'New Object Type',
@@ -507,6 +511,9 @@ export default {
     metadataFound: 'Metadata Found',
     metadataLocationUpdated: 'Location updated from photo',
     metadataDateTimeUpdated: 'Date and time updated from photo',
+    locationRequiredBanner:
+      'Location is required to submit a signal. Allow location access so the report can be placed on the map.',
+    enableLocation: 'Enable location',
     objectTypes: {
       wasteContainer: 'Waste Container',
       streetLight: 'Street Light',
