@@ -206,7 +206,7 @@ export default {
   },
 
   arView: {
-    cleaning: 'Почистване',
+    cleaning: 'Извозване',
     lastCleaned: 'преди',
     expectedCleaning: 'след',
     inHours: 'след',
@@ -277,13 +277,13 @@ export default {
     cleanSuccess: 'Контейнерът е почистен успешно',
     cleanError: 'Грешка при почистване на контейнера',
     cleanConfirm: 'Сигурни ли сте, че искате да почистите този контейнер?',
-    lastCleaned: 'Последно почистване',
+    lastCleaned: 'Последно извозване',
     lastObservations: 'Последни три наблюдения',
-    cleaningHistory: 'История на почистванията',
-    noHistory: 'Няма записани почиствания',
+    cleaningHistory: 'История на извозванията',
+    noHistory: 'Няма записани извозвания',
     signals: 'Сигнали',
     signal: 'Сигнал',
-    cleaning: 'Почистване',
+    cleaning: 'Извозване',
     signalsActive: 'Активни сигнали: {{active}}/{{count}}',
     cleanDescription:
       'Това действие ще маркира всички активни сигнали като решени и ще промени статуса на контейнера на активен.',
