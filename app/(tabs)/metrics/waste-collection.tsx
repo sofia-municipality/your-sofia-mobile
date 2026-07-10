@@ -114,20 +114,22 @@ export default function WasteCollectionDashboard() {
     >
       {/* Date range selector */}
       <View style={styles.rangeRow}>
-        {(/* 'day', */ ['week', 'month'] as MetricsRange[]).map((r) => (
-          <Pressable
-            key={r}
-            style={[styles.rangeBtn, range === r && styles.rangeBtnActive]}
-            onPress={() => setRange(r)}
-            accessibilityRole="button"
-            accessibilityLabel={t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
-            accessibilityState={{selected: range === r}}
-          >
-            <Text style={[styles.rangeBtnText, range === r && styles.rangeBtnTextActive]}>
-              {t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
-            </Text>
-          </Pressable>
-        ))}
+        {
+          /* 'day', */ (['week', 'month'] as MetricsRange[]).map((r) => (
+            <Pressable
+              key={r}
+              style={[styles.rangeBtn, range === r && styles.rangeBtnActive]}
+              onPress={() => setRange(r)}
+              accessibilityRole="button"
+              accessibilityLabel={t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
+              accessibilityState={{selected: range === r}}
+            >
+              <Text style={[styles.rangeBtnText, range === r && styles.rangeBtnTextActive]}>
+                {t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
+              </Text>
+            </Pressable>
+          ))
+        }
       </View>
 
       {/* Summary cards */}
