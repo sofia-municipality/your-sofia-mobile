@@ -114,7 +114,7 @@ export default function WasteCollectionDashboard() {
     >
       {/* Date range selector */}
       <View style={styles.rangeRow}>
-        {(['day', 'week', 'month'] as MetricsRange[]).map((r) => (
+        {(/* 'day', */ ['week', 'month'] as MetricsRange[]).map((r) => (
           <Pressable
             key={r}
             style={[styles.rangeBtn, range === r && styles.rangeBtnActive]}
