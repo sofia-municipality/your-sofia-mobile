@@ -46,7 +46,8 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Your Sofia to use your location so it can show nearby events and city objects on the map."
+          "locationAlwaysAndWhenInUsePermission": "needed to show upcoming events and city objects around you on the map.",
+          "locationWhenInUsePermission": "needed to show upcoming events and city objects around you on the map."
         }
       ],
       "expo-secure-store",
