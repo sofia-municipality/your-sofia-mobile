@@ -8,6 +8,12 @@ import type {WasteContainer, ContainerStatus, CreateContainerInput} from '../typ
 import type {Signal, CreateSignalInput} from '../types/signal'
 import type {Assignment, CreateAssignmentInput, AssignmentProgress} from '../types/assignment'
 import {environmentManager} from './environment'
+import type {
+  CityDistrict,
+  Subscription,
+  CreateSubscriptionInput,
+  UpdateSubscriptionInput,
+} from '../types/subscription'
 
 const getApiUrl = () => environmentManager.getApiUrl()
 
@@ -155,7 +161,7 @@ export function getMediaUrl(media: any): string | undefined {
 export async function fetchContainersWithSignals(options?: {
   limit?: number
   page?: number
-  districtId?: number
+  districtId?: number[]
 }): Promise<PayloadResponse<WasteContainer & {signalCount: number; activeSignalCount: number}>> {
   const {limit = 1000, page = 1, districtId} = options || {}
 
@@ -164,8 +170,9 @@ export async function fetchContainersWithSignals(options?: {
     page: page.toString(),
     zoom: '16',
   })
-  if (districtId !== undefined) {
-    params.set('districtId', String(districtId))
+
+  if (districtId && districtId.length > 0) {
+    params.set('districtId', districtId.join(','))
   }
 
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
@@ -233,7 +240,7 @@ export async function fetchContainerClusters(options: {
   minLng: number
   maxLng: number
   status?: ContainerStatus
-  districtId?: number
+  districtId?: number[]
 }): Promise<
   | {type: 'clusters'; docs: ContainerCluster[]; zoom: number}
   | {type: 'markers'; docs: WasteContainer[]; zoom: number}
@@ -248,8 +255,8 @@ export async function fetchContainerClusters(options: {
   if (options.status) {
     params.set('status', options.status)
   }
-  if (options.districtId !== undefined) {
-    params.set('districtId', String(options.districtId))
+  if (options.districtId && options.districtId.length > 0) {
+    params.set('districtId', options.districtId.join(','))
   }
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
@@ -1172,13 +1179,6 @@ export async function fetchCollectionMetrics(from: string, to: string): Promise<
 }
 
 // ─── Subscriptions ────────────────────────────────────────────────────────────
-
-import type {
-  CityDistrict,
-  Subscription,
-  CreateSubscriptionInput,
-  UpdateSubscriptionInput,
-} from '../types/subscription'
 
 /**
  * Fetch all city districts ordered by districtId.
