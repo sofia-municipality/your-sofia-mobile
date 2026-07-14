@@ -203,7 +203,7 @@ export default {
   },
 
   arView: {
-    cleaning: 'Cleaning',
+    cleaning: 'Collection',
     lastCleaned: 'last',
     expectedCleaning: 'next',
     inHours: 'in',
@@ -274,13 +274,13 @@ export default {
     cleanSuccess: 'Container marked as clean successfully',
     cleanError: 'Error marking container as clean',
     cleanConfirm: 'Are you sure you want to mark this container as clean?',
-    lastCleaned: 'Last Cleaned',
+    lastCleaned: 'Last Collection',
     lastObservations: 'Last three observations',
-    cleaningHistory: 'Cleaning History',
-    noHistory: 'No cleaning records found',
+    cleaningHistory: 'Collection History',
+    noHistory: 'No collection records found',
     signals: 'Signals',
     signal: 'Signal',
-    cleaning: 'Cleaning',
+    cleaning: 'Collection',
     signalsCount: '{{count}} signals',
     signalsActive: '{{active}} active',
     cleanDescription:
