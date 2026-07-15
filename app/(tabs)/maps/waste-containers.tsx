@@ -118,7 +118,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setContainersLoading(true)
         setContainersError(null)
         try {
-          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: 24})
+          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: [13, 24]})
           if (isMountedRef.current && data.type === 'markers') {
             setContainers(data.docs)
           }
@@ -140,7 +140,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           zoom: z,
           ...bounds,
           status: statusFilter,
-          districtId: 24,
+          districtId: [13, 24],
         })
         if (isMountedRef.current && data.type === 'clusters') {
           setClusters(data.docs)
