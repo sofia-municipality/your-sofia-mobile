@@ -44,6 +44,8 @@ export default {
     loading: 'Loading...',
     retry: 'Try again',
     unexpectedErrorMessage: 'An unexpected error occurred while loading data. Please try again.',
+    contentTooLongErrorMessage:
+      'This content is too large to display safely. Please open the source link',
     noNews: 'No news available',
     payments: 'Payments',
     cancel: 'Cancel',
