@@ -413,9 +413,15 @@ export default function NewSignal() {
     } catch (error) {
       console.error('Error creating signal:', error)
       setUploadProgress({stage: null, current: 0, total: 0})
+      const isDailyLimitError =
+        error instanceof Error && (error as Error & {status?: number}).status === 429
       Alert.alert(
         t('signals.error'),
-        error instanceof Error ? error.message : t('newSignal.submitError')
+        isDailyLimitError
+          ? t('newSignal.dailyLimitReached')
+          : error instanceof Error
+            ? error.message
+            : t('newSignal.submitError')
       )
     } finally {
       setLoading(false)
