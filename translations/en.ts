@@ -533,6 +533,7 @@ export default {
     photoError: 'Error taking photo',
     submitError: 'Error submitting signal',
     cancelConfirm: 'Are you sure you want to cancel? All data will be lost.',
+    dailyLimitReached: 'You have reached the daily limit of 5 signals. Please try again tomorrow.',
   },
   new: {
     title: 'New',
