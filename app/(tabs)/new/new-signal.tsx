@@ -438,7 +438,10 @@ export default function NewSignal() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContainer}>
           <Text style={styles.messageText}>{t('newSignal.cameraPermissionRequired')}</Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
+          <TouchableOpacity
+            style={[styles.primaryButton, styles.permissionButtonOverride]}
+            onPress={requestPermission}
+          >
             <Text style={styles.primaryButtonText}>{t('newSignal.allowAccess')}</Text>
           </TouchableOpacity>
         </View>
@@ -1123,6 +1126,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+  },
+  permissionButtonOverride: {
+    flex: 0,
+    alignSelf: 'stretch',
   },
   primaryButtonText: {
     fontSize: fontSizes.body,
