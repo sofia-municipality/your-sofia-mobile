@@ -241,6 +241,7 @@ export async function fetchContainerClusters(options: {
   maxLng: number
   status?: ContainerStatus
   districtId?: number[]
+  volumeOptions?: number[]
 }): Promise<
   | {type: 'clusters'; docs: ContainerCluster[]; zoom: number}
   | {type: 'markers'; docs: WasteContainer[]; zoom: number}
@@ -257,6 +258,9 @@ export async function fetchContainerClusters(options: {
   }
   if (options.districtId && options.districtId.length > 0) {
     params.set('districtId', options.districtId.join(','))
+  }
+  if (options.volumeOptions && options.volumeOptions.length > 0) {
+    params.set('volumeOptions', options.volumeOptions.join(','))
   }
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
