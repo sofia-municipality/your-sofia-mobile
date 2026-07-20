@@ -75,12 +75,12 @@ export default function WasteCollectionDashboard() {
     ? [
         {
           status: t('metrics.complianceOnTime'),
-          count: Math.max(0, compliance.scheduledToday - compliance.delayed),
+          count: Math.max(0, compliance.scheduledToday - compliance.delayed - compliance.missed),
           color: colors.success,
         },
         {
           status: t('metrics.complianceDelayed'),
-          count: Math.max(0, compliance.delayed - compliance.missed),
+          count: compliance.delayed,
           color: colors.warning,
         },
         {
@@ -114,20 +114,22 @@ export default function WasteCollectionDashboard() {
     >
       {/* Date range selector */}
       <View style={styles.rangeRow}>
-        {(['day', 'week', 'month'] as MetricsRange[]).map((r) => (
-          <Pressable
-            key={r}
-            style={[styles.rangeBtn, range === r && styles.rangeBtnActive]}
-            onPress={() => setRange(r)}
-            accessibilityRole="button"
-            accessibilityLabel={t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
-            accessibilityState={{selected: range === r}}
-          >
-            <Text style={[styles.rangeBtnText, range === r && styles.rangeBtnTextActive]}>
-              {t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
-            </Text>
-          </Pressable>
-        ))}
+        {
+          /* 'day', */ (['week', 'month'] as MetricsRange[]).map((r) => (
+            <Pressable
+              key={r}
+              style={[styles.rangeBtn, range === r && styles.rangeBtnActive]}
+              onPress={() => setRange(r)}
+              accessibilityRole="button"
+              accessibilityLabel={t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
+              accessibilityState={{selected: range === r}}
+            >
+              <Text style={[styles.rangeBtnText, range === r && styles.rangeBtnTextActive]}>
+                {t(`metrics.last${r.charAt(0).toUpperCase() + r.slice(1)}` as any)}
+              </Text>
+            </Pressable>
+          ))
+        }
       </View>
 
       {/* Summary cards */}

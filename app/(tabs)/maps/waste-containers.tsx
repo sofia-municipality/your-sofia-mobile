@@ -77,6 +77,8 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     longitudeDelta: 0.01,
   })
   const clusterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const locationRef = useRef<Location.LocationObject | null>(null)
+  const mapCenterRef = useRef<{latitude: number; longitude: number} | null>(null)
 
   // Cleanup on unmount
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setContainersLoading(true)
         setContainersError(null)
         try {
-          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: 24})
+          const data = await fetchContainerClusters({zoom: z, ...bounds, districtId: [13, 24]})
           if (isMountedRef.current && data.type === 'markers') {
             setContainers(data.docs)
           }
@@ -138,7 +140,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           zoom: z,
           ...bounds,
           status: statusFilter,
-          districtId: 24,
+          districtId: [13, 24],
         })
         if (isMountedRef.current && data.type === 'clusters') {
           setClusters(data.docs)
@@ -192,7 +194,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         setLocation(currentLocation)
       } catch (error) {
         console.error('Error getting location:', error)
-        Alert.alert(t('common.error'), 'Не можахме да получим текущото ви местоположение.')
+        Alert.alert(t('common.error'), t('map.locationError'))
       }
     })()
   }, [t])
@@ -234,6 +236,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           },
           (pos) => {
             if (!mounted) return
+            locationRef.current = pos
             setLocation(pos)
           }
         )
@@ -463,6 +466,23 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     [selectedContainer, mapCenter, fetchClusters]
   )
 
+  // Poll for server-side changes every 60 seconds so the map stays in sync
+  // without requiring the user to pan/zoom or restart the app.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const center =
+        mapCenterRef.current ??
+        (locationRef.current
+          ? {
+              latitude: locationRef.current.coords.latitude,
+              longitude: locationRef.current.coords.longitude,
+            }
+          : {latitude: 42.683, longitude: 23.315})
+      fetchClusters({...center, ...regionDeltaRef.current})
+    }, 60_000)
+    return () => clearInterval(id)
+  }, [fetchClusters])
+
   // Handle refreshContainerId param from navigation
   useEffect(() => {
     const refreshContainerId = params.refreshContainerId as string | undefined
@@ -507,6 +527,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       <MapView
         ref={mapRef}
         onRegionChangeComplete={(region) => {
+          mapCenterRef.current = {latitude: region.latitude, longitude: region.longitude}
           setMapCenter({
             latitude: region.latitude,
             longitude: region.longitude,
@@ -815,6 +836,7 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     gap: 8,
+    zIndex: 30,
   },
   filterColumn: {
     flex: 1,
