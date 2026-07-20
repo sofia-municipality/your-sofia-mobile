@@ -16,6 +16,10 @@
     "android": "expo run:android",
     "ios": "REACT_NATIVE_PACKAGER_HOSTNAME=localhost expo run:ios",
     "test": "jest",
+    "e2e:build:ios": "detox build --configuration ios.sim.debug",
+    "e2e:test:ios": "detox test --configuration ios.sim.debug",
+    "e2e:build:android": "detox build --configuration android.emulator.debug",
+    "e2e:test:android": "detox test --configuration android.emulator.debug",
     "update:development": "eas update --channel development",
     "update:preview": "eas update --channel preview",
     "update:production": "eas update --channel production"
@@ -86,6 +90,7 @@
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
     "cross-env": "^10.1.0",
+    "detox": "20.51.4",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
