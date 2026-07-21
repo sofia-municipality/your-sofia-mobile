@@ -18,9 +18,12 @@ import {useRouter, useLocalSearchParams} from 'expo-router'
 import {useFocusEffect} from '@react-navigation/native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
+import * as Location from 'expo-location'
 import {WasteContainerForm, type WasteContainerFormData} from '../../../forms/waste-container'
+import {DrinkingFountainForm, type DrinkingFountainFormData} from '../../../forms/drinking-fountain'
 import {
   createWasteContainer,
+  createDrinkingFountain,
   updateWasteContainer,
   fetchWasteContainerById,
 } from '../../../lib/payload'
@@ -37,19 +40,29 @@ interface Photo {
   uri: string
 }
 
+type CityObjectType = 'waste-container' | 'drinking-fountain'
+
 export default function NewCityObjectScreen() {
   const {t} = useTranslation()
   const router = useRouter()
   const params = useLocalSearchParams()
   const cameraRef = useRef<CameraView>(null)
   const formRef = useRef<any>(null)
-  const {isContainerAdmin, token} = useAuth()
+  const {isContainerAdmin, isInfrastructureAdmin, isFountainAdmin, token} = useAuth()
+
+  // Roles allowed to create drinking fountains: general infrastructure admins
+  // plus the dedicated fountain admin.
+  const canManageFountains = isInfrastructureAdmin || isFountainAdmin
 
   // Check if we're editing an existing container
   const containerId = params.containerId as string | undefined
   const isEditing = !!containerId
 
   const [permission, requestPermission] = useCameraPermissions()
+  // Fountain-only admins start on the fountain form (they can't submit containers).
+  const [objectType, setObjectType] = useState<CityObjectType>(
+    isFountainAdmin && !isContainerAdmin ? 'drinking-fountain' : 'waste-container'
+  )
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
   const [photos, setPhotos] = useState<Photo[]>([])
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null)
@@ -75,6 +88,12 @@ export default function NewCityObjectScreen() {
       ])
     }
   }, [isContainerAdmin, isEditing, t, router])
+
+  React.useEffect(() => {
+    if (!canManageFountains && objectType === 'drinking-fountain') {
+      setObjectType('waste-container')
+    }
+  }, [canManageFountains, objectType])
 
   // Load existing container if editing
   React.useEffect(() => {
@@ -115,12 +134,29 @@ export default function NewCityObjectScreen() {
 
   // Get current location
   React.useEffect(() => {
-    if (!isEditing && !currentLocation) {
-      // Use a default Sofia location if we can't get user location
-      setCurrentLocation({
-        latitude: 42.6977,
-        longitude: 23.3219,
-      })
+    if (isEditing || currentLocation) return
+    let mounted = true
+    ;(async () => {
+      try {
+        const {status} = await Location.requestForegroundPermissionsAsync()
+        if (status === 'granted') {
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          })
+          if (mounted) {
+            setCurrentLocation({latitude: pos.coords.latitude, longitude: pos.coords.longitude})
+          }
+          return
+        }
+      } catch (error) {
+        console.error('Error getting location:', error)
+      }
+      if (mounted) {
+        setCurrentLocation({latitude: 42.6977, longitude: 23.3219})
+      }
+    })()
+    return () => {
+      mounted = false
     }
   }, [isEditing, currentLocation])
 
@@ -249,6 +285,38 @@ export default function NewCityObjectScreen() {
     }
   }
 
+  const handleFountainSubmit = async (data: DrinkingFountainFormData) => {
+    if (!canManageFountains) {
+      Alert.alert(t('common.error'), t('newCityObject.adminOnly'))
+      return
+    }
+
+    setLoading(true)
+    try {
+      if (!token) {
+        throw new Error('Authentication required')
+      }
+      await createDrinkingFountain(data, token)
+      Alert.alert(t('common.success'), t('newCityObject.createSuccess'), [
+        {
+          text: 'OK',
+          onPress: () => {
+            setShowCamera(false)
+            setTimeout(() => router.back(), 80)
+          },
+        },
+      ])
+    } catch (error) {
+      console.error('Error creating fountain:', error)
+      Alert.alert(
+        t('common.error'),
+        error instanceof Error ? error.message : t('newCityObject.createError')
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Reset form when tab is focused
   useFocusEffect(
     useCallback(() => {
@@ -280,9 +348,38 @@ export default function NewCityObjectScreen() {
     )
   }
 
-  if (!permission.granted) {
+  const objectTypeSelector = !isEditing && canManageFountains && (
+    <View style={styles.typeSelectorContainer}>
+      <Text style={styles.typeSelectorLabel}>{t('newCityObject.objectType')}</Text>
+      <View style={styles.typeChipsRow}>
+        {(
+          [
+            {key: 'waste-container', label: t('newSignal.objectTypes.wasteContainer')},
+            {key: 'drinking-fountain', label: t('newSignal.objectTypes.drinkingFountain')},
+          ] as {key: CityObjectType; label: string}[]
+        ).map((type) => (
+          <TouchableOpacity
+            key={type.key}
+            style={[styles.typeChip, objectType === type.key && styles.typeChipActive]}
+            onPress={() => setObjectType(type.key)}
+            accessibilityRole="button"
+            accessibilityState={{selected: objectType === type.key}}
+          >
+            <Text
+              style={[styles.typeChipText, objectType === type.key && styles.typeChipTextActive]}
+            >
+              {type.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  )
+
+  if (!permission.granted && objectType === 'waste-container') {
     return (
       <SafeAreaView style={styles.container}>
+        {objectTypeSelector}
         <View style={styles.centerContainer}>
           <Text style={styles.messageText}>{t('newSignal.cameraPermissionRequired')}</Text>
           <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
@@ -303,54 +400,58 @@ export default function NewCityObjectScreen() {
         enableOnAndroid={false}
         extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
       >
+        {objectTypeSelector}
+
         {/* Camera Section */}
-        <View style={styles.cameraContainer}>
-          {showCamera && !isEditing ? (
-            <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
-          ) : (
-            <View style={styles.camera} />
-          )}
-          {/* Coordinates Overlay */}
-          {currentLocation && (
-            <View style={styles.coordinatesOverlay}>
-              <MapPinIcon size={14} color="#fff" />
-              <Text style={styles.coordinatesText}>
-                {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
+        {objectType === 'waste-container' && (
+          <View style={styles.cameraContainer}>
+            {showCamera && !isEditing ? (
+              <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
+            ) : (
+              <View style={styles.camera} />
+            )}
+
+            {currentLocation && (
+              <View style={styles.coordinatesOverlay}>
+                <MapPinIcon size={14} color="#fff" />
+                <Text style={styles.coordinatesText}>
+                  {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.dateTimeOverlay}>
+              <Text style={styles.dateTimeText}>
+                {currentDateTime.toLocaleDateString('bg-BG', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                })}{' '}
+                {currentDateTime.toLocaleTimeString('bg-BG', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                })}
               </Text>
             </View>
-          )}
-          {/* Date/Time Overlay */}
-          <View style={styles.dateTimeOverlay}>
-            <Text style={styles.dateTimeText}>
-              {currentDateTime.toLocaleDateString('bg-BG', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })}{' '}
-              {currentDateTime.toLocaleTimeString('bg-BG', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-              })}
-            </Text>
-          </View>
-          {!isEditing && (
-            <View style={styles.cameraOverlay}>
-              <View style={styles.cameraButtonsContainer}>
-                <View style={styles.uploadButtonPlaceholder} />
-                <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
-                  <View style={styles.captureButtonInner} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
-                  <Upload size={24} color="#fff" />
-                </TouchableOpacity>
+            {!isEditing && (
+              <View style={styles.cameraOverlay}>
+                <View style={styles.cameraButtonsContainer}>
+                  <View style={styles.uploadButtonPlaceholder} />
+                  <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+                    <View style={styles.captureButtonInner} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.uploadButton} onPress={pickImageFromGallery}>
+                    <Upload size={24} color="#fff" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
-        </View>
+            )}
+          </View>
+        )}
 
         {/* Photo Chips */}
-        {photos.length > 0 && (
+        {objectType === 'waste-container' && photos.length > 0 && (
           <View style={styles.photosContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {photos.map((photo) => (
@@ -373,16 +474,24 @@ export default function NewCityObjectScreen() {
           </View>
         )}
 
-        {/* Container Form */}
-        <WasteContainerForm
-          ref={formRef}
-          container={container}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isSubmitting={loading}
-          isEditing={true}
-          canEdit={isContainerAdmin}
-        />
+        {objectType === 'waste-container' ? (
+          <WasteContainerForm
+            ref={formRef}
+            container={container}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isSubmitting={loading}
+            isEditing={true}
+            canEdit={isContainerAdmin}
+          />
+        ) : (
+          <DrinkingFountainForm
+            initialLocation={currentLocation}
+            onSubmit={handleFountainSubmit}
+            onCancel={handleCancel}
+            isSubmitting={loading}
+          />
+        )}
       </KeyboardAwareScrollView>
 
       {/* Full-Screen Photo Viewer */}
@@ -414,6 +523,43 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: 12,
+  },
+  typeSelectorContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  typeSelectorLabel: {
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.semiBold,
+    color: colors.textPrimary,
+    marginBottom: 8,
+  },
+  typeChipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  typeChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  typeChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  typeChipText: {
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.semiBold,
+    color: colors.textSecondary,
+  },
+  typeChipTextActive: {
+    color: colors.surface,
   },
   cameraContainer: {
     height: height * 0.4,

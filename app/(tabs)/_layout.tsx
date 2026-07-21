@@ -37,7 +37,10 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
   const {closedSignalsCount} = useNotifications()
   const canAccessNewTab =
     isAuthenticated &&
-    (user?.role === 'admin' || user?.role === 'containerAdmin' || user?.role === 'inspector')
+    (user?.role === 'admin' ||
+      user?.role === 'containerAdmin' ||
+      user?.role === 'fountainAdmin' ||
+      user?.role === 'inspector')
 
   return (
     <Tabs

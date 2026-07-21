@@ -309,7 +309,7 @@ export default function NewSignal() {
           'road-damage': 'street-damage',
           'park-bench': 'green-spaces',
           playground: 'green-spaces',
-          'drinking-fountain': 'other',
+          'drinking-fountain': 'drinking-fountain',
           tree: 'green-spaces',
           car: 'parking',
           pole: 'other',
