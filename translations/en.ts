@@ -322,6 +322,9 @@ export default {
     collectionFrequency_one: '{{count}} time/week',
     collectionFrequency_other: '{{count}} times/week',
     triaditsaOnlyAvailability: 'The containers are enabled only for Triaditsa.',
+    triaditsaAndMladostOnlyAvailability:
+      'The containers are enabled only for Triaditsa and Mladost.',
+    limitedToDistricts: 'The containers are enabled for districts {{districts}} only',
     collectionDay: {
       '1': 'Monday',
       '2': 'Tuesday',
