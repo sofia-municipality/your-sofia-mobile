@@ -9,21 +9,30 @@ describe('Login screen', () => {
     await device.reloadReactNative()
 
     // First launch shows a one-time "what's new" screen; dismiss it if present.
+    // On Android its (async, remotely-checked) content can take a while to
+    // mount, so this needs a generous timeout — a race here leaves the modal
+    // covering the header when the next step tries to tap the profile icon.
     try {
       await waitFor(element(by.label('Напред')))
         .toBeVisible()
-        .withTimeout(3000)
+        .withTimeout(15000)
       await element(by.label('Напред')).tap()
     } catch {
       // already dismissed in a prior test, nothing to do
     }
-  })
 
-  it('navigates from the profile tab to the login screen', async () => {
     // "profile" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —
     // it's reached via the person icon in the home header. That icon's
     // accessibilityLabel is literally "profile.title" (a missing i18n key
     // in app/_layout.tsx — t('profile.title') has no matching translation).
+    // Wait for it rather than tapping immediately: the "what's new" dismiss
+    // above may still be mid-animation.
+    await waitFor(element(by.label('profile.title')))
+      .toBeVisible()
+      .withTimeout(10000)
+  })
+
+  it('navigates from the profile tab to the login screen', async () => {
     await element(by.label('profile.title')).tap()
     await element(by.label('Вход')).atIndex(0).tap()
 
@@ -32,10 +41,6 @@ describe('Login screen', () => {
   })
 
   it('shows a validation alert when submitting the form empty', async () => {
-    // "profile" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —
-    // it's reached via the person icon in the home header. That icon's
-    // accessibilityLabel is literally "profile.title" (a missing i18n key
-    // in app/_layout.tsx — t('profile.title') has no matching translation).
     await element(by.label('profile.title')).tap()
     await element(by.label('Вход')).atIndex(0).tap()
 

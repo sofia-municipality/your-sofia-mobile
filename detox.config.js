@@ -19,12 +19,29 @@ module.exports = {
       build:
         "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'",
     },
+    'android.release': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/release/app-release.apk',
+      testBinaryPath:
+        'android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk',
+      // Scoped to :app only — the unscoped `assembleAndroidTest` builds the
+      // androidTest variant for every module, including
+      // react-native-gesture-handler's own (which hits an unrelated
+      // libfbjni.so duplicate-file merge conflict).
+      build:
+        'cd android && ./gradlew :app:assembleRelease :app:assembleAndroidTest -DtestBuildType=release && cd ..',
+    },
+
     'android.debug': {
       type: 'android.apk',
       binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
       testBinaryPath: 'android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk',
+      // Scoped to :app only — the unscoped `assembleAndroidTest` builds the
+      // androidTest variant for every module, including
+      // react-native-gesture-handler's own (which hits an unrelated
+      // libfbjni.so duplicate-file merge conflict).
       build:
-        'cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..',
+        'cd android && ./gradlew :app:assembleDebug :app:assembleAndroidTest -DtestBuildType=debug && cd ..',
     },
   },
   devices: {
@@ -41,7 +58,7 @@ module.exports = {
       device: {
         // Must match an AVD you've already created (Android Studio > Device Manager,
         // or `avdmanager create avd -n Pixel_7_API_34 ...`). Rename to match your setup.
-        avdName: 'Pixel_7_API_34',
+        avdName: 'Pixel_10_Pro',
       },
     },
   },
@@ -53,6 +70,10 @@ module.exports = {
     'android.emulator.debug': {
       device: 'emulator',
       app: 'android.debug',
+    },
+    'android.emulator.release': {
+      device: 'emulator',
+      app: 'android.release',
     },
   },
 }
