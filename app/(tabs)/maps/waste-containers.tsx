@@ -525,7 +525,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     <View style={styles.container}>
       <View style={styles.availabilityBanner}>
         <Text style={styles.availabilityBannerText}>
-          {t('wasteContainers.triaditsaOnlyAvailability')}
+          {t('wasteContainers.triaditsaAndMladostOnlyAvailability')}
         </Text>
       </View>
 
