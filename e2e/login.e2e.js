@@ -1,27 +1,48 @@
 describe('Login screen', () => {
   beforeAll(async () => {
-    await device.launchApp()
+    // Auto-grant the notifications permission so the native OS prompt
+    // doesn't block the app from reaching the foreground/active state.
+    await device.launchApp({permissions: {notifications: 'YES', location: 'always'}})
   })
 
   beforeEach(async () => {
     await device.reloadReactNative()
+
+    // First launch shows a one-time "what's new" screen; dismiss it if present.
+    try {
+      await waitFor(element(by.label('Напред')))
+        .toBeVisible()
+        .withTimeout(3000)
+      await element(by.label('Напред')).tap()
+    } catch {
+      // already dismissed in a prior test, nothing to do
+    }
   })
 
   it('navigates from the profile tab to the login screen', async () => {
-    await element(by.text('Профил')).atIndex(0).tap()
+    // "profile" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —
+    // it's reached via the person icon in the home header. That icon's
+    // accessibilityLabel is literally "profile.title" (a missing i18n key
+    // in app/_layout.tsx — t('profile.title') has no matching translation).
+    await element(by.label('profile.title')).tap()
     await element(by.label('Вход')).atIndex(0).tap()
 
-    await expect(element(by.label('Имейл'))).toBeVisible()
-    await expect(element(by.label('Парола'))).toBeVisible()
+    await expect(element(by.label('Имейл')).atIndex(0)).toBeVisible()
+    await expect(element(by.label('Парола')).atIndex(0)).toBeVisible()
   })
 
   it('shows a validation alert when submitting the form empty', async () => {
-    await element(by.text('Профил')).atIndex(0).tap()
+    // "profile" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —
+    // it's reached via the person icon in the home header. That icon's
+    // accessibilityLabel is literally "profile.title" (a missing i18n key
+    // in app/_layout.tsx — t('profile.title') has no matching translation).
+    await element(by.label('profile.title')).tap()
     await element(by.label('Вход')).atIndex(0).tap()
 
-    // Submit button on the login screen shares the same label as the
-    // profile screen's "log in" button (both are t('auth.login')).
-    await element(by.label('Вход')).atIndex(0).tap()
+    // On the login screen itself, "Вход" also matches the screen's own
+    // heading text (atIndex(0)) before the actual submit button
+    // (atIndex(1)) — verified via `detox test --loglevel verbose`.
+    await element(by.label('Вход')).atIndex(1).tap()
 
     await expect(element(by.text('Грешка'))).toBeVisible()
     await expect(element(by.text('Моля, попълнете всички полета'))).toBeVisible()

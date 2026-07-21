@@ -10,11 +10,14 @@ module.exports = {
     },
   },
   apps: {
-    'ios.debug': {
+    'ios.release': {
+      // Release (not Debug) so the JS bundle is embedded at build time —
+      // a Debug build launches into expo-dev-client's dev-server picker
+      // screen instead of the app, which stalls device.reloadReactNative().
       type: 'ios.app',
-      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/YourSofia.app',
+      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/YourSofia.app',
       build:
-        "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'",
+        "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'",
     },
     'android.debug': {
       type: 'android.apk',
@@ -28,7 +31,9 @@ module.exports = {
     simulator: {
       type: 'ios.simulator',
       device: {
-        type: 'iPhone 16',
+        // 'iPhone 16' isn't installed on every machine — check `xcrun simctl
+        // list devices available` and match whatever's actually there.
+        type: 'iPhone 16e',
       },
     },
     emulator: {
@@ -41,9 +46,9 @@ module.exports = {
     },
   },
   configurations: {
-    'ios.sim.debug': {
+    'ios.sim.release': {
       device: 'simulator',
-      app: 'ios.debug',
+      app: 'ios.release',
     },
     'android.emulator.debug': {
       device: 'emulator',
