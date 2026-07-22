@@ -40,3 +40,7 @@ yarn-error.*
 # detox
 /artifacts/
 ios/build/
+
+
+/.idea/
+/.vscode/
