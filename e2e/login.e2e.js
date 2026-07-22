@@ -12,11 +12,18 @@ describe('Login screen', () => {
     // On Android its (async, remotely-checked) content can take a while to
     // mount, so this needs a generous timeout — a race here leaves the modal
     // covering the header when the next step tries to tap the profile icon.
+    //
+    // atIndex(0): the button's own accessibilityLabel and its inner Text's
+    // text both equal "Напред", so by.label('Напред') matches two views
+    // (the touchable and its label) — same ambiguity as "Вход" below.
+    // Without it, Espresso can resolve the match to either view non-
+    // deterministically, and toBeVisible()/tap() silently fail against the
+    // wrong one, leaving the modal up for the rest of the test.
     try {
-      await waitFor(element(by.label('Напред')))
+      await waitFor(element(by.label('Напред')).atIndex(0))
         .toBeVisible()
         .withTimeout(15000)
-      await element(by.label('Напред')).tap()
+      await element(by.label('Напред')).atIndex(0).tap()
     } catch {
       // already dismissed in a prior test, nothing to do
     }
