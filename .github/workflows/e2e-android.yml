@@ -62,6 +62,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Install libpulse0
+        # Without it, `emulator -version` fails and Detox can't detect the
+        # emulator version — which makes it skip the adb-reverse port patch
+        # it applies for older emulators, breaking the app<->host websocket.
+        run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
+
       - name: Run Detox tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
