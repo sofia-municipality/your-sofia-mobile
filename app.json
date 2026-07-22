@@ -76,7 +76,8 @@
             "defaultChannel": "default"
           }
         }
-      ]
+      ],
+      "./plugins/withDetoxAndroid.js"
     ],
     "experiments": {
       "typedRoutes": true
