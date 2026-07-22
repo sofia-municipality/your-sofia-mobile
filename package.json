@@ -20,7 +20,7 @@
     "e2e:test:ios": "detox test --configuration ios.sim.release",
     "e2e:debug_test:ios": "detox test --inspect-brk --configuration ios.sim.release",
     "e2e:build:android": "detox build --configuration android.emulator.release",
-    "e2e:test:android": "detox test --configuration android.emulator.release",
+    "e2e:test:android": "detox test --configuration android.emulator.release --loglevel verbose",
     "e2e:debug_test:android": "detox test --inspect-brk --configuration android.emulator.release",
     "update:development": "eas update --channel development",
     "update:preview": "eas update --channel preview",
