@@ -1,4 +1,9 @@
-const {withAppBuildGradle, withSettingsGradle, withDangerousMod} = require('expo/config-plugins')
+const {
+  withAppBuildGradle,
+  withSettingsGradle,
+  withDangerousMod,
+  withGradleProperties,
+} = require('expo/config-plugins')
 const fs = require('fs')
 const path = require('path')
 
@@ -108,9 +113,28 @@ class DetoxTest {
   ])
 }
 
+// Building assembleRelease + assembleAndroidTest together (as Detox's build
+// command does) runs lintVital and dex-merging concurrently, which OOMs the
+// default 512m Metaspace from Expo's generated gradle.properties.
+function withDetoxAndroidGradleMemory(config) {
+  return withGradleProperties(config, (config) => {
+    const jvmArgs = config.modResults.find(
+      (item) => item.type === 'property' && item.key === 'org.gradle.jvmargs'
+    )
+    const value = '-Xmx4096m -XX:MaxMetaspaceSize=1024m'
+    if (jvmArgs) {
+      jvmArgs.value = value
+    } else {
+      config.modResults.push({type: 'property', key: 'org.gradle.jvmargs', value})
+    }
+    return config
+  })
+}
+
 module.exports = function withDetoxAndroid(config) {
   config = withDetoxAndroidBuildGradle(config)
   config = withDetoxAndroidSettingsGradle(config)
   config = withDetoxTestClass(config)
+  config = withDetoxAndroidGradleMemory(config)
   return config
 }
