@@ -413,9 +413,15 @@ export default function NewSignal() {
     } catch (error) {
       console.error('Error creating signal:', error)
       setUploadProgress({stage: null, current: 0, total: 0})
+      const isDailyLimitError =
+        error instanceof Error && (error as Error & {status?: number}).status === 429
       Alert.alert(
         t('signals.error'),
-        error instanceof Error ? error.message : t('newSignal.submitError')
+        isDailyLimitError
+          ? t('newSignal.dailyLimitReached')
+          : error instanceof Error
+            ? error.message
+            : t('newSignal.submitError')
       )
     } finally {
       setLoading(false)
@@ -438,7 +444,10 @@ export default function NewSignal() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContainer}>
           <Text style={styles.messageText}>{t('newSignal.cameraPermissionRequired')}</Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
+          <TouchableOpacity
+            style={[styles.primaryButton, styles.permissionButtonOverride]}
+            onPress={requestPermission}
+          >
             <Text style={styles.primaryButtonText}>{t('newSignal.allowAccess')}</Text>
           </TouchableOpacity>
         </View>
@@ -1123,6 +1132,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+  },
+  permissionButtonOverride: {
+    flex: 0,
+    alignSelf: 'stretch',
   },
   primaryButtonText: {
     fontSize: fontSizes.body,

@@ -326,6 +326,9 @@ export default {
     collectionFrequency_one: '{{count}} път/седмица',
     collectionFrequency_other: '{{count}} пъти/седмица',
     triaditsaOnlyAvailability: 'Контейнерите са активирани само за район Триадица.',
+    triaditsaAndMladostOnlyAvailability:
+      'Контейнерите са активирани само за райони Триадица и Младост.',
+    limitedToDistricts: 'Контейнерите са активирани само за райони {{districts}}',
     collectionDay: {
       '1': 'Понеделник',
       '2': 'Вторник',
@@ -545,6 +548,7 @@ export default {
     photoError: 'Грешка при заснемане на снимка',
     submitError: 'Грешка при подаване на сигнал',
     cancelConfirm: 'Сигурни ли сте, че искате да откажете? Всички данни ще бъдат изгубени.',
+    dailyLimitReached: 'Достигнахте дневния лимит от 5 сигнала. Моля, опитайте отново утре.',
   },
   new: {
     title: 'Създай',
