@@ -105,6 +105,16 @@ pnpm android
 pnpm ios
 ```
 
+### Running against the Staging API
+
+Set `EXPO_PUBLIC_STAGING_API_URL` in `.env.local`, then start Metro with the staging default:
+
+```bash
+pnpm dev:staging
+```
+
+You can also copy the staging values from `.env.staging.example`.
+
 ### 4. Create a Branch
 
 ```bash

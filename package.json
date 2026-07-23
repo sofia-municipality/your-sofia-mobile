@@ -7,6 +7,7 @@
   "packageManager": "pnpm@10.0.0",
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start --dev-client",
+    "dev:staging": "cross-env EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_DEFAULT_ENV=staging expo start --dev-client",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
