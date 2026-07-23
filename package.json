@@ -17,6 +17,12 @@
     "android": "expo run:android",
     "ios": "REACT_NATIVE_PACKAGER_HOSTNAME=localhost expo run:ios",
     "test": "jest",
+    "e2e:build:ios": "detox build --configuration ios.sim.release",
+    "e2e:test:ios": "detox test --configuration ios.sim.release --cleanup",
+    "e2e:debug_test:ios": "detox test --inspect-brk --configuration ios.sim.release",
+    "e2e:build:android": "detox build --configuration android.emulator.release",
+    "e2e:test:android": "detox test --configuration android.emulator.release --loglevel verbose",
+    "e2e:debug_test:android": "detox test --inspect-brk --configuration android.emulator.release",
     "update:development": "eas update --channel development",
     "update:preview": "eas update --channel preview",
     "update:production": "eas update --channel production"
@@ -87,6 +93,7 @@
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
     "cross-env": "^10.1.0",
+    "detox": "20.51.4",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
@@ -107,6 +114,9 @@
     }
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "detox"
+    ],
     "overrides": {
       "fast-uri": "^3.1.1",
       "brace-expansion": "^5.0.6",
@@ -125,6 +135,9 @@
       "postcss": ">=8.5.10",
       "uuid": ">=11.1.1",
       "js-yaml": ">=4.2.0"
+    },
+    "patchedDependencies": {
+      "detox": "patches/detox.patch"
     }
   }
 }

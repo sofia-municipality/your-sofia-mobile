@@ -1,0 +1,69 @@
+name: E2E iOS
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+
+jobs:
+  e2e-ios:
+    name: Detox E2E (iOS)
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            pods-${{ runner.os }}-
+
+      - name: Install CocoaPods dependencies
+        run: pod install
+        working-directory: ios
+
+      - name: Build Detox iOS app
+        run: pnpm e2e:build:ios
+
+      - name: Install applesimutils
+        run: |
+          brew tap wix/brew
+          brew trust --formula wix/brew/applesimutils
+          brew install applesimutils
+
+      - name: Build Detox framework cache
+        # detox's own postinstall script builds this (gated behind
+        # pnpm.onlyBuiltDependencies), but whether it lands on the Xcode
+        # version this runner ends up using at test time isn't guaranteed —
+        # confirmed on a real run: "ignored build scripts" no longer listed
+        # detox, yet the framework still didn't match. This is Detox's own
+        # documented fix for a framework/Xcode-version mismatch, and it's
+        # fast (~1-2s locally): it just extracts a bundled binary.
+        run: npx detox clean-framework-cache && npx detox build-framework-cache
+
+      - name: Run Detox tests on iOS simulator
+        run: pnpm e2e:test:ios

@@ -36,3 +36,11 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 .gstack/
+
+# detox
+/artifacts/
+ios/build/
+
+
+/.idea/
+/.vscode/
