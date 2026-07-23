@@ -1,0 +1,26 @@
+diff --git a/src/devices/runtime/RuntimeDevice.js b/src/devices/runtime/RuntimeDevice.js
+index 78b1c612038c6a6163c9d573c5fd188fc15fda27..1a858095ea4368ac921667aa005b26cdd9007b78 100644
+--- a/src/devices/runtime/RuntimeDevice.js
++++ b/src/devices/runtime/RuntimeDevice.js
+@@ -427,8 +427,20 @@ class RuntimeDevice {
+   }
+ 
+   _prepareLaunchArgs(additionalLaunchArgs) {
++    // DETOX_DEVICE_SERVER_HOST lets the *device-facing* server address
++    // differ from the one Detox's own host-side client (Client.js) uses,
++    // which is always this._sessionConfig.server unchanged. Needed on
++    // Android emulators where `adb reverse`-tunneled "localhost" reports
++    // success but never actually passes traffic in some CI environments —
++    // pointing the app at 10.0.2.2 (the emulator's own host alias, routed
++    // through its SLIRP networking) sidesteps the adb tunnel entirely.
++    let detoxServer = this._sessionConfig.server;
++    if (process.env.DETOX_DEVICE_SERVER_HOST && detoxServer) {
++      detoxServer = detoxServer.replace('localhost', process.env.DETOX_DEVICE_SERVER_HOST);
++    }
++
+     return {
+-      detoxServer: this._sessionConfig.server,
++      detoxServer,
+       detoxSessionId: this._sessionConfig.sessionId,
+       ...additionalLaunchArgs
+     };

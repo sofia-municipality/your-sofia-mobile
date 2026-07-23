@@ -3,6 +3,7 @@ const {
   withSettingsGradle,
   withDangerousMod,
   withGradleProperties,
+  withAndroidManifest,
 } = require('expo/config-plugins')
 const fs = require('fs')
 const path = require('path')
@@ -131,10 +132,50 @@ function withDetoxAndroidGradleMemory(config) {
   })
 }
 
+// Android blocks cleartext (ws://, not wss://) traffic by default for any
+// non-loopback address. That's fine for Detox's usual ws://localhost — the
+// platform always exempts loopback — but DETOX_DEVICE_SERVER_HOST=10.0.2.2
+// (see patches/detox.patch) points the app at the emulator's own host
+// alias instead, a real routable IP the platform doesn't exempt, so it
+// gets silently blocked without this. Gated behind an env var so this
+// relaxation only ever ships in the e2e-only APK, never the real one —
+// this must NOT run for a normal `expo prebuild` / production build.
+function withDetoxAndroidNetworkSecurityConfig(config) {
+  if (process.env.DETOX_E2E_BUILD !== 'true') {
+    return config
+  }
+
+  config = withDangerousMod(config, [
+    'android',
+    async (config) => {
+      const dir = path.join(config.modRequest.platformProjectRoot, 'app/src/main/res/xml')
+      fs.mkdirSync(dir, {recursive: true})
+      fs.writeFileSync(
+        path.join(dir, 'network_security_config.xml'),
+        `<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
+`
+      )
+      return config
+    },
+  ])
+
+  return withAndroidManifest(config, (config) => {
+    const application = config.modResults.manifest.application[0]
+    application.$['android:networkSecurityConfig'] = '@xml/network_security_config'
+    return config
+  })
+}
+
 module.exports = function withDetoxAndroid(config) {
   config = withDetoxAndroidBuildGradle(config)
   config = withDetoxAndroidSettingsGradle(config)
   config = withDetoxTestClass(config)
   config = withDetoxAndroidGradleMemory(config)
+  config = withDetoxAndroidNetworkSecurityConfig(config)
   return config
 }
