@@ -55,5 +55,15 @@ jobs:
           brew trust --formula wix/brew/applesimutils
           brew install applesimutils
 
+      - name: Build Detox framework cache
+        # detox's own postinstall script builds this (gated behind
+        # pnpm.onlyBuiltDependencies), but whether it lands on the Xcode
+        # version this runner ends up using at test time isn't guaranteed —
+        # confirmed on a real run: "ignored build scripts" no longer listed
+        # detox, yet the framework still didn't match. This is Detox's own
+        # documented fix for a framework/Xcode-version mismatch, and it's
+        # fast (~1-2s locally): it just extracts a bundled binary.
+        run: npx detox clean-framework-cache && npx detox build-framework-cache
+
       - name: Run Detox tests on iOS simulator
         run: pnpm e2e:test:ios
