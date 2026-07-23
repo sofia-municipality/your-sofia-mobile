@@ -20,7 +20,12 @@ jobs:
     # instead of nested KVM, same as the iOS job's simulator — matches the
     # environment this was actually verified working in.
     runs-on: macos-latest
-    timeout-minutes: 45
+    # First run measured an uncached Gradle build alone taking ~37 minutes
+    # on macos-latest (vs. ~1 min warm/~15-20 min uncached on Linux) — the
+    # 45-minute budget left almost no room for the emulator to even boot,
+    # and since the job got hard-cancelled the Gradle cache never got to
+    # save, which would've repeated the same wall on every subsequent run.
+    timeout-minutes: 60
 
     steps:
       - name: Checkout code
