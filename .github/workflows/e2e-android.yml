@@ -41,16 +41,23 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Generate native Android project
-        # DETOX_E2E_BUILD gates a network security config (see
-        # plugins/withDetoxAndroid.js) that allows cleartext traffic to
-        # 10.0.2.2 — the emulator's own host alias. Android blocks
-        # cleartext to any non-loopback address by default, which is what
-        # was actually breaking the app<->Detox-server connection: `adb
-        # reverse`'s tunneled "localhost" is exempt (loopback), but this
-        # runner's adb-reverse tunnel itself never passes traffic, and the
-        # obvious fallback address (10.0.2.2) isn't loopback so the app
-        # silently refused to even attempt the connection to it.
-        run: DETOX_E2E_BUILD=true npx expo prebuild --platform android
+        env:
+          # Gates a network security config (see plugins/withDetoxAndroid.js)
+          # that allows cleartext traffic to 10.0.2.2 — the emulator's own
+          # host alias. Android blocks cleartext to any non-loopback address
+          # by default, which is what was actually breaking the
+          # app<->Detox-server connection: `adb reverse`'s tunneled
+          # "localhost" is exempt (loopback), but this runner's adb-reverse
+          # tunnel itself never passes traffic, and the obvious fallback
+          # address (10.0.2.2) isn't loopback so the app silently refused to
+          # even attempt the connection to it.
+          DETOX_E2E_BUILD: 'true'
+          # Without a real key, app.json's "${GOOGLE_MAPS_ANDROID_API_KEY}"
+          # resolves empty and Google Play Services' Maps "dynamite" module
+          # crashes on init (ExtensionSchemaFull "Unable to lookup extension
+          # field offset") the moment a map-bearing screen renders.
+          GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+        run: npx expo prebuild --platform android
 
       - name: Cache Gradle
         uses: actions/cache@v4
