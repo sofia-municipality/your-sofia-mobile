@@ -107,4 +107,10 @@ jobs:
           # DETOX_DEVICE_SERVER_HOST=10.0.2.2 (via patches/detox.patch)
           # points the app at the emulator's own host alias instead of
           # localhost, bypassing the broken adb-reverse tunnel entirely.
-          script: DETOX_DEVICE_SERVER_HOST=10.0.2.2 pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
+          #
+          # `svc power stayon true`: without it, Espresso's own root-view
+          # focus check ("Waited for the root of the view hierarchy to have
+          # window focus... for 10 seconds") fails on this runner — a
+          # known, common cause is the emulator's screen going to sleep
+          # right as the first test starts interacting.
+          script: adb shell svc power stayon true && DETOX_DEVICE_SERVER_HOST=10.0.2.2 pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
