@@ -28,8 +28,9 @@ export const ENVIRONMENTS: Record<Environment, EnvironmentConfig> = {
   },
 }
 
-// Default to development in dev mode, production in production builds
-const DEFAULT_ENV: Environment = __DEV__ ? 'development' : 'production'
+const envOverride = process.env.EXPO_PUBLIC_DEFAULT_ENV as Environment | undefined
+const DEFAULT_ENV: Environment =
+  envOverride && envOverride in ENVIRONMENTS ? envOverride : __DEV__ ? 'development' : 'production'
 
 class EnvironmentManager {
   private currentEnv: Environment = DEFAULT_ENV
@@ -39,6 +40,18 @@ class EnvironmentManager {
     if (this.initialized) return
 
     try {
+      if (envOverride && this.isValidEnvironment(envOverride)) {
+        this.currentEnv = envOverride
+        console.log(
+          '[EnvironmentManager] Using environment override:',
+          this.currentEnv,
+          'API URL:',
+          this.getApiUrl()
+        )
+        this.initialized = true
+        return
+      }
+
       const stored = await AsyncStorage.getItem(STORAGE_KEY)
       console.log('[EnvironmentManager] Loaded stored environment:', stored)
       if (stored && this.isValidEnvironment(stored)) {
