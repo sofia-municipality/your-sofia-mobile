@@ -1,31 +1,33 @@
 name: E2E Android
 
+# PAUSED (2026-07-23): not wired to push/PR — manual trigger only via
+# `gh workflow run e2e-android.yml` (needs this file on the default branch
+# first) or the Actions tab.
+#
+# Status: the app never completes its adb-reverse websocket handshake to
+# the Detox server on ubuntu-latest. Confirmed NOT an app or Detox-config
+# bug — built and ran the exact same emulator version, same app, both
+# default and CI-matching launch flags locally (arm64-v8a + Apple
+# Hypervisor.Framework), and it connects instantly and passes every time.
+# Tried moving this job to macos-latest (same acceleration model that
+# already makes the iOS job reliable) — that avoided the networking
+# problem's territory entirely but hit a different wall: this project's
+# uncached Gradle build alone takes 40-50+ minutes on macos-latest
+# (vs. ~15-20 min on ubuntu-latest, ~1 min warm-cache locally), blowing
+# through even a 60-minute job timeout before a single pass/fail cycle
+# ever completed twice in a row.
+#
+# Revisit with either: a real fix for the Linux adb-reverse handshake, or
+# a way to make the macOS build fast enough to fit a reasonable timeout
+# (e.g. actionable Gradle/JVM tuning specific to macOS runners).
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   e2e-android:
     name: Detox E2E (Android)
-    # ubuntu-latest's Android emulator networking is broken here: the app
-    # never completes its adb-reverse websocket handshake to the Detox
-    # server (confirmed not an app/Detox-config bug — same emulator
-    # version, same app, same launch flags all connect instantly when
-    # reproduced locally). macos-latest uses Apple's Hypervisor.Framework
-    # instead of nested KVM, same as the iOS job's simulator — matches the
-    # environment this was actually verified working in.
-    runs-on: macos-latest
-    # First run measured an uncached Gradle build alone taking ~37 minutes
-    # on macos-latest (vs. ~1 min warm/~15-20 min uncached on Linux) — the
-    # 45-minute budget left almost no room for the emulator to even boot,
-    # and since the job got hard-cancelled the Gradle cache never got to
-    # save, which would've repeated the same wall on every subsequent run.
-    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout code
@@ -68,16 +70,24 @@ jobs:
       - name: Build Detox Android app + test APKs
         run: pnpm e2e:build:android
 
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install libpulse0
+        # Without it, `emulator -version` fails and Detox can't detect the
+        # emulator version — which makes it skip the adb-reverse port patch
+        # it applies for older emulators, breaking the app<->host websocket.
+        run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
+
       - name: Run Detox tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
-          # arm64-v8a, not x86_64: macos-latest runners are Apple Silicon,
-          # so arm64 gets real Hypervisor.Framework acceleration (verified
-          # locally on this exact combination) while x86_64 would fall back
-          # to slow software translation.
-          arch: arm64-v8a
+          arch: x86_64
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
