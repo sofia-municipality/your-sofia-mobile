@@ -12,7 +12,14 @@ on:
 jobs:
   e2e-android:
     name: Detox E2E (Android)
-    runs-on: ubuntu-latest
+    # ubuntu-latest's Android emulator networking is broken here: the app
+    # never completes its adb-reverse websocket handshake to the Detox
+    # server (confirmed not an app/Detox-config bug — same emulator
+    # version, same app, same launch flags all connect instantly when
+    # reproduced locally). macos-latest uses Apple's Hypervisor.Framework
+    # instead of nested KVM, same as the iOS job's simulator — matches the
+    # environment this was actually verified working in.
+    runs-on: macos-latest
     timeout-minutes: 45
 
     steps:
@@ -56,24 +63,16 @@ jobs:
       - name: Build Detox Android app + test APKs
         run: pnpm e2e:build:android
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Install libpulse0
-        # Without it, `emulator -version` fails and Detox can't detect the
-        # emulator version — which makes it skip the adb-reverse port patch
-        # it applies for older emulators, breaking the app<->host websocket.
-        run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
-
       - name: Run Detox tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
-          arch: x86_64
+          # arm64-v8a, not x86_64: macos-latest runners are Apple Silicon,
+          # so arm64 gets real Hypervisor.Framework acceleration (verified
+          # locally on this exact combination) while x86_64 would fall back
+          # to slow software translation.
+          arch: arm64-v8a
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
