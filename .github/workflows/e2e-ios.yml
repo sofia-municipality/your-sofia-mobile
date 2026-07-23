@@ -62,7 +62,7 @@ jobs:
         # has been closed abruptly") without ever actually exiting the
         # process, running out the 45-minute job timeout otherwise. Kill it
         # after a generous timeout and trust the jest summary line instead
-        # of the hung process's own exit code.
+        # of the hung process's own exit code
         run: |
           perl -e 'alarm 900; exec @ARGV' pnpm e2e:test:ios 2>&1 | tee detox-ios.log
           test_exit=${PIPESTATUS[0]}
