@@ -62,10 +62,20 @@ jobs:
         # has been closed abruptly") without ever actually exiting the
         # process, running out the 45-minute job timeout otherwise. Kill it
         # after a generous timeout and trust the jest summary line instead
-        # of the hung process's own exit code
+        # of the hung process's own exit code.
+        #
+        # Redirects to a plain file rather than piping through `tee`: killing
+        # the top-level process doesn't kill its lingering descendants (the
+        # same lingering connections causing the hang in the first place),
+        # and if any of them still hold the pipe's write end open, `tee`
+        # blocks forever waiting for EOF that never comes — reproduced
+        # locally, this hangs the wrapper exactly like the bug it's working
+        # around. A regular file has no such "wait for all writers to close"
+        # semantics, so this is immune to that.
         run: |
-          perl -e 'alarm 900; exec @ARGV' pnpm e2e:test:ios 2>&1 | tee detox-ios.log
-          test_exit=${PIPESTATUS[0]}
+          perl -e 'alarm 900; exec @ARGV' pnpm e2e:test:ios > detox-ios.log 2>&1
+          test_exit=$?
+          cat detox-ios.log
           if grep -qE "^Test Suites: [0-9]+ passed, [0-9]+ total$" detox-ios.log; then
             echo "All test suites passed — treating as success (raw exit code was $test_exit, from a hung teardown)."
             exit 0
