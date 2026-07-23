@@ -72,12 +72,21 @@ jobs:
         # locally, this hangs the wrapper exactly like the bug it's working
         # around. A regular file has no such "wait for all writers to close"
         # semantics, so this is immune to that.
+        #
+        # GitHub Actions runs `run:` steps with `set -e`, so the alarm-killed
+        # command's nonzero exit would abort the script before the grep check
+        # ever ran — reproduced locally too. Wrapping it as an `if` condition
+        # is the standard way to capture a command's exit code without
+        # tripping errexit.
         run: |
-          perl -e 'alarm 900; exec @ARGV' pnpm e2e:test:ios > detox-ios.log 2>&1
-          test_exit=$?
+          if perl -e 'alarm 900; exec @ARGV' pnpm e2e:test:ios > detox-ios.log 2>&1; then
+            test_exit=0
+          else
+            test_exit=$?
+          fi
           cat detox-ios.log
           if grep -qE "^Test Suites: [0-9]+ passed, [0-9]+ total$" detox-ios.log; then
-            echo "All test suites passed — treating as success (raw exit code was $test_exit, from a hung teardown)."
+            echo "All test suites passed — treating as success (raw exit code was $test_exit)."
             exit 0
           fi
           exit $test_exit
