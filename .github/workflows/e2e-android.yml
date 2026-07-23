@@ -81,4 +81,10 @@ jobs:
           # as its own separate shell invocation (and aborts the step on the
           # first non-zero one) rather than as a single cohesive script, so
           # the failure-only logcat dump has to be chained on the same line.
-          script: pnpm e2e:test:android || (echo "--- adb logcat (last 1000 lines) ---"; adb logcat -d -t 1000; exit 1)
+          #
+          # No `-t N` tail limit: that grabs only the last N lines of the
+          # buffer and discards everything before, which previously cut off
+          # the actual first-connection failure and left only the later
+          # retry spam. The full buffer for one boot+test cycle is small
+          # enough to just dump entirely.
+          script: pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
