@@ -14,6 +14,9 @@ jobs:
     name: Detox E2E (Android)
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      DETOX_E2E_BUILD: 'true'
+      GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
       - name: Checkout code
@@ -40,23 +43,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate native Android project
-        env:
-          # Gates a network security config (see plugins/withDetoxAndroid.js)
-          # that allows cleartext traffic to 10.0.2.2 — the emulator's own
-          # host alias. Android blocks cleartext to any non-loopback address
-          # by default, which is what was actually breaking the
-          # app<->Detox-server connection: `adb reverse`'s tunneled
-          # "localhost" is exempt (loopback), but this runner's adb-reverse
-          # tunnel itself never passes traffic, and the obvious fallback
-          # address (10.0.2.2) isn't loopback so the app silently refused to
-          # even attempt the connection to it.
-          DETOX_E2E_BUILD: 'true'
-          # Without a real key, app.json's "${GOOGLE_MAPS_ANDROID_API_KEY}"
-          # resolves empty and Google Play Services' Maps "dynamite" module
-          # crashes on init (ExtensionSchemaFull "Unable to lookup extension
-          # field offset") the moment a map-bearing screen renders.
-          GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+      - name: Prebuild Android project
         run: npx expo prebuild --platform android
 
       - name: Cache Gradle
@@ -69,22 +56,19 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: Build Detox Android app + test APKs
+      - name: Build Detox APKs
         run: pnpm e2e:build:android
 
-      - name: Enable KVM group perms
+      - name: Enable KVM access
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Install libpulse0
-        # Without it, `emulator -version` fails and Detox can't detect the
-        # emulator version — which makes it skip the adb-reverse port patch
-        # it applies for older emulators, breaking the app<->host websocket.
+      - name: Install emulator dependency
         run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
 
-      - name: Run Detox tests on Android emulator
+      - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -93,24 +77,6 @@ jobs:
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
-          # android-emulator-runner runs each line of a multi-line `script`
-          # as its own separate shell invocation (and aborts the step on the
-          # first non-zero one) rather than as a single cohesive script, so
-          # the failure-only logcat dump has to be chained on the same line.
-          #
-          # No `-t N` tail limit: that grabs only the last N lines of the
-          # buffer and discards everything before, which previously cut off
-          # the actual first-connection failure and left only the later
-          # retry spam. The full buffer for one boot+test cycle is small
-          # enough to just dump entirely.
-          #
-          # DETOX_DEVICE_SERVER_HOST=10.0.2.2 (via patches/detox.patch)
-          # points the app at the emulator's own host alias instead of
-          # localhost, bypassing the broken adb-reverse tunnel entirely.
-          #
-          # `svc power stayon true`: without it, Espresso's own root-view
-          # focus check ("Waited for the root of the view hierarchy to have
-          # window focus... for 10 seconds") fails on this runner — a
-          # known, common cause is the emulator's screen going to sleep
-          # right as the first test starts interacting.
-          script: adb shell svc power stayon true && DETOX_DEVICE_SERVER_HOST=10.0.2.2 pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
+          env:
+            DETOX_DEVICE_SERVER_HOST: 10.0.2.2
+          script: adb shell svc power stayon true && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
