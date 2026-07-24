@@ -285,6 +285,145 @@ export async function fetchContainerClusters(options: {
   return data
 }
 
+// ─── Drinking Fountains ─────────────────────────────────────────────────────
+
+export interface DrinkingFountain {
+  id: number
+  /** Public identifier (e.g. DF-RTR-0001); used to link signals to this fountain. */
+  publicNumber: string | null
+  address: string
+  latitude: number
+  longitude: number
+  /** null = no data on whether the fountain works. */
+  isActive: boolean | null
+  protectionStatus: string | null
+  externalLink: string | null
+  districtName: string | null
+  sourceName: string | null
+  statusName: string | null
+  ownerName: string | null
+  activationName: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+/** Return the populated relationship's `name`, or null when it's just an id. */
+function relName(value: unknown): string | null {
+  return value && typeof value === 'object' ? ((value as {name?: string}).name ?? null) : null
+}
+
+/**
+ * Fetch drinking fountains for the map.
+ *
+ * Uses the public collection list endpoint (read access is open) rather than the
+ * admin-only `/map-data` endpoint. The dataset is small, so we load all fountains
+ * in a single request and render them at every zoom level. `depth=1` populates the
+ * lookup relationships (status, source, owner, activation type, district) — all of
+ * which are publicly readable — so the info card can show their names.
+ */
+export async function fetchDrinkingFountains(): Promise<DrinkingFountain[]> {
+  const params = new URLSearchParams({
+    limit: '2000',
+    depth: '1',
+  })
+  const url = `${getApiUrl()}/api/drinking-fountains?${params}`
+  const response = await fetch(url)
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch drinking fountains: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return (data.docs ?? []).map((doc: any) => ({
+    id: doc.id,
+    publicNumber: doc.publicNumber ?? null,
+    address: doc.address,
+    // Payload point fields are stored as [longitude, latitude].
+    latitude: Array.isArray(doc.location) ? doc.location[1] : 0,
+    longitude: Array.isArray(doc.location) ? doc.location[0] : 0,
+    isActive: doc.isActive ?? null,
+    protectionStatus: doc.protectionStatus ?? null,
+    externalLink: doc.externalLink ?? null,
+    districtName: relName(doc.district),
+    sourceName: relName(doc.source),
+    statusName: relName(doc.status),
+    ownerName: relName(doc.owner),
+    activationName: relName(doc.activationType),
+    createdAt: normalizePgTimestamp(doc.createdAt) as string | null,
+    updatedAt: normalizePgTimestamp(doc.updatedAt) as string | null,
+  }))
+}
+
+/** A row of one of the fountain lookup collections (status, source, …). */
+export interface FountainLookup {
+  id: number
+  name: string
+}
+
+async function fetchLookupCollection(slug: string): Promise<FountainLookup[]> {
+  const response = await fetch(`${getApiUrl()}/api/${slug}?limit=100&sort=name`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${slug}: ${response.statusText}`)
+  }
+  const data = await response.json()
+  return (data.docs ?? []).map((doc: any) => ({id: doc.id, name: doc.name}))
+}
+
+/** Possible fountain conditions (e.g. "Добро състояние") — publicly readable. */
+export function fetchFountainStatuses(): Promise<FountainLookup[]> {
+  return fetchLookupCollection('fountain-status')
+}
+
+/** Possible water sources (e.g. "Минерална") — publicly readable. */
+export function fetchFountainSources(): Promise<FountainLookup[]> {
+  return fetchLookupCollection('drinking-fountain-source')
+}
+
+export interface CreateDrinkingFountainInput {
+  address: string
+  location: {latitude: number; longitude: number}
+  isActive: boolean
+  /** Payload row ids of the lookup relationships. */
+  district?: number | string
+  source?: number
+  status?: number
+}
+
+/**
+ * Create a new drinking fountain. Requires a city-infrastructure admin account;
+ * the backend generates the DF-… publicNumber from the chosen district.
+ */
+export async function createDrinkingFountain(
+  input: CreateDrinkingFountainInput,
+  authToken: string
+): Promise<DrinkingFountain> {
+  const {location, ...rest} = input
+  const response = await fetch(`${getApiUrl()}/api/drinking-fountains`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      ...rest,
+      // Payload point fields expect [longitude, latitude]
+      location: [location.longitude, location.latitude],
+    }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    handleAuthError(response)
+    throw new Error(
+      errorData.message || `Failed to create drinking fountain: ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+  return data.doc
+}
+
 /**
  * Fetch waste containers from Payload CMS
  */

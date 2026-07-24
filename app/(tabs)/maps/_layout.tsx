@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native
 import {useTranslation} from 'react-i18next'
 import {Stack} from 'expo-router'
 import WasteContainers from './waste-containers'
+import DrinkingFountains from './drinking-fountains'
 import TransportMap from './transport-bpilot'
 import NewsMap from './news'
 import EventsMap from './events'
@@ -10,7 +11,14 @@ import BgsmetView from './bgsmet-view'
 import ArView from './ar-view'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
-type MapFilter = 'wasteContainers' | 'bgsmetView' | 'transport' | 'news' | 'events' | 'arView'
+type MapFilter =
+  | 'wasteContainers'
+  | 'fountains'
+  | 'bgsmetView'
+  | 'transport'
+  | 'news'
+  | 'events'
+  | 'arView'
 
 export default function MapsLayout() {
   const {t} = useTranslation()
@@ -18,6 +26,7 @@ export default function MapsLayout() {
 
   const filters: {key: MapFilter; label: string}[] = [
     {key: 'wasteContainers', label: t('map.filters.wasteContainers')},
+    {key: 'fountains', label: t('map.filters.fountains')},
     // {key: 'bgsmetView', label: t('map.filters.bgsmetView')},
     // {key: 'transport', label: t('map.filters.transportBpilot')},
     {key: 'news', label: t('map.filters.news')},
@@ -32,6 +41,8 @@ export default function MapsLayout() {
     switch (selectedFilter) {
       case 'wasteContainers':
         return <WasteContainers onOpenAR={openAR} />
+      case 'fountains':
+        return <DrinkingFountains />
       case 'arView':
         return <ArView onClose={closeAR} />
       case 'bgsmetView':

@@ -10,7 +10,14 @@ interface User {
   id: number
   email: string
   name?: string
-  role: 'user' | 'admin' | 'containerAdmin' | 'inspector' | 'wasteCollector'
+  role:
+    | 'user'
+    | 'admin'
+    | 'containerAdmin'
+    | 'fountainAdmin'
+    | 'inspector'
+    | 'wasteCollector'
+    | 'infrastructureAdmin'
 }
 
 export class AuthApiError extends Error {
@@ -34,6 +41,9 @@ interface AuthContextType {
   isAuthenticated: boolean
   isAdmin: boolean
   isContainerAdmin: boolean
+  isInfrastructureAdmin: boolean
+  /** Dedicated role: may create fountains and resolve fountain signals only. */
+  isFountainAdmin: boolean
   isBulkUploadAllowed: boolean
 }
 
@@ -249,6 +259,9 @@ export function AuthProvider({children}: {children: ReactNode}) {
     isAuthenticated: !!user && !!token && !isTokenExpired(token),
     isAdmin: user?.role === 'admin',
     isContainerAdmin: user?.role === 'containerAdmin' || user?.role === 'admin',
+    isInfrastructureAdmin:
+      user?.role === 'admin' || user?.role === 'infrastructureAdmin' || user?.role === 'inspector',
+    isFountainAdmin: user?.role === 'fountainAdmin',
     isBulkUploadAllowed: user?.role === 'admin' || user?.role === 'inspector',
   }
 
