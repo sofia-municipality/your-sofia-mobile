@@ -22,5 +22,23 @@ index 78b1c612038c6a6163c9d573c5fd188fc15fda27..1a858095ea4368ac921667aa005b26cd
 -      detoxServer: this._sessionConfig.server,
 +      detoxServer,
        detoxSessionId: this._sessionConfig.sessionId,
-       ...additionalLaunchArgs
-     };
+         ...additionalLaunchArgs
+      };
+
+diff --git a/android/detox/src/full/java/com/wix/detox/reactnative/idlingresources/uimodule/fabric/FabricUIManagerIdlingResources.kt b/android/detox/src/full/java/com/wix/detox/reactnative/idlingresources/uimodule/fabric/FabricUIManagerIdlingResources.kt
+index d6db5d5d7a4173eae88d97bf06eaeaf8b38c3b94..33b37968f55b91a480b01f5b87bb31ab971f9975 100644
+--- a/android/detox/src/full/java/com/wix/detox/reactnative/idlingresources/uimodule/fabric/FabricUIManagerIdlingResources.kt
++++ b/android/detox/src/full/java/com/wix/detox/reactnative/idlingresources/uimodule/fabric/FabricUIManagerIdlingResources.kt
+@@ -98,7 +98,12 @@ class FabricUIManagerIdlingResources(
+
+       private fun getMountItemDispatcher(): Any {
+             val fabricUIManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC)
+-        val mountItemDispatcher = Reflect.on(fabricUIManager).field("mMountItemDispatcher").get<Any>()
++        val mountItemDispatcherFieldName = if (ReactNativeInfo.rnVersion().minor >= 81) {
++            "mountItemDispatcher"
++        } else {
++            "mMountItemDispatcher"
++        }
++        val mountItemDispatcher = Reflect.on(fabricUIManager).field(mountItemDispatcherFieldName).get<Any>()
+             return mountItemDispatcher
+       }

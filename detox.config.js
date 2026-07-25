@@ -1,5 +1,12 @@
 /** @type {Detox.DetoxConfig} */
 module.exports = {
+  artifacts: {
+    rootDir: '.artifacts',
+    plugins: {
+      log: 'failing',
+      screenshot: 'failing',
+    },
+  },
   testRunner: {
     args: {
       $0: 'jest',

@@ -80,3 +80,11 @@ jobs:
           disable-animations: true
           avd-name: Pixel_10_Pro
           script: adb shell svc power stayon true && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
+
+      - name: Upload Detox artifacts on failure
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-detox-artifacts
+          path: .artifacts
+          if-no-files-found: ignore
