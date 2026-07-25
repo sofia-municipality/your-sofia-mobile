@@ -1,6 +1,7 @@
 name: E2E Android
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -16,6 +17,7 @@ jobs:
     timeout-minutes: 45
     env:
       DETOX_E2E_BUILD: 'true'
+      DETOX_DEVICE_SERVER_HOST: 10.0.2.2
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
@@ -77,6 +79,4 @@ jobs:
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
-          env:
-            DETOX_DEVICE_SERVER_HOST: 10.0.2.2
           script: adb shell svc power stayon true && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
