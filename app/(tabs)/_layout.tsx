@@ -34,7 +34,7 @@ export default function TabLayout() {
 
 function TabLayoutContent({t}: {t: (key: string) => string}) {
   const insets = useSafeAreaInsets()
-  const {isContainerAdmin, isAuthenticated, user} = useAuth()
+  const {isAdmin, isContainerAdmin, isAuthenticated, user} = useAuth()
   const {closedSignalsCount} = useNotifications()
   const canAccessNewTab =
     isAuthenticated &&
@@ -107,6 +107,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       <Tabs.Screen
         name="missions"
         options={{
+          href: isAdmin && isAuthenticated ? '/missions' : null, // Only show for authenticated containerAdmin
           title: t('missions.title'),
           tabBarLabel: t('missions.title'),
           tabBarIcon: ({color}) => <Swords size={24} color={color} />,
