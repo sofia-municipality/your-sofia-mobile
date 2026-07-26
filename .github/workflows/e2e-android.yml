@@ -17,7 +17,6 @@ jobs:
     timeout-minutes: 45
     env:
       DETOX_E2E_BUILD: 'true'
-      DETOX_DEVICE_SERVER_HOST: 10.0.2.2
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
