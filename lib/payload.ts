@@ -15,7 +15,24 @@ import type {
   CreateSubscriptionInput,
   UpdateSubscriptionInput,
 } from '../types/subscription'
-import type {Mission, MissionsFeedResponse} from '../types/mission'
+import type {Mission, MissionsFeedResponse, MissionLevel} from '../types/mission'
+
+export interface CreateMissionInput {
+  signal: string
+  title: string
+  description?: string
+  level: MissionLevel
+  status: 'draft' | 'open'
+  pointsReward: number
+  generalInstructions: string
+  tasks: Array<{
+    title: string
+    instructions: string
+    acceptanceCriteria: string
+    requiresBeforePhoto?: boolean
+    requiresAfterPhoto?: boolean
+  }>
+}
 
 export interface MissionProfileSummary {
   darPoints: number
@@ -1412,6 +1429,38 @@ function transformMissionMedia(mission: any): Mission {
       url: getMediaUrl(m),
     })),
   }
+}
+
+/**
+ * POST /api/missions
+ * Admin-only mission creation endpoint using collection create access.
+ */
+export async function createMission(
+  input: CreateMissionInput,
+  authToken: string
+): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify(input),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    const message =
+      errorData?.message ||
+      errorData?.errors?.[0]?.message ||
+      errorData?.error ||
+      `Failed to create mission: ${response.statusText}`
+    throw new Error(message)
+  }
+
+  const created = await response.json()
+  return transformMissionMedia(created)
 }
 
 /**
