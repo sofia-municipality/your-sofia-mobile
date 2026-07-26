@@ -12,6 +12,7 @@ import {
   ChartNoAxesCombined,
   MapPlus,
   ClipboardList,
+  Swords,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -101,6 +102,15 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           headerTitle: () => (
             <TabHeader title={t('signals.title')} showActionIcon={false} ActionIcon={Plus} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="missions"
+        options={{
+          title: t('missions.title'),
+          tabBarLabel: t('missions.title'),
+          tabBarIcon: ({color}) => <Swords size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen

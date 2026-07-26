@@ -1,9 +1,14 @@
-import React, {createContext, useState, useContext, useEffect, ReactNode} from 'react'
+import React, {createContext, useState, useContext, useEffect, ReactNode, useCallback} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Alert} from 'react-native'
 import {router} from 'expo-router'
 import {environmentManager} from '../lib/environment'
-import {setAuthErrorHandler, updateSubscription} from '../lib/payload'
+import {
+  fetchMissionProfileMe,
+  MissionProfileSummary,
+  setAuthErrorHandler,
+  updateSubscription,
+} from '../lib/payload'
 import {SUBSCRIPTION_ID_KEY} from '../lib/storageKeys'
 
 interface User {
@@ -11,6 +16,8 @@ interface User {
   email: string
   name?: string
   role: 'user' | 'admin' | 'containerAdmin' | 'inspector' | 'wasteCollector'
+  darPoints?: number
+  contributorLevel?: 'beginner' | 'contributor' | 'guardian'
 }
 
 export class AuthApiError extends Error {
@@ -31,6 +38,7 @@ interface AuthContextType {
   logout: () => Promise<void>
   deleteAccount: () => Promise<void>
   resendVerificationEmail: (email: string) => Promise<void>
+  refreshUser: () => Promise<void>
   isAuthenticated: boolean
   isAdmin: boolean
   isContainerAdmin: boolean
@@ -44,9 +52,9 @@ const AUTH_USER_KEY = 'auth_user'
 
 type ApiErrorResponse = {
   message?: string
-  errors?: Array<{
+  errors?: {
     message?: string
-  }>
+  }[]
 }
 
 const extractApiErrorMessage = async (response: Response, fallback: string): Promise<string> => {
@@ -130,15 +138,31 @@ export function AuthProvider({children}: {children: ReactNode}) {
       }
 
       const data = await response.json()
+      let missionProfile: MissionProfileSummary = {
+        darPoints: 0,
+        contributorLevel: 'beginner',
+      }
+
+      try {
+        missionProfile = await fetchMissionProfileMe(data.token)
+      } catch (profileError) {
+        console.warn('[AuthContext] Could not load mission profile on login:', profileError)
+      }
+
+      const mergedUser = {
+        ...data.user,
+        darPoints: missionProfile.darPoints,
+        contributorLevel: missionProfile.contributorLevel,
+      }
 
       // Store token and user data
       await Promise.all([
         AsyncStorage.setItem(AUTH_TOKEN_KEY, data.token),
-        AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user)),
+        AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(mergedUser)),
       ])
 
       setToken(data.token)
-      setUser(data.user)
+      setUser(mergedUser)
 
       // Link the device's anonymous subscription to this user (non-fatal)
       try {
@@ -237,6 +261,38 @@ export function AuthProvider({children}: {children: ReactNode}) {
     }
   }
 
+  // Re-fetches the current user (e.g. darPoints balance after a mission is
+  // approved) without requiring a fresh login.
+  const refreshUser = useCallback(async () => {
+    if (!token) return
+    try {
+      const userResponse = await fetch(`${environmentManager.getApiUrl()}/api/users/me`, {
+        headers: {Authorization: `JWT ${token}`},
+      })
+      let missionProfile: MissionProfileSummary = {darPoints: 0, contributorLevel: 'beginner'}
+
+      try {
+        missionProfile = await fetchMissionProfileMe(token)
+      } catch (profileError) {
+        console.warn('[AuthContext] Could not load mission profile on refresh:', profileError)
+      }
+      const response = userResponse
+      if (!response.ok) return
+      const data = await response.json()
+      const nextUser = {
+        ...(data.user ?? data),
+        darPoints: missionProfile.darPoints,
+        contributorLevel: missionProfile.contributorLevel,
+      }
+      if (nextUser?.id) {
+        setUser(nextUser)
+        await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser))
+      }
+    } catch (error) {
+      console.warn('[AuthContext] Failed to refresh user:', error)
+    }
+  }, [token])
+
   const value: AuthContextType = {
     user,
     token,
@@ -246,6 +302,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
     logout,
     deleteAccount,
     resendVerificationEmail,
+    refreshUser,
     isAuthenticated: !!user && !!token && !isTokenExpired(token),
     isAdmin: user?.role === 'admin',
     isContainerAdmin: user?.role === 'containerAdmin' || user?.role === 'admin',

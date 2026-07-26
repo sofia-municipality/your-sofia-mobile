@@ -24,7 +24,7 @@ import {
   UserX,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect, useCallback, useRef} from 'react'
 import {useFocusEffect, useRouter} from 'expo-router'
 import {GitHubIcon} from '../../components/GitHubIcon'
 import {getUniqueReporterId} from '../../lib/deviceId'
@@ -89,7 +89,8 @@ interface ProfileSection {
 export default function ProfileScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
-  const {user, isAuthenticated, isContainerAdmin, isAdmin, logout, deleteAccount} = useAuth()
+  const {user, isAuthenticated, isContainerAdmin, isAdmin, logout, deleteAccount, refreshUser} =
+    useAuth()
   const {expoPushToken, registerAndSendToken} = useNotifications()
   const [isRegisteringToken, setIsRegisteringToken] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')
@@ -98,7 +99,7 @@ export default function ProfileScreen() {
     active: number
   }>({total: 0, active: 0})
   const [loadingStats, setLoadingStats] = useState(true)
-  const [isFirstFocus, setIsFirstFocus] = useState(true)
+  const hasSkippedFirstFocusRef = useRef(false)
   const [showForgetMeModal, setShowForgetMeModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -132,14 +133,18 @@ export default function ProfileScreen() {
   // Refresh stats when tab comes into focus
   useFocusEffect(
     useCallback(() => {
-      if (isFirstFocus) {
-        setIsFirstFocus(false)
+      if (!hasSkippedFirstFocusRef.current) {
+        hasSkippedFirstFocusRef.current = true
         return
       }
       if (deviceId) {
         loadSignalStats(deviceId)
       }
-    }, [isFirstFocus, deviceId, loadSignalStats])
+      // Refresh darPoints in case a mission was just completed
+      if (isAuthenticated) {
+        refreshUser()
+      }
+    }, [deviceId, loadSignalStats, isAuthenticated, refreshUser])
   )
 
   const handleForgetMeConfirm = () => {
@@ -314,6 +319,10 @@ export default function ProfileScreen() {
             <View style={styles.statCard}>
               <Text style={styles.statNumber}>{loadingStats ? '-' : signalStats.active}</Text>
               <Text style={styles.statLabel}>{t('profile.stats.signalsActive')}</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{user?.darPoints ?? 0}</Text>
+              <Text style={styles.statLabel}>{t('profile.stats.darPoints')}</Text>
             </View>
           </View>
         </View>

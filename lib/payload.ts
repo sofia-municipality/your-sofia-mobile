@@ -15,6 +15,12 @@ import type {
   CreateSubscriptionInput,
   UpdateSubscriptionInput,
 } from '../types/subscription'
+import type {Mission, MissionsFeedResponse} from '../types/mission'
+
+export interface MissionProfileSummary {
+  darPoints: number
+  contributorLevel: 'beginner' | 'contributor' | 'guardian'
+}
 
 const getApiUrl = () => environmentManager.getApiUrl()
 
@@ -1354,4 +1360,291 @@ export async function fetchPushTokenId(token: string): Promise<number | string> 
   const data = await response.json()
   if (!data.docs?.length) throw new Error('Push token not registered on server')
   return data.docs[0].id
+}
+
+/**
+ * Fetches mission profile summary for the authenticated user.
+ */
+export async function fetchMissionProfileMe(authToken: string): Promise<MissionProfileSummary> {
+  const response = await fetch(`${getApiUrl()}/api/mission-profiles/me`, {
+    headers: {
+      Authorization: `JWT ${authToken}`,
+    },
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch mission profile: ${response.statusText}`)
+  }
+
+  const data = (await response.json()) as Partial<MissionProfileSummary>
+  return {
+    darPoints: typeof data.darPoints === 'number' ? data.darPoints : 0,
+    contributorLevel:
+      data.contributorLevel === 'contributor' || data.contributorLevel === 'guardian'
+        ? data.contributorLevel
+        : 'beginner',
+  }
+}
+
+/**
+ * Missions ("Мисии") — gamified quest board
+ */
+
+function transformMissionMedia(mission: any): Mission {
+  return {
+    ...mission,
+    tasks: (mission.tasks ?? []).map((task: any) => ({
+      ...task,
+      beforePhoto: task.beforePhoto
+        ? {...task.beforePhoto, url: getMediaUrl(task.beforePhoto)}
+        : task.beforePhoto,
+      afterPhoto: task.afterPhoto
+        ? {...task.afterPhoto, url: getMediaUrl(task.afterPhoto)}
+        : task.afterPhoto,
+    })),
+    missionBeforePhotos: (mission.missionBeforePhotos ?? []).map((m: any) => ({
+      ...m,
+      url: getMediaUrl(m),
+    })),
+    missionAfterPhotos: (mission.missionAfterPhotos ?? []).map((m: any) => ({
+      ...m,
+      url: getMediaUrl(m),
+    })),
+  }
+}
+
+/**
+ * GET /api/missions/feed — quest board: open missions + the citizen's own
+ * missions, each annotated server-side with `locked`/`unlockRequirement`.
+ */
+export async function fetchMissionsFeed(authToken: string): Promise<MissionsFeedResponse> {
+  const response = await fetch(`${getApiUrl()}/api/missions/feed`, {
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to load missions feed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return {
+    ...data,
+    missions: (data.missions ?? []).map(transformMissionMedia),
+  }
+}
+
+/**
+ * Fetch a single mission by id (depth=1 to populate task/media relationships).
+ */
+export async function fetchMissionById(id: string, authToken?: string): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}?depth=2`, {
+    headers: authToken ? {Authorization: `JWT ${authToken}`} : {},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch mission: ${response.statusText}`)
+  }
+
+  const mission = await response.json()
+  return transformMissionMedia(mission)
+}
+
+/**
+ * POST /api/missions/:id/claim
+ */
+export async function claimMission(id: string, authToken: string): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}/claim`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to claim mission: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Uploads a single photo to /api/media and returns the created media id.
+ * Mirrors the upload-then-reference pattern used by `createSignal`.
+ */
+async function uploadMissionPhoto(
+  photo: {uri: string; type: string; name: string},
+  authToken: string
+): Promise<number> {
+  const formData = new FormData()
+  formData.append('file', {
+    uri: photo.uri,
+    type: photo.type,
+    name: photo.name,
+  } as any)
+
+  const response = await fetch(`${getApiUrl()}/api/media`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+    body: formData,
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Failed to upload photo: ${photo.name}`)
+  }
+
+  const uploaded = await response.json()
+  return uploaded.doc.id
+}
+
+/**
+ * POST /api/missions/:id/submit-task
+ * Uploads before/after photos (if provided) then submits the task progress.
+ */
+export async function submitMissionTask(
+  missionId: string,
+  taskId: string,
+  photos: {
+    before?: {uri: string; type: string; name: string}
+    after?: {uri: string; type: string; name: string}
+  },
+  authToken: string
+): Promise<Mission> {
+  const [beforePhotoId, afterPhotoId] = await Promise.all([
+    photos.before ? uploadMissionPhoto(photos.before, authToken) : Promise.resolve(undefined),
+    photos.after ? uploadMissionPhoto(photos.after, authToken) : Promise.resolve(undefined),
+  ])
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${missionId}/submit-task`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({taskId, beforePhotoId, afterPhotoId}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to submit task: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Uploads mission-level before/after photos (hasMany) and attaches them to
+ * the mission via `POST /:id/photos` (citizens have no generic PATCH access
+ * on missions, so this dedicated endpoint is required).
+ */
+export async function submitMissionOverallPhotos(
+  missionId: string,
+  photos: {
+    before?: {uri: string; type: string; name: string}[]
+    after?: {uri: string; type: string; name: string}[]
+  },
+  authToken: string
+): Promise<Mission> {
+  const beforePhotoIds = photos.before
+    ? await Promise.all(photos.before.map((p) => uploadMissionPhoto(p, authToken)))
+    : []
+  const afterPhotoIds = photos.after
+    ? await Promise.all(photos.after.map((p) => uploadMissionPhoto(p, authToken)))
+    : []
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${missionId}/photos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({beforePhotoIds, afterPhotoIds}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to submit mission photos: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+export async function submitMissionForReview(id: string, authToken: string): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}/submit-for-review`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(
+      errorData.error || `Failed to submit mission for review: ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Fetches other citizens' `ready_for_review` missions available for
+ * community verification (excludes the requester's own missions).
+ */
+export async function fetchVerifiableMissions(authToken: string): Promise<Mission[]> {
+  const params = new URLSearchParams({
+    'where[status][equals]': 'ready_for_review',
+    depth: '1',
+    limit: '50',
+  })
+
+  const response = await fetch(`${getApiUrl()}/api/missions?${params}`, {
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to load verifiable missions: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return (data.docs ?? []).map(transformMissionMedia)
+}
+
+/**
+ * Submits a community verification (approve/reject) for another citizen's
+ * `ready_for_review` mission. Purely advisory — never auto-completes the mission.
+ */
+export async function submitMissionVerification(
+  missionId: string,
+  decision: 'approve' | 'reject',
+  comment: string | undefined,
+  authToken: string
+): Promise<void> {
+  const response = await fetch(`${getApiUrl()}/api/mission-verifications`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({mission: missionId, decision, comment}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    const message =
+      errorData.errors?.[0]?.message ||
+      errorData.message ||
+      `Failed to submit verification: ${response.statusText}`
+    throw new Error(message)
+  }
 }
