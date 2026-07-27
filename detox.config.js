@@ -37,9 +37,6 @@ module.exports = {
       // libfbjni.so duplicate-file merge conflict).
       build:
         'cd android && ./gradlew :app:assembleRelease :app:assembleAndroidTest -DtestBuildType=release && cd ..',
-      launchArgs: {
-        detoxEnableSynchronization: 0,
-      },
     },
 
     'android.debug': {
@@ -52,9 +49,6 @@ module.exports = {
       // libfbjni.so duplicate-file merge conflict).
       build:
         'cd android && ./gradlew :app:assembleDebug :app:assembleAndroidTest -DtestBuildType=debug && cd ..',
-      launchArgs: {
-        detoxEnableSynchronization: 0,
-      },
     },
   },
   devices: {
