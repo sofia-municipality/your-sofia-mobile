@@ -1,6 +1,6 @@
 import React, {useMemo, useRef, useState, useEffect} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker, type Region} from 'react-native-maps'
+import MapView, {Marker, type Region} from '@/lib/Map'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {useUpdates} from '../../../hooks/useUpdates'

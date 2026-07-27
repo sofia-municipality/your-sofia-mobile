@@ -15,7 +15,7 @@ import {
   Modal,
   Linking,
 } from 'react-native'
-import MapView, {Marker, type Region} from 'react-native-maps'
+import MapView, {Marker, type Region} from '@/lib/Map'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'

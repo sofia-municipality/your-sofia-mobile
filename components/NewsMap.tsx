@@ -1,5 +1,5 @@
 import {StyleSheet, View, Dimensions} from 'react-native'
-import MapView, {Marker, type Region} from 'react-native-maps'
+import MapView, {Marker, type Region} from '@/lib/Map'
 import type {NewsItem} from '../types/news'
 import type {MapBounds} from '@/lib/mapBounds'
 import {estimateZoom, getBoundsFromRegion} from '@/lib/mapBounds'

@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native'
-import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
+import MapView, {Marker, PROVIDER_DEFAULT, type MapViewRef} from '@/lib/Map'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {
@@ -53,7 +53,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const router = useRouter()
   useAuth()
   const params = useLocalSearchParams()
-  const mapRef = useRef<MapView>(null)
+  const mapRef = useRef<MapViewRef>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
   const [selectedStateFilter, setSelectedStateFilter] = useState<ContainerFilter>('active')

@@ -26,6 +26,10 @@ jobs:
       # bypassing the tunnel entirely.
       DETOX_E2E_BUILD: 'true'
       DETOX_DEVICE_SERVER_HOST: 10.0.2.2
+      # Read by lib/Map.tsx (inlined into the JS bundle at build time, same
+      # as this repo's other EXPO_PUBLIC_* vars) to swap real MapViews for
+      # an inert stub — see that file for why.
+      EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
