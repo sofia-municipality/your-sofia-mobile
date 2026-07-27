@@ -9,6 +9,7 @@ export type WasteType =
   | 'plastic'
   | 'metal'
   | 'trashCan'
+  | 'bulky-waste-zones'
 
 export type CapacitySize = 'tiny' | 'small' | 'standard' | 'big' | 'industrial'
 

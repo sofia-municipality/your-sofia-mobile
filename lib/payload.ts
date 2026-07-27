@@ -5,6 +5,7 @@
  */
 
 import type {WasteContainer, ContainerStatus, CreateContainerInput} from '../types/wasteContainer'
+import type {BulkyWasteZone, BulkyWasteZonesFeatureCollection} from '../types/bulkyWasteZone'
 import type {Signal, CreateSignalInput} from '../types/signal'
 import type {Assignment, CreateAssignmentInput, AssignmentProgress} from '../types/assignment'
 import {environmentManager} from './environment'
@@ -73,6 +74,60 @@ export interface PayloadResponse<T> {
   hasNextPage: boolean
   prevPage: number | null
   nextPage: number | null
+}
+
+export async function fetchBulkyWasteZones(signal?: AbortSignal): Promise<BulkyWasteZone[]> {
+  const response = await fetch(`${getApiUrl()}/api/bulky-waste-zones`, {signal})
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch bulky waste zones: ${response.statusText}`)
+  }
+
+  const data = (await response.json()) as
+    | BulkyWasteZonesFeatureCollection
+    | {
+        docs: Array<{
+          id: string | number
+          name: string
+          info?: string | null
+          collectionDaysOfWeek?: string[]
+          boundary: BulkyWasteZone['geometry']
+        }>
+      }
+
+  if ('type' in data && data.type === 'FeatureCollection' && Array.isArray(data.features)) {
+    return data.features
+      .filter(
+        (feature) =>
+          feature.type === 'Feature' &&
+          Boolean(feature.properties?.id) &&
+          (feature.geometry?.type === 'Polygon' || feature.geometry?.type === 'MultiPolygon')
+      )
+      .map((feature) => ({
+        ...feature.properties,
+        id: String(feature.properties.id),
+        collectionDaysOfWeek: feature.properties.collectionDaysOfWeek ?? [],
+        geometry: feature.geometry,
+      }))
+  }
+
+  if ('docs' in data && Array.isArray(data.docs)) {
+    return data.docs
+      .filter(
+        (zone) =>
+          Boolean(zone.id) &&
+          (zone.boundary?.type === 'Polygon' || zone.boundary?.type === 'MultiPolygon')
+      )
+      .map((zone) => ({
+        id: String(zone.id),
+        name: zone.name,
+        info: zone.info,
+        collectionDaysOfWeek: zone.collectionDaysOfWeek ?? [],
+        geometry: zone.boundary,
+      }))
+  }
+
+  throw new Error('Invalid bulky waste zones response')
 }
 
 /**

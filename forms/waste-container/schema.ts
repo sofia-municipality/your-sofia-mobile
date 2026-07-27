@@ -12,6 +12,7 @@ export const wasteContainerFormSchema = z.object({
     'plastic',
     'metal',
     'trashCan',
+    'bulky-waste-zones',
   ]),
   capacityVolume: z.number().min(0.1, 'newCityObject.capacityRequired'),
   capacitySize: z.enum(['tiny', 'small', 'standard', 'big', 'industrial']),

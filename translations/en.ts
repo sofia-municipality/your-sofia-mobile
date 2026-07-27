@@ -220,6 +220,10 @@ export default {
 
   wasteContainers: {
     name: 'Container',
+    group: {
+      wasteContainerTypes: 'Container types',
+      zones: 'Zones',
+    },
     size: {
       tiny: 'Tiny',
       small: 'Small',
@@ -236,6 +240,7 @@ export default {
       plastic: 'Plastic',
       metal: 'Metal',
       trashCan: 'Trash Can',
+      bulkyWasteZones: 'Bulky Waste',
     },
     statuses: {
       active: 'Active',
@@ -256,6 +261,11 @@ export default {
       bulkyWaste: 'Bulky Waste',
       uncollected: 'Uncollected',
     },
+    bulkyWasteZone: {
+      collectionDays: 'Collection days',
+      info: 'Information',
+      notAvailable: 'Not available',
+    },
     filterByState: 'Filter by State',
     filterByType: 'Filter by Type',
     types: {
@@ -267,6 +277,7 @@ export default {
       plastic: 'Plastic',
       metal: 'Metal',
       trashCan: 'Trash Can',
+      bulkyWasteZones: 'Bulky waste',
     },
     notes: 'Notes',
     reportIssue: 'Report Issue',
