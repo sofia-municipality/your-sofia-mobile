@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
