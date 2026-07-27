@@ -135,8 +135,8 @@ function withDetoxAndroidGradleMemory(config) {
 // Android blocks cleartext (ws://, not wss://) traffic by default for any
 // non-loopback address. That's fine for Detox's usual ws://localhost — the
 // platform always exempts loopback — but DETOX_DEVICE_SERVER_HOST=10.0.2.2
-// (see patches/detox.patch) points the app at the emulator's own host
-// alias instead, a real routable IP the platform doesn't exempt, so it
+// (see patches/detox@20.51.4.patch) points the app at the emulator's own
+// host alias instead, a real routable IP the platform doesn't exempt, so it
 // gets silently blocked without this. Gated behind an env var so this
 // relaxation only ever ships in the e2e-only APK, never the real one —
 // this must NOT run for a normal `expo prebuild` / production build.
