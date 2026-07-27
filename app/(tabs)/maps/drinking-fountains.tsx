@@ -23,6 +23,7 @@ import {DrinkingFountainMarker} from '../../../components/DrinkingFountainMarker
 import {DrinkingFountainCard, getFountainColor} from '../../../components/DrinkingFountainCard'
 import {fetchDrinkingFountains, type DrinkingFountain} from '../../../lib/payload'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {BottomSheetBackdrop} from '@/components/BottomSheetBackdrop'
 
 const SOFIA_CENTER = {latitude: 42.6977, longitude: 23.3219}
 
@@ -323,17 +324,13 @@ export default function DrinkingFountains() {
         animationType="slide"
         onRequestClose={() => setSelected(null)}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setSelected(null)}
-        >
+        <BottomSheetBackdrop onPress={() => setSelected(null)}>
           <View style={styles.modalContent}>
             {selected && (
               <DrinkingFountainCard fountain={selected} onClose={() => setSelected(null)} />
             )}
           </View>
-        </TouchableOpacity>
+        </BottomSheetBackdrop>
       </Modal>
     </View>
   )
