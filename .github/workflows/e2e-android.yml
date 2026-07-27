@@ -101,12 +101,17 @@ jobs:
           # our Activity's window never becomes the focused one — some
           # other system window still owns focus. Explicitly finishing
           # "setup" and dismissing the keyguard before testing starts is the
-          # standard fix for this on freshly-created CI emulators. Kept on
-          # one line (see below for why): android-emulator-runner runs each
-          # line of a multi-line script as its own separate invocation, so
-          # splitting these across lines would drop them from the `||`
-          # logcat-dump fallback that has to cover the whole sequence.
-          script: adb shell svc power stayon true && adb shell settings put global device_provisioned 1 && adb shell settings put secure user_setup_complete 1 && adb shell wm dismiss-keyguard && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
+          # standard fix for this on freshly-created CI emulators — but a
+          # single dismiss-keyguard call still raced the keyguard/SystemUI
+          # finishing its own post-boot initialization on some runs (still
+          # observed the same 10s window-focus failure intermittently after
+          # boot_completed was already signalled). Retrying it for ~10s
+          # closes that race. Kept on one line (see below for why):
+          # android-emulator-runner runs each line of a multi-line script as
+          # its own separate invocation, so splitting these across lines
+          # would drop them from the `||` logcat-dump fallback that has to
+          # cover the whole sequence.
+          script: adb shell svc power stayon true && adb shell settings put global device_provisioned 1 && adb shell settings put secure user_setup_complete 1 && for i in 1 2 3 4 5; do adb shell wm dismiss-keyguard; adb shell input keyevent 82; sleep 2; done && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
 
       - name: Upload Detox artifacts on failure
         if: failure() || cancelled()
