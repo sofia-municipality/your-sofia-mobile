@@ -91,14 +91,22 @@ jobs:
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
-          # Default (2) starves cold app-launch: MainActivity alone took
-          # ~4.3s to display, then Detox's own launch synchronization added
-          # another ~7s of lock contention on top — comfortably blowing past
-          # Espresso's hard-coded, non-configurable 10s window-focus wait
-          # ("Waited for the root of the view hierarchy to have window
-          # focus... for 10 seconds"). ubuntu-latest runners have 4 vCPUs.
+          # ubuntu-latest runners have 4 vCPUs; the default of 2 makes cold
+          # app-launch slower than it needs to be.
           cores: 4
-          script: adb shell svc power stayon true && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
+          # A freshly created AVD boots with the device not yet marked
+          # "provisioned"/setup-complete and the keyguard still up. Espresso
+          # then hits a hard-coded, non-configurable 10s wait ("Waited for
+          # the root of the view hierarchy to have window focus...") because
+          # our Activity's window never becomes the focused one — some
+          # other system window still owns focus. Explicitly finishing
+          # "setup" and dismissing the keyguard before testing starts is the
+          # standard fix for this on freshly-created CI emulators. Kept on
+          # one line (see below for why): android-emulator-runner runs each
+          # line of a multi-line script as its own separate invocation, so
+          # splitting these across lines would drop them from the `||`
+          # logcat-dump fallback that has to cover the whole sequence.
+          script: adb shell svc power stayon true && adb shell settings put global device_provisioned 1 && adb shell settings put secure user_setup_complete 1 && adb shell wm dismiss-keyguard && pnpm e2e:test:android || (echo "--- adb logcat ---"; adb logcat -d; exit 1)
 
       - name: Upload Detox artifacts on failure
         if: failure() || cancelled()
