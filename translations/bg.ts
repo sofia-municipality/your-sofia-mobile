@@ -666,7 +666,7 @@ export default {
   },
   missions: {
     title: 'Мисии',
-    questBoard: 'Дъска с мисии',
+    questBoard: 'Списък с мисии',
     questBoardSubtitle: 'Поеми мисия и помогни на квартала си',
     myMissions: 'Моите мисии',
     verifyMissions: 'Провери мисии',
