@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native'
-import MapView, {Marker, Polygon, PROVIDER_DEFAULT, type LatLng} from 'react-native-maps'
+import MapViewComponent, {Marker, Polygon, PROVIDER_DEFAULT, type MapViewRef} from '@/lib/Map'
+import type {LatLng} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {
@@ -649,7 +650,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       </View>
 
       {/* Map */}
-      <MapView
+      <MapViewComponent
         ref={mapRef}
         onPress={() => {
           setShowStateFilters(false)
@@ -738,7 +739,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
               />
             </Marker>
           ))}
-      </MapView>
+      </MapViewComponent>
 
       {/* Expandable filter row - overlay */}
       <View style={styles.filtersRow}>
