@@ -35,6 +35,7 @@ import type {WasteContainerFormData} from '../forms/waste-container'
 import {Signal} from '@/types/signal'
 import {environmentManager} from '@/lib/environment'
 import {colors, fonts, fontSizes, radius, spacing} from '@/styles/tokens'
+import {BottomSheetBackdrop} from './BottomSheetBackdrop'
 
 interface WasteContainerCardProps {
   container: WasteContainer
@@ -718,7 +719,7 @@ export function WasteContainerCard({
         animationType="slide"
         onRequestClose={() => setShowObservations(false)}
       >
-        <View style={styles.formModalOverlay}>
+        <BottomSheetBackdrop onPress={() => setShowObservations(false)}>
           <View style={styles.formModalContent}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>{t('wasteContainers.lastObservations')}</Text>
@@ -770,7 +771,7 @@ export function WasteContainerCard({
               })
             )}
           </View>
-        </View>
+        </BottomSheetBackdrop>
       </Modal>
 
       {/* Edit Container Modal */}
@@ -780,7 +781,7 @@ export function WasteContainerCard({
         transparent={true}
         onRequestClose={() => setShowEditForm(false)}
       >
-        <View style={styles.formModalOverlay}>
+        <BottomSheetBackdrop onPress={() => setShowEditForm(false)}>
           <View style={[styles.formModalContent, {maxHeight: '95%'}]}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>
@@ -808,7 +809,7 @@ export function WasteContainerCard({
               />
             </ScrollView>
           </View>
-        </View>
+        </BottomSheetBackdrop>
       </Modal>
 
       {/* Clean Container Form Modal */}
@@ -818,7 +819,13 @@ export function WasteContainerCard({
         animationType="slide"
         onRequestClose={() => setShowCleanForm(false)}
       >
-        <View style={styles.formModalOverlay}>
+        <BottomSheetBackdrop
+          onPress={() => {
+            setShowCleanForm(false)
+            setPhotoUri(null)
+            setNotes('')
+          }}
+        >
           <View style={styles.formModalContent}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>{t('wasteContainers.cleanContainer')}</Text>
@@ -936,7 +943,7 @@ export function WasteContainerCard({
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </BottomSheetBackdrop>
       </Modal>
     </View>
   )
@@ -1159,11 +1166,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: radius.xl,
     padding: spacing.xs,
-  },
-  formModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
   },
   formModalContent: {
     backgroundColor: colors.surface,

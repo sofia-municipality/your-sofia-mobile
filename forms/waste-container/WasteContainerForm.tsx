@@ -73,6 +73,7 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
       {value: 'plastic', label: t('wasteContainers.type.plastic')},
       {value: 'metal', label: t('wasteContainers.type.metal')},
       {value: 'trashCan', label: t('wasteContainers.type.trashCan')},
+      {value: 'bulky-waste-zones', label: t('wasteContainers.type.bulkyWasteZones')},
     ]
 
     const capacitySizes: {value: CapacitySize; label: string}[] = [

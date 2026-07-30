@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native'
-import MapView, {Marker, PROVIDER_DEFAULT, type MapViewRef} from '@/lib/Map'
+import MapView, {Marker, Polygon, PROVIDER_DEFAULT, type LatLng} from 'react-native-maps'
 import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {
@@ -25,7 +25,10 @@ import {useRouter, useLocalSearchParams} from 'expo-router'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
 import {WasteContainerMarker} from '../../../components/WasteContainerMarker'
 import {WasteContainerCluster} from '../../../components/WasteContainerCluster'
+import {BulkyWasteZoneDetailsModal} from '../../../components/BulkyWasteZoneDetailsModal'
+import {BottomSheetBackdrop} from '../../../components/BottomSheetBackdrop'
 import {
+  fetchBulkyWasteZones,
   fetchWasteContainerById,
   fetchContainerClusters,
   type ContainerCluster,
@@ -37,6 +40,7 @@ import {
   type ContainerState,
   type WasteType,
 } from '../../../types/wasteContainer'
+import type {BulkyWasteZone, GeoJsonPosition} from '../../../types/bulkyWasteZone'
 
 /** Derive an approximate integer zoom level from a MapView latitudeDelta. */
 function latDeltaToZoom(latitudeDelta: number): number {
@@ -48,6 +52,22 @@ const INDIVIDUAL_ZOOM = 16
 
 type ContainerFilter = 'all' | 'active' | 'uncollected' | ContainerState
 
+function toMapCoordinates(ring: GeoJsonPosition[]): LatLng[] {
+  return ring.map(([longitude, latitude]) => ({latitude, longitude}))
+}
+
+function getZonePolygons(zone: BulkyWasteZone): {coordinates: LatLng[]; holes: LatLng[][]}[] {
+  const polygons =
+    zone.geometry.type === 'Polygon' ? [zone.geometry.coordinates] : zone.geometry.coordinates
+
+  return polygons
+    .filter((polygon) => polygon[0]?.length >= 3)
+    .map(([outerRing, ...innerRings]) => ({
+      coordinates: toMapCoordinates(outerRing),
+      holes: innerRings.filter((ring) => ring.length >= 3).map(toMapCoordinates),
+    }))
+}
+
 export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const {t} = useTranslation()
   const router = useRouter()
@@ -56,10 +76,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const mapRef = useRef<MapViewRef>(null)
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null)
-  const [selectedStateFilter, setSelectedStateFilter] = useState<ContainerFilter>('active')
-  const [selectedTypeFilter, setSelectedTypeFilter] = useState<WasteType | 'all'>('all')
+  const [selectedStateFilters, setSelectedStateFilters] = useState<ContainerFilter[]>(['active'])
+  const [selectedTypeFilters, setSelectedTypeFilters] = useState<(WasteType | 'all')[]>(['all'])
   const [showStateFilters, setShowStateFilters] = useState(false)
   const [showTypeFilters, setShowTypeFilters] = useState(false)
+  const [bulkyWasteZones, setBulkyWasteZones] = useState<BulkyWasteZone[]>([])
+  const [selectedBulkyWasteZone, setSelectedBulkyWasteZone] = useState<BulkyWasteZone | null>(null)
   const [selectedContainer, setSelectedContainer] = useState<WasteContainer | null>(null)
   const [showContainerCard, setShowContainerCard] = useState(false)
   const [containers, setContainers] = useState<WasteContainer[]>([])
@@ -92,6 +114,22 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       }
       if (clusterDebounceRef.current) clearTimeout(clusterDebounceRef.current)
     }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetchBulkyWasteZones(controller.signal)
+      .then((zones) => {
+        if (!controller.signal.aborted) setBulkyWasteZones(zones)
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          console.error('[fetchBulkyWasteZones] Error:', error)
+        }
+      })
+
+    return () => controller.abort()
   }, [])
 
   // Fetch server-side data for the current viewport — clusters when zoomed out, markers when zoomed in
@@ -139,7 +177,10 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       }
 
       setContainers([])
-      const statusFilter = selectedStateFilter === 'active' ? 'active' : undefined
+      const statusFilter =
+        selectedStateFilters.length === 1 && selectedStateFilters[0] === 'active'
+          ? 'active'
+          : undefined
       try {
         const data = await fetchContainerClusters({
           zoom: z,
@@ -155,7 +196,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         console.error('[fetchClusters] Error:', err)
       }
     },
-    [selectedStateFilter, t]
+    [selectedStateFilters, t]
   )
 
   // Initial cluster fetch using the default region (before the user pans)
@@ -180,7 +221,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     // handled by the debounced onRegionChangeComplete handler. Including them here
     // would fire a duplicate identical request on every pan.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStateFilter, fetchClusters])
+  }, [selectedStateFilters, fetchClusters])
 
   useEffect(() => {
     ;(async () => {
@@ -349,16 +390,57 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     {key: 'uncollected', label: t('wasteContainers.filters.uncollected')},
   ]
 
-  const typeFilters: {key: WasteType | 'all'; label: string}[] = [
-    {key: 'all', label: t('wasteContainers.filters.all')},
-    {key: 'general', label: t('wasteContainers.types.general')},
-    {key: 'recyclables', label: t('wasteContainers.types.recyclables')},
-    {key: 'organic', label: t('wasteContainers.types.organic')},
-    {key: 'glass', label: t('wasteContainers.types.glass')},
-    {key: 'paper', label: t('wasteContainers.types.paper')},
-    {key: 'plastic', label: t('wasteContainers.types.plastic')},
-    {key: 'metal', label: t('wasteContainers.types.metal')},
-    {key: 'trashCan', label: t('wasteContainers.types.trashCan')},
+  const typeFilters: {key: WasteType | 'all'; label: string; group: string}[] = [
+    {
+      key: 'all',
+      label: t('wasteContainers.filters.all'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'general',
+      label: t('wasteContainers.types.general'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'recyclables',
+      label: t('wasteContainers.types.recyclables'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'organic',
+      label: t('wasteContainers.types.organic'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'glass',
+      label: t('wasteContainers.types.glass'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'paper',
+      label: t('wasteContainers.types.paper'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'plastic',
+      label: t('wasteContainers.types.plastic'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'metal',
+      label: t('wasteContainers.types.metal'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'trashCan',
+      label: t('wasteContainers.types.trashCan'),
+      group: t('wasteContainers.group.wasteContainerTypes'),
+    },
+    {
+      key: 'bulky-waste-zones',
+      label: t('wasteContainers.types.bulkyWasteZones'),
+      group: t('wasteContainers.group.zones'),
+    },
   ]
 
   // 'active' filter means "operational" — hide only inactive/pending containers.
@@ -370,14 +452,18 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const visibleContainers = React.useMemo(() => {
     return containers.filter((container) => {
       const matchesState =
-        selectedStateFilter === 'all' ||
-        (selectedStateFilter === 'active' && isOperational(container)) ||
-        selectedStateFilter === 'uncollected' ||
-        (container.state?.includes(selectedStateFilter as ContainerState) ?? false)
-      const matchesType = selectedTypeFilter === 'all' || container.wasteType === selectedTypeFilter
+        selectedStateFilters.includes('all') ||
+        selectedStateFilters.some(
+          (filter) =>
+            (filter === 'active' && isOperational(container)) ||
+            filter === 'uncollected' ||
+            (container.state?.includes(filter as ContainerState) ?? false)
+        )
+      const matchesType =
+        selectedTypeFilters.includes('all') || selectedTypeFilters.includes(container.wasteType)
       return matchesState && matchesType
     })
-  }, [containers, selectedStateFilter, selectedTypeFilter])
+  }, [containers, selectedStateFilters, selectedTypeFilters])
 
   // Memoize container markers to prevent re-renders during map movement
   const containerMarkers = React.useMemo(() => {
@@ -387,20 +473,27 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         latitude: container.latitude,
         longitude: container.longitude,
       },
-      pinColor: getContainerPinColor(container, selectedStateFilter === 'uncollected'),
+      pinColor: getContainerPinColor(container, selectedStateFilters.includes('uncollected')),
       container,
     }))
-  }, [visibleContainers, selectedStateFilter])
+  }, [visibleContainers, selectedStateFilters])
 
   const handleStateFilterChange = useCallback(
     (filter: ContainerFilter) => {
+      const nextFilters: ContainerFilter[] =
+        filter === 'all'
+          ? ['all']
+          : selectedStateFilters.includes(filter)
+            ? selectedStateFilters.filter((item) => item !== filter)
+            : [...selectedStateFilters.filter((item) => item !== 'all'), filter]
+
       React.startTransition(() => {
-        setSelectedStateFilter(filter)
+        setSelectedStateFilters(nextFilters.length > 0 ? nextFilters : ['all'])
       })
-      setShowStateFilters(false)
       // Auto-zoom to individual marker mode when a specific state filter is selected
       // so the client-side filtering is actually visible on the map
-      if (filter !== 'all' && filter !== 'active' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+      const hasSpecificFilter = nextFilters.some((item) => item !== 'all' && item !== 'active')
+      if (hasSpecificFilter && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
         const center = mapCenter || {
           latitude: location?.coords.latitude ?? 42.683,
           longitude: location?.coords.longitude ?? 23.315,
@@ -412,17 +505,23 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         )
       }
     },
-    [zoom, mapCenter, location]
+    [selectedStateFilters, zoom, mapCenter, location]
   )
 
   const handleTypeFilterChange = useCallback(
     (filter: WasteType | 'all') => {
+      const nextFilters: (WasteType | 'all')[] =
+        filter === 'all'
+          ? ['all']
+          : selectedTypeFilters.includes(filter)
+            ? selectedTypeFilters.filter((item) => item !== filter)
+            : [...selectedTypeFilters.filter((item) => item !== 'all'), filter]
+
       React.startTransition(() => {
-        setSelectedTypeFilter(filter)
+        setSelectedTypeFilters(nextFilters.length > 0 ? nextFilters : ['all'])
       })
-      setShowTypeFilters(false)
       // Auto-zoom to individual marker mode when a specific type filter is selected
-      if (filter !== 'all' && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
+      if (nextFilters.some((item) => item !== 'all') && zoom < INDIVIDUAL_ZOOM && mapRef.current) {
         const center = mapCenter || {
           latitude: location?.coords.latitude ?? 42.683,
           longitude: location?.coords.longitude ?? 23.315,
@@ -434,8 +533,28 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         )
       }
     },
-    [zoom, mapCenter, location]
+    [selectedTypeFilters, zoom, mapCenter, location]
   )
+
+  const filterGroups = typeFilters.reduce<{group: string; filters: typeof typeFilters}[]>(
+    (groups, filter) => {
+      const existingGroup = groups.find((item) => item.group === filter.group)
+
+      if (existingGroup) {
+        existingGroup.filters.push(filter)
+      } else {
+        groups.push({
+          group: filter.group,
+          filters: [filter],
+        })
+      }
+
+      return groups
+    },
+    []
+  )
+
+  const showBulkyWasteZones = selectedTypeFilters.includes('bulky-waste-zones')
 
   const handleContainerPress = (container: WasteContainer) => {
     setSelectedContainer(container)
@@ -532,6 +651,10 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       {/* Map */}
       <MapView
         ref={mapRef}
+        onPress={() => {
+          setShowStateFilters(false)
+          setShowTypeFilters(false)
+        }}
         onRegionChangeComplete={(region) => {
           mapCenterRef.current = {latitude: region.latitude, longitude: region.longitude}
           setMapCenter({
@@ -551,6 +674,22 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         initialRegion={region}
         showsUserLocation={true}
       >
+        {showBulkyWasteZones &&
+          bulkyWasteZones.flatMap((zone) =>
+            getZonePolygons(zone).map((polygon, index) => (
+              <Polygon
+                key={`${zone.id}-${index}`}
+                coordinates={polygon.coordinates}
+                holes={polygon.holes}
+                fillColor="rgba(224, 179, 64, 0.2)"
+                strokeColor={colors.accentGold}
+                strokeWidth={2}
+                tappable
+                onPress={() => setSelectedBulkyWasteZone(zone)}
+              />
+            ))
+          )}
+
         {/* Cluster markers — shown when zoomed out (zoom < INDIVIDUAL_ZOOM) */}
         {zoom < INDIVIDUAL_ZOOM &&
           clusters.map((cluster, i) => (
@@ -624,7 +763,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
                 {stateFilters.map((filter) => {
-                  const isActive = selectedStateFilter === filter.key
+                  const isActive = selectedStateFilters.includes(filter.key)
                   return (
                     <TouchableOpacity
                       key={filter.key}
@@ -664,22 +803,36 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           {showTypeFilters && (
             <View style={styles.filterColumn}>
               <ScrollView contentContainerStyle={styles.filterOptionsContent}>
-                {typeFilters.map((filter) => {
-                  const isActive = selectedTypeFilter === filter.key
-                  return (
-                    <TouchableOpacity
-                      key={filter.key}
-                      style={[styles.filterChip, isActive && styles.filterChipActive]}
-                      onPress={() => handleTypeFilterChange(filter.key)}
-                    >
-                      <Text
-                        style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
-                      >
-                        {filter.label}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
+                <View style={styles.filterGroups}>
+                  {filterGroups.map(({group, filters}) => (
+                    <View key={group} style={styles.filterGroup}>
+                      <Text style={styles.filterGroupTitle}>{group}</Text>
+
+                      <View style={styles.filterChipRow}>
+                        {filters.map(({key, label}) => {
+                          const isActive = selectedTypeFilters.includes(key)
+
+                          return (
+                            <TouchableOpacity
+                              key={key}
+                              style={[styles.filterChip, isActive && styles.filterChipActive]}
+                              onPress={() => handleTypeFilterChange(key)}
+                            >
+                              <Text
+                                style={[
+                                  styles.filterChipText,
+                                  isActive && styles.filterChipTextActive,
+                                ]}
+                              >
+                                {label}
+                              </Text>
+                            </TouchableOpacity>
+                          )
+                        })}
+                      </View>
+                    </View>
+                  ))}
+                </View>
               </ScrollView>
             </View>
           )}
@@ -736,7 +889,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         animationType="slide"
         onRequestClose={handleCloseCard}
       >
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleCloseCard}>
+        <BottomSheetBackdrop onPress={handleCloseCard}>
           <View style={styles.modalContent}>
             {selectedContainer && (
               <WasteContainerCard
@@ -746,8 +899,14 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
               />
             )}
           </View>
-        </TouchableOpacity>
+        </BottomSheetBackdrop>
       </Modal>
+
+      <BulkyWasteZoneDetailsModal
+        visible={selectedBulkyWasteZone !== null}
+        zone={selectedBulkyWasteZone}
+        onClose={() => setSelectedBulkyWasteZone(null)}
+      />
 
       {/* Loading overlay for containers */}
       {containersLoading && (
@@ -892,7 +1051,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   filterChip: {
+    width: '100%',
     alignSelf: 'auto',
+    fontFamily: fonts.regular,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -932,11 +1093,6 @@ const styles = StyleSheet.create({
   calloutText: {
     fontSize: fontSizes.caption,
     color: colors.textSecondary,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: 'transparent',
@@ -1046,5 +1202,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  filterGroups: {
+    gap: 6,
+  },
+  filterGroup: {
+    gap: 8,
+  },
+  filterGroupTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: fonts.bold,
+    color: colors.textSecondary,
+  },
+  filterChipRow: {
+    fontFamily: fonts.regular,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    width: '100%',
   },
 })

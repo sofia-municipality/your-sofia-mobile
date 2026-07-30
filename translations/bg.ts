@@ -223,6 +223,10 @@ export default {
 
   wasteContainers: {
     name: 'Контейнер',
+    group: {
+      wasteContainerTypes: 'Вид отпадък',
+      zones: 'Зони',
+    },
     size: {
       tiny: 'Мини',
       small: 'Малък',
@@ -239,6 +243,7 @@ export default {
       plastic: 'Пластмаса',
       metal: 'Метал',
       trashCan: 'Кошче',
+      bulkyWasteZones: 'ЕГО Зони',
     },
     statuses: {
       active: 'Активен',
@@ -259,6 +264,11 @@ export default {
       bulkyWaste: 'Едри отпадъци',
       uncollected: 'Несъбрани',
     },
+    bulkyWasteZone: {
+      collectionDays: 'Дни за събиране',
+      info: 'Информация',
+      notAvailable: 'Няма информация',
+    },
     filterByState: 'Филтър по състояние',
     filterByType: 'Филтър по вид',
     types: {
@@ -270,6 +280,7 @@ export default {
       plastic: 'Пластмаса',
       metal: 'Метал',
       trashCan: 'Кошче',
+      bulkyWasteZones: 'ЕГО Зони',
     },
     notes: 'Бележки',
     reportIssue: 'Сигнализирай',
