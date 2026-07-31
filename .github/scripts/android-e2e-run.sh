@@ -63,4 +63,9 @@ for _ in 1 2 3 4 5; do
 done
 
 echo "Running Detox tests..."
-pnpm e2e:test:android
+# Belt-and-suspenders backstop: Detox's own teardown (closing the adb
+# reverse tunnel / websocket server) has hung past this job's 45-minute
+# timeout at least once even after the tests themselves passed (jest.config.js's
+# `forceExit` is the real fix for that). If it ever hangs again for a
+# different reason, fail in 10 minutes instead of burning the whole budget.
+timeout 600 pnpm e2e:test:android
