@@ -749,6 +749,11 @@ export default {
       create: 'Създай',
       createSuccess: 'Мисията е създадена успешно',
       createError: 'Неуспешно създаване на мисия',
+      linkedSignal: 'Свързан сигнал',
+      linkedObject: 'Свързан обект',
+      signalId: 'ID на сигнала',
+      openSignal: 'Отвори сигнала',
+      inspector: 'Инспектор',
     },
   },
   assignments: {

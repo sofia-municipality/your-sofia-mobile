@@ -1,14 +1,5 @@
 import React, {forwardRef, useImperativeHandle, useCallback, useMemo, useState} from 'react'
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
-  Modal,
-} from 'react-native'
+import {View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert} from 'react-native'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {useTranslation} from 'react-i18next'
@@ -34,7 +25,7 @@ import type {Signal} from '../../types/signal'
 import {colors} from '@/styles/tokens'
 import {useAuth} from '@/contexts/AuthContext'
 import {createMission} from '@/lib/payload'
-import {MissionForm, type MissionFormData} from '../mission'
+import {MissionCreateModal, type MissionFormData} from '../mission'
 
 function SignalLifecycleBanner({status}: {status: Signal['status']}) {
   const {t} = useTranslation()
@@ -610,41 +601,15 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        <Modal
+        <MissionCreateModal
           visible={showMissionForm}
-          transparent
-          animationType="slide"
-          onRequestClose={() => {
-            if (!isCreatingMission) {
-              setShowMissionForm(false)
-            }
-          }}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalSheet}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t('missions.form.createMissionTitle')}</Text>
-                <TouchableOpacity
-                  onPress={() => setShowMissionForm(false)}
-                  disabled={isCreatingMission}
-                  style={styles.modalCloseButton}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('common.close')}
-                >
-                  <X size={18} color={colors.textSecondary} />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.modalSubtitle}>{t('missions.form.createMissionSubtitle')}</Text>
-
-              <MissionForm
-                onSubmit={handleCreateMission}
-                onCancel={() => setShowMissionForm(false)}
-                isSubmitting={isCreatingMission}
-              />
-            </View>
-          </View>
-        </Modal>
+          onClose={() => setShowMissionForm(false)}
+          onSubmit={handleCreateMission}
+          isSubmitting={isCreatingMission}
+          signalId={signal.id}
+          cityObject={signal.cityObject}
+          location={signal.location}
+        />
       </View>
     )
   }

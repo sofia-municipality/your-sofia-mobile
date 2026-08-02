@@ -12,6 +12,73 @@ export const styles = StyleSheet.create({
   section: {
     gap: spacing.xs,
   },
+  locationCard: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  signalLinkCard: {
+    borderWidth: 1,
+    borderColor: colors.primaryTint,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primaryTint,
+    padding: spacing.md,
+  },
+  signalLinkContent: {
+    gap: 4,
+  },
+  signalLinkText: {
+    color: colors.textSecondary,
+    fontSize: fontSizes.caption,
+    fontFamily: fonts.medium,
+  },
+  signalLinkValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  signalLinkValue: {
+    color: colors.primary,
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.semiBold,
+    flexShrink: 1,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  locationText: {
+    color: colors.textPrimary,
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.regular,
+    flex: 1,
+  },
+  locationToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+  },
+  locationToggleText: {
+    color: colors.primary,
+    fontSize: fontSizes.bodySm,
+    fontFamily: fonts.semiBold,
+  },
+  mapContainer: {
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface2,
+    height: 160,
+  },
+  map: {
+    flex: 1,
+  },
   sectionLabel: {
     fontSize: fontSizes.bodySm,
     fontFamily: fonts.semiBold,

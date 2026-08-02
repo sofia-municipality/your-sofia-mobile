@@ -743,6 +743,11 @@ export default {
       create: 'Create',
       createSuccess: 'Mission created successfully',
       createError: 'Failed to create mission',
+      linkedSignal: 'Linked signal',
+      linkedObject: 'Linked object',
+      signalId: 'Signal ID',
+      openSignal: 'Open signal',
+      inspector: 'Inspector',
     },
   },
   assignments: {

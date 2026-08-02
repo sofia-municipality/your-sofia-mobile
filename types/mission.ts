@@ -27,9 +27,25 @@ export interface MissionTask {
   completedByCitizenAt?: string | null
 }
 
+export interface MissionSignalRef {
+  id: number
+  title?: string
+  location?: number[]
+  cityObject?: {
+    type?: string
+    referenceId?: string
+  }
+}
+
+export interface MissionInspectorRef {
+  id?: number
+  name?: string
+  email?: string
+}
+
 export interface Mission {
   id: string
-  signal: string | number
+  signal: MissionSignalRef
   title: string
   description?: string
   level: MissionLevel
@@ -40,7 +56,7 @@ export interface Mission {
   tasks: MissionTask[]
   missionBeforePhotos?: MissionMediaRef[]
   missionAfterPhotos?: MissionMediaRef[]
-  inspector?: {id: number; name?: string} | number
+  inspector?: MissionInspectorRef
   citizen?: {id: number; name?: string} | number | null
   claimedAt?: string | null
   submittedForReviewAt?: string | null

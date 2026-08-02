@@ -24,4 +24,15 @@ export interface MissionFormProps {
   onSubmit: (data: MissionFormData) => Promise<void>
   onCancel: () => void
   isSubmitting?: boolean
+  cityObject?: {
+    type?: 'waste-container' | 'street' | 'park' | 'building' | 'other'
+    referenceId?: string
+    name?: string
+  }
+  location?: {
+    latitude?: number
+    longitude?: number
+    address?: string
+  }
+  signalId?: string
 }

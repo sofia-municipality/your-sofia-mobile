@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useMemo, useState} from 'react'
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native'
+import MapView, {Marker} from 'react-native-maps'
 import {useTranslation} from 'react-i18next'
-import {useLocalSearchParams} from 'expo-router'
+import {useLocalSearchParams, useRouter} from 'expo-router'
+import {ExternalLink} from 'lucide-react-native'
 import {useAuth} from '@/contexts/AuthContext'
 import {useMission, useMissions} from '@/hooks/useMissions'
 import {
@@ -36,6 +38,7 @@ const STATUS_KEY: Record<string, string> = {
 
 export default function MissionDetailScreen() {
   const {t} = useTranslation()
+  const router = useRouter()
   const {id} = useLocalSearchParams<{id: string}>()
   const {user} = useAuth()
   const {mission, loading, error, refresh} = useMission(id)
@@ -45,6 +48,19 @@ export default function MissionDetailScreen() {
   const [submittingTaskId, setSubmittingTaskId] = useState<string | null>(null)
   const [submittingOverall, setSubmittingOverall] = useState(false)
   const [submittingReview, setSubmittingReview] = useState(false)
+
+  const missionLocation = useMemo(() => {
+    if (!mission?.signal.location) {
+      return null
+    }
+
+    return {
+      latitude: mission.signal.location[1],
+      longitude: mission.signal.location[0],
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }
+  }, [mission?.signal.location])
 
   if (loading && !mission) {
     return (
@@ -79,6 +95,11 @@ export default function MissionDetailScreen() {
   const hasOverallPhotos =
     (mission.missionBeforePhotos?.length ?? 0) > 0 && (mission.missionAfterPhotos?.length ?? 0) > 0
   const canSubmitForReview = isEditable && allTasksDone && hasOverallPhotos
+
+  const handleOpenSignal = () => {
+    if (!mission.signal.id) return
+    router.push(`/(tabs)/signals/${mission.signal.id}` as any)
+  }
 
   const handleClaim = async () => {
     setClaiming(true)
@@ -148,16 +169,15 @@ export default function MissionDetailScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <MissionLevelBadge level={mission.level} />
-      <Text style={styles.title}>{mission.title}</Text>
-      {mission.description ? <Text style={styles.description}>{mission.description}</Text> : null}
-
       <View style={styles.metaRow}>
+        <MissionLevelBadge level={mission.level} />
         <DarPointsBadge amount={mission.pointsAwarded ?? mission.pointsReward} />
         <Text style={[styles.statusLabel, {color: statusColor}]}>
           {t(STATUS_KEY[mission.status] ?? mission.status)}
         </Text>
       </View>
+      <Text style={styles.title}>{mission.title}</Text>
+      {mission.description ? <Text style={styles.description}>{mission.description}</Text> : null}
 
       {mission.status === 'returned_for_improvement' && mission.inspectorReviewNotes ? (
         <View style={styles.noticeBox}>
@@ -165,6 +185,23 @@ export default function MissionDetailScreen() {
           <Text style={styles.noticeText}>{mission.inspectorReviewNotes}</Text>
         </View>
       ) : null}
+
+      {missionLocation && (
+        <View style={styles.sectionBox}>
+          {missionLocation ? (
+            <View style={styles.mapContainer}>
+              <MapView style={styles.map} initialRegion={missionLocation} region={missionLocation}>
+                <Marker
+                  coordinate={{
+                    latitude: missionLocation.latitude,
+                    longitude: missionLocation.longitude,
+                  }}
+                />
+              </MapView>
+            </View>
+          ) : null}
+        </View>
+      )}
 
       <View style={styles.sectionBox}>
         <Text style={styles.sectionTitle}>{t('missions.instructions')}</Text>
@@ -225,6 +262,33 @@ export default function MissionDetailScreen() {
           )}
         </TouchableOpacity>
       ) : null}
+
+      {mission.signal.id ? (
+        <TouchableOpacity style={styles.infoCard} onPress={handleOpenSignal}>
+          <View style={styles.linkRow}>
+            <View style={styles.linkValueRow}>
+              <Text style={styles.linkValue}>
+                {t('missions.form.linkedSignal') + ' ' + mission.signal.id}
+              </Text>
+              <ExternalLink size={14} color={missionColors.neonPrimary} />
+              <Text style={styles.linkMeta}>
+                {[mission.signal.cityObject?.type, mission.signal.cityObject?.referenceId]
+                  .filter(Boolean)
+                  .join(' • ')}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      ) : null}
+
+      {(mission.inspector?.name || mission.inspector?.email) && (
+        <View style={styles.infoCard}>
+          <Text style={styles.infoPrimary}>
+            {t('missions.form.inspector') + ': ' + mission.inspector.name}
+          </Text>
+          <Text style={styles.infoSecondary}>{mission.inspector.email}</Text>
+        </View>
+      )}
     </ScrollView>
   )
 }
@@ -292,6 +356,86 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: missionColors.border,
     padding: missionSpacing.sm,
+  },
+  linkCard: {
+    borderRadius: missionRadius.md,
+    borderWidth: 1,
+    borderColor: missionColors.neonPrimary,
+    backgroundColor: 'rgba(14, 165, 233, 0.08)',
+    padding: missionSpacing.sm,
+    marginTop: 6,
+  },
+  linkRow: {
+    gap: 4,
+  },
+  linkTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.bodySm,
+    color: missionColors.textPrimary,
+    marginBottom: 4,
+  },
+  linkLabel: {
+    fontFamily: fonts.medium,
+    fontSize: fontSizes.caption,
+    color: missionColors.textMuted,
+  },
+  linkValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  linkValue: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.bodySm,
+    color: missionColors.neonPrimary,
+    flexShrink: 1,
+  },
+  linkMeta: {
+    fontFamily: fonts.regular,
+    fontSize: fontSizes.caption,
+    color: missionColors.textMuted,
+    marginTop: 2,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: missionSpacing.sm,
+    borderRadius: missionRadius.md,
+    borderWidth: 1,
+    borderColor: missionColors.border,
+    padding: missionSpacing.sm,
+    marginTop: 6,
+    backgroundColor: missionColors.bg,
+  },
+  infoPrimary: {
+    flex: 1,
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.bodySm,
+    color: missionColors.textPrimary,
+  },
+  infoSecondary: {
+    fontFamily: fonts.regular,
+    fontSize: fontSizes.bodySm,
+    color: missionColors.textMuted,
+    textAlign: 'right',
+  },
+  locationText: {
+    fontFamily: fonts.regular,
+    fontSize: fontSizes.bodySm,
+    color: missionColors.textPrimary,
+    marginTop: 4,
+  },
+  mapContainer: {
+    marginTop: missionSpacing.sm,
+    borderRadius: missionRadius.md,
+    overflow: 'hidden',
+    height: 180,
+    borderWidth: 1,
+    borderColor: missionColors.border,
+  },
+  map: {
+    flex: 1,
   },
   sectionTitle: {
     fontFamily: fonts.bold,

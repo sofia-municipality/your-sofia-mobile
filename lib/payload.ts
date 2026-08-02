@@ -1489,7 +1489,26 @@ export async function fetchMissionsFeed(authToken: string): Promise<MissionsFeed
  * Fetch a single mission by id (depth=1 to populate task/media relationships).
  */
 export async function fetchMissionById(id: string, authToken?: string): Promise<Mission> {
-  const response = await fetch(`${getApiUrl()}/api/missions/${id}?depth=2`, {
+  const params = new URLSearchParams({depth: '2'})
+
+  params.set('select[id]', 'true')
+  params.set('select[title]', 'true')
+  params.set('select[status]', 'true')
+  params.set('select[description]', 'true')
+  params.set('select[level]', 'true')
+  params.set('select[pointsReward]', 'true')
+  params.set('select[generalInstructions]', 'true')
+  params.set('select[tasks]', 'true')
+  params.set('select[signal][id]', 'true')
+  params.set('select[signal][title]', 'true')
+  params.set('select[signal][location]', 'true')
+  params.set('select[signal][cityObject][type]', 'true')
+  params.set('select[signal][cityObject][referenceId]', 'true')
+  params.set('select[inspector][id]', 'true')
+  params.set('select[inspector][name]', 'true')
+  params.set('select[inspector][email]', 'true')
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}?${params.toString()}`, {
     headers: authToken ? {Authorization: `JWT ${authToken}`} : {},
   })
   handleAuthError(response)
