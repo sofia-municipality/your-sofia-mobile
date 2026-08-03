@@ -89,8 +89,16 @@ interface ProfileSection {
 export default function ProfileScreen() {
   const {t, i18n} = useTranslation()
   const router = useRouter()
-  const {user, isAuthenticated, isContainerAdmin, isFountainAdmin, isAdmin, logout, deleteAccount, refreshUser} =
-    useAuth()
+  const {
+    user,
+    isAuthenticated,
+    isContainerAdmin,
+    isFountainAdmin,
+    isAdmin,
+    logout,
+    deleteAccount,
+    refreshUser,
+  } = useAuth()
   const {expoPushToken, registerAndSendToken} = useNotifications()
   const [isRegisteringToken, setIsRegisteringToken] = useState(false)
   const [deviceId, setDeviceId] = useState<string>('')

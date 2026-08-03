@@ -21,7 +21,7 @@ interface MissionCreateModalProps {
   isSubmitting: boolean
   signalId?: string
   cityObject?: {
-    type?: 'waste-container' | 'street' | 'park' | 'building' | 'other'
+    type?: 'waste-container' | 'drinking-fountain' | 'street' | 'park' | 'building' | 'other'
     referenceId?: string
     name?: string
   }
