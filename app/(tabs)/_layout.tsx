@@ -12,6 +12,7 @@ import {
   ChartNoAxesCombined,
   MapPlus,
   ClipboardList,
+  Swords,
 } from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -33,7 +34,7 @@ export default function TabLayout() {
 
 function TabLayoutContent({t}: {t: (key: string) => string}) {
   const insets = useSafeAreaInsets()
-  const {isContainerAdmin, isAuthenticated, user} = useAuth()
+  const {isAdmin, isContainerAdmin, isAuthenticated, user} = useAuth()
   const {closedSignalsCount} = useNotifications()
   const canAccessNewTab =
     isAuthenticated &&
@@ -104,6 +105,16 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           headerTitle: () => (
             <TabHeader title={t('signals.title')} showActionIcon={false} ActionIcon={Plus} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="missions"
+        options={{
+          href: isAdmin && isAuthenticated ? '/missions' : null, // Only show for authenticated containerAdmin
+          title: t('missions.title'),
+          tabBarLabel: t('missions.title'),
+          tabBarIcon: ({color}) => <Swords size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen

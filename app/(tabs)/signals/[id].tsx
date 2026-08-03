@@ -21,7 +21,7 @@ import {useNotifications} from '../../../hooks/useNotifications'
 import {useAuth} from '@/contexts/AuthContext'
 
 export default function SignalDetailsScreen() {
-  const {t, i18n} = useTranslation()
+  const {t} = useTranslation()
   const navigation = useNavigation()
   const {id} = useLocalSearchParams<{id: string}>()
   const formRef = useRef<any>(null)
@@ -60,7 +60,7 @@ export default function SignalDetailsScreen() {
     } finally {
       setLoading(false)
     }
-  }, [id, i18n.language, t])
+  }, [id, t])
 
   useEffect(() => {
     loadSignal()
@@ -132,7 +132,7 @@ export default function SignalDetailsScreen() {
         setSaving(false)
       }
     },
-    [signal, token, i18n.language, t]
+    [signal, token, t]
   )
 
   const handleSave = useCallback(() => {
