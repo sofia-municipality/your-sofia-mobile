@@ -1,4 +1,4 @@
-import React, {forwardRef, useImperativeHandle, useCallback, useMemo} from 'react'
+import React, {forwardRef, useImperativeHandle, useCallback, useMemo, useState} from 'react'
 import {View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert} from 'react-native'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -7,7 +7,6 @@ import {
   MapPin,
   Calendar,
   FileText,
-  Tag,
   AlertCircle,
   Camera,
   Upload,
@@ -16,19 +15,22 @@ import {
   CheckCircle2,
   XCircle,
   Send,
+  Plus,
 } from 'lucide-react-native'
 import * as ImagePicker from 'expo-image-picker'
 import {signalFormSchema, type SignalFormData, type SignalFormProps} from './schema'
 import {styles} from './signal.styles'
 import {CONTAINER_STATES, getStateColor} from '../../types/wasteContainer'
 import type {Signal} from '../../types/signal'
-import {colors, fonts, fontSizes, radius, spacing} from '@/styles/tokens'
+import {colors} from '@/styles/tokens'
+import {useAuth} from '@/contexts/AuthContext'
+import {createMission} from '@/lib/payload'
+import {MissionCreateModal, type MissionFormData} from '../mission'
 
 function SignalLifecycleBanner({status}: {status: Signal['status']}) {
   const {t} = useTranslation()
 
   const isRejected = status === 'rejected'
-  const step1Done = true
   const step2Active = status === 'in-progress'
   const step2Done = status === 'resolved' || status === 'rejected'
   const step3Done = status === 'resolved'
@@ -158,6 +160,9 @@ function SignalLifecycleBanner({status}: {status: Signal['status']}) {
 export const SignalForm = forwardRef<any, SignalFormProps>(
   ({signal, onSubmit, onCancel, isSubmitting = false, isEditing = true, canEdit = false}, ref) => {
     const {t, i18n} = useTranslation()
+    const {isAdmin, token} = useAuth()
+    const [showMissionForm, setShowMissionForm] = useState(false)
+    const [isCreatingMission, setIsCreatingMission] = useState(false)
 
     const {
       control,
@@ -261,6 +266,49 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
       setValue('containerState', newStates)
     }
 
+    const handleCreateMission = useCallback(
+      async (missionData: MissionFormData) => {
+        if (!token) {
+          Alert.alert(t('common.error'), t('auth.notAuthenticated'))
+          return
+        }
+
+        setIsCreatingMission(true)
+        try {
+          await createMission(
+            {
+              signal: signal.id,
+              title: missionData.title.trim(),
+              description: missionData.description?.trim() || undefined,
+              level: missionData.level,
+              status: missionData.status,
+              pointsReward: missionData.pointsReward,
+              generalInstructions: missionData.generalInstructions.trim(),
+              tasks: missionData.tasks.map((task) => ({
+                title: task.title.trim(),
+                instructions: task.instructions.trim(),
+                acceptanceCriteria: task.acceptanceCriteria.trim(),
+                requiresBeforePhoto: task.requiresBeforePhoto,
+                requiresAfterPhoto: task.requiresAfterPhoto,
+              })),
+            },
+            token
+          )
+
+          setShowMissionForm(false)
+          Alert.alert(t('common.success'), t('missions.form.createSuccess'))
+        } catch (error) {
+          Alert.alert(
+            t('common.error'),
+            error instanceof Error ? error.message : t('missions.form.createError')
+          )
+        } finally {
+          setIsCreatingMission(false)
+        }
+      },
+      [signal.id, t, token]
+    )
+
     const getStatusIcon = (status: Signal['status']) => {
       const iconProps = {size: 20}
       switch (status) {
@@ -327,6 +375,20 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
               {/* City Object */}
               <MapPin size={16} color={colors.textSecondary} />
               <Text style={styles.metaText}>{signal.cityObject.name}</Text>
+              {isAdmin && (
+                <TouchableOpacity
+                  style={styles.createMissionButton}
+                  onPress={() => setShowMissionForm(true)}
+                  disabled={isSubmitting}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('missions.form.createMission')}
+                >
+                  <Plus size={14} color={colors.surface} />
+                  <Text style={styles.createMissionButtonText}>
+                    {t('missions.form.createMission')}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
@@ -538,6 +600,16 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
             <Text style={styles.infoText}>{t('signals.cannotEdit')}</Text>
           </View>
         )}
+
+        <MissionCreateModal
+          visible={showMissionForm}
+          onClose={() => setShowMissionForm(false)}
+          onSubmit={handleCreateMission}
+          isSubmitting={isCreatingMission}
+          signalId={signal.id}
+          cityObject={signal.cityObject}
+          location={signal.location}
+        />
       </View>
     )
   }

@@ -13,6 +13,7 @@ import * as Location from 'expo-location'
 import {useTranslation} from 'react-i18next'
 import {ChevronLeft, ChevronRight, X} from 'lucide-react-native'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
+import {BottomSheetBackdrop} from '../../../components/BottomSheetBackdrop'
 import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import {useDeviceHeading} from '../../../hooks/useDeviceHeading'
@@ -371,11 +372,7 @@ export default function ArView({onClose}: ArViewProps) {
         animationType="slide"
         onRequestClose={() => setSelectedContainer(null)}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setSelectedContainer(null)}
-        >
+        <BottomSheetBackdrop onPress={() => setSelectedContainer(null)}>
           <View style={styles.modalContent}>
             {selectedContainer && (
               <WasteContainerCard
@@ -384,7 +381,7 @@ export default function ArView({onClose}: ArViewProps) {
               />
             )}
           </View>
-        </TouchableOpacity>
+        </BottomSheetBackdrop>
       </Modal>
     </View>
   )
@@ -514,11 +511,6 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.bodySm,
     fontFamily: fonts.bold,
     fontVariant: ['tabular-nums'],
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: 'transparent',

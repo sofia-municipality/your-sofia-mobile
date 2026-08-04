@@ -14,6 +14,7 @@ import {Newspaper} from 'lucide-react-native'
 import {markWhatsNewSeen, getCurrentAppVersion} from '@/lib/whatsNew'
 import {useWhatsNew} from '@/hooks/useWhatsNew'
 import {colors, fonts, fontSizes, radius, spacing} from '@/styles/tokens'
+import {BottomSheetBackdrop} from '../components/BottomSheetBackdrop'
 
 export default function WhatsNewScreen() {
   const {t} = useTranslation()
@@ -27,10 +28,7 @@ export default function WhatsNewScreen() {
   }, [router])
 
   return (
-    <View style={styles.overlay}>
-      {/* Backdrop — tap to dismiss */}
-      <TouchableOpacity style={styles.backdrop} onPress={handleContinue} activeOpacity={1} />
-
+    <BottomSheetBackdrop onPress={handleContinue}>
       {/* Bottom sheet — ~2/3 of screen */}
       <View style={styles.sheet}>
         {/* Drag handle */}
@@ -91,19 +89,11 @@ export default function WhatsNewScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </BottomSheetBackdrop>
   )
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
   sheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,

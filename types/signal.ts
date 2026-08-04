@@ -1,11 +1,14 @@
 import type {ContainerState} from './wasteContainer'
 
+export type FountainState = 'notWorking' | 'damaged' | 'dirty' | 'leaking' | 'other'
+
 export interface Signal {
   id: string
   title: string
   description: string
   category:
     | 'waste-container'
+    | 'drinking-fountain'
     | 'street-damage'
     | 'lighting'
     | 'green-spaces'
@@ -13,11 +16,12 @@ export interface Signal {
     | 'public-transport'
     | 'other'
   cityObject?: {
-    type?: 'waste-container' | 'street' | 'park' | 'building' | 'other'
+    type?: 'waste-container' | 'drinking-fountain' | 'street' | 'park' | 'building' | 'other'
     referenceId?: string
     name?: string
   }
   containerState?: ContainerState[]
+  fountainState?: FountainState[]
   location?: {
     latitude?: number
     longitude?: number
@@ -42,6 +46,7 @@ export interface CreateSignalInput {
   category: Signal['category']
   cityObject?: Signal['cityObject']
   containerState?: ContainerState[]
+  fountainState?: FountainState[]
   location?: Signal['location']
   reporterUniqueId?: string
 }

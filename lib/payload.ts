@@ -5,6 +5,7 @@
  */
 
 import type {WasteContainer, ContainerStatus, CreateContainerInput} from '../types/wasteContainer'
+import type {BulkyWasteZone, BulkyWasteZonesFeatureCollection} from '../types/bulkyWasteZone'
 import type {Signal, CreateSignalInput} from '../types/signal'
 import type {Assignment, CreateAssignmentInput, AssignmentProgress} from '../types/assignment'
 import {environmentManager} from './environment'
@@ -14,6 +15,29 @@ import type {
   CreateSubscriptionInput,
   UpdateSubscriptionInput,
 } from '../types/subscription'
+import type {Mission, MissionsFeedResponse, MissionLevel} from '../types/mission'
+
+export interface CreateMissionInput {
+  signal: string
+  title: string
+  description?: string
+  level: MissionLevel
+  status: 'draft' | 'open'
+  pointsReward: number
+  generalInstructions: string
+  tasks: Array<{
+    title: string
+    instructions: string
+    acceptanceCriteria: string
+    requiresBeforePhoto?: boolean
+    requiresAfterPhoto?: boolean
+  }>
+}
+
+export interface MissionProfileSummary {
+  darPoints: number
+  contributorLevel: 'beginner' | 'contributor' | 'guardian'
+}
 
 const getApiUrl = () => environmentManager.getApiUrl()
 
@@ -73,6 +97,60 @@ export interface PayloadResponse<T> {
   hasNextPage: boolean
   prevPage: number | null
   nextPage: number | null
+}
+
+export async function fetchBulkyWasteZones(signal?: AbortSignal): Promise<BulkyWasteZone[]> {
+  const response = await fetch(`${getApiUrl()}/api/bulky-waste-zones`, {signal})
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch bulky waste zones: ${response.statusText}`)
+  }
+
+  const data = (await response.json()) as
+    | BulkyWasteZonesFeatureCollection
+    | {
+        docs: Array<{
+          id: string | number
+          name: string
+          info?: string | null
+          collectionDaysOfWeek?: string[]
+          boundary: BulkyWasteZone['geometry']
+        }>
+      }
+
+  if ('type' in data && data.type === 'FeatureCollection' && Array.isArray(data.features)) {
+    return data.features
+      .filter(
+        (feature) =>
+          feature.type === 'Feature' &&
+          Boolean(feature.properties?.id) &&
+          (feature.geometry?.type === 'Polygon' || feature.geometry?.type === 'MultiPolygon')
+      )
+      .map((feature) => ({
+        ...feature.properties,
+        id: String(feature.properties.id),
+        collectionDaysOfWeek: feature.properties.collectionDaysOfWeek ?? [],
+        geometry: feature.geometry,
+      }))
+  }
+
+  if ('docs' in data && Array.isArray(data.docs)) {
+    return data.docs
+      .filter(
+        (zone) =>
+          Boolean(zone.id) &&
+          (zone.boundary?.type === 'Polygon' || zone.boundary?.type === 'MultiPolygon')
+      )
+      .map((zone) => ({
+        id: String(zone.id),
+        name: zone.name,
+        info: zone.info,
+        collectionDaysOfWeek: zone.collectionDaysOfWeek ?? [],
+        geometry: zone.boundary,
+      }))
+  }
+
+  throw new Error('Invalid bulky waste zones response')
 }
 
 /**
@@ -241,6 +319,7 @@ export async function fetchContainerClusters(options: {
   maxLng: number
   status?: ContainerStatus
   districtId?: number[]
+  volumeOptions?: number[]
 }): Promise<
   | {type: 'clusters'; docs: ContainerCluster[]; zoom: number}
   | {type: 'markers'; docs: WasteContainer[]; zoom: number}
@@ -257,6 +336,9 @@ export async function fetchContainerClusters(options: {
   }
   if (options.districtId && options.districtId.length > 0) {
     params.set('districtId', options.districtId.join(','))
+  }
+  if (options.volumeOptions && options.volumeOptions.length > 0) {
+    params.set('volumeOptions', options.volumeOptions.join(','))
   }
   const url = `${getApiUrl()}/api/waste-containers/containers-with-signal-count?${params}`
   const response = await fetch(url)
@@ -279,6 +361,145 @@ export async function fetchContainerClusters(options: {
     }
   }
   return data
+}
+
+// ─── Drinking Fountains ─────────────────────────────────────────────────────
+
+export interface DrinkingFountain {
+  id: number
+  /** Public identifier (e.g. DF-RTR-0001); used to link signals to this fountain. */
+  publicNumber: string | null
+  address: string
+  latitude: number
+  longitude: number
+  /** null = no data on whether the fountain works. */
+  isActive: boolean | null
+  protectionStatus: string | null
+  externalLink: string | null
+  districtName: string | null
+  sourceName: string | null
+  statusName: string | null
+  ownerName: string | null
+  activationName: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+/** Return the populated relationship's `name`, or null when it's just an id. */
+function relName(value: unknown): string | null {
+  return value && typeof value === 'object' ? ((value as {name?: string}).name ?? null) : null
+}
+
+/**
+ * Fetch drinking fountains for the map.
+ *
+ * Uses the public collection list endpoint (read access is open) rather than the
+ * admin-only `/map-data` endpoint. The dataset is small, so we load all fountains
+ * in a single request and render them at every zoom level. `depth=1` populates the
+ * lookup relationships (status, source, owner, activation type, district) — all of
+ * which are publicly readable — so the info card can show their names.
+ */
+export async function fetchDrinkingFountains(): Promise<DrinkingFountain[]> {
+  const params = new URLSearchParams({
+    limit: '2000',
+    depth: '1',
+  })
+  const url = `${getApiUrl()}/api/drinking-fountains?${params}`
+  const response = await fetch(url)
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch drinking fountains: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return (data.docs ?? []).map((doc: any) => ({
+    id: doc.id,
+    publicNumber: doc.publicNumber ?? null,
+    address: doc.address,
+    // Payload point fields are stored as [longitude, latitude].
+    latitude: Array.isArray(doc.location) ? doc.location[1] : 0,
+    longitude: Array.isArray(doc.location) ? doc.location[0] : 0,
+    isActive: doc.isActive ?? null,
+    protectionStatus: doc.protectionStatus ?? null,
+    externalLink: doc.externalLink ?? null,
+    districtName: relName(doc.district),
+    sourceName: relName(doc.source),
+    statusName: relName(doc.status),
+    ownerName: relName(doc.owner),
+    activationName: relName(doc.activationType),
+    createdAt: normalizePgTimestamp(doc.createdAt) as string | null,
+    updatedAt: normalizePgTimestamp(doc.updatedAt) as string | null,
+  }))
+}
+
+/** A row of one of the fountain lookup collections (status, source, …). */
+export interface FountainLookup {
+  id: number
+  name: string
+}
+
+async function fetchLookupCollection(slug: string): Promise<FountainLookup[]> {
+  const response = await fetch(`${getApiUrl()}/api/${slug}?limit=100&sort=name`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${slug}: ${response.statusText}`)
+  }
+  const data = await response.json()
+  return (data.docs ?? []).map((doc: any) => ({id: doc.id, name: doc.name}))
+}
+
+/** Possible fountain conditions (e.g. "Добро състояние") — publicly readable. */
+export function fetchFountainStatuses(): Promise<FountainLookup[]> {
+  return fetchLookupCollection('fountain-status')
+}
+
+/** Possible water sources (e.g. "Минерална") — publicly readable. */
+export function fetchFountainSources(): Promise<FountainLookup[]> {
+  return fetchLookupCollection('drinking-fountain-source')
+}
+
+export interface CreateDrinkingFountainInput {
+  address: string
+  location: {latitude: number; longitude: number}
+  isActive: boolean
+  /** Payload row ids of the lookup relationships. */
+  district?: number | string
+  source?: number
+  status?: number
+}
+
+/**
+ * Create a new drinking fountain. Requires a city-infrastructure admin account;
+ * the backend generates the DF-… publicNumber from the chosen district.
+ */
+export async function createDrinkingFountain(
+  input: CreateDrinkingFountainInput,
+  authToken: string
+): Promise<DrinkingFountain> {
+  const {location, ...rest} = input
+  const response = await fetch(`${getApiUrl()}/api/drinking-fountains`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({
+      ...rest,
+      // Payload point fields expect [longitude, latitude]
+      location: [location.longitude, location.latitude],
+    }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    handleAuthError(response)
+    throw new Error(
+      errorData.message || `Failed to create drinking fountain: ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+  return data.doc
 }
 
 /**
@@ -1295,4 +1516,342 @@ export async function fetchPushTokenId(token: string): Promise<number | string> 
   const data = await response.json()
   if (!data.docs?.length) throw new Error('Push token not registered on server')
   return data.docs[0].id
+}
+
+/**
+ * Fetches mission profile summary for the authenticated user.
+ */
+export async function fetchMissionProfileMe(authToken: string): Promise<MissionProfileSummary> {
+  const response = await fetch(`${getApiUrl()}/api/mission-profiles/me`, {
+    headers: {
+      Authorization: `JWT ${authToken}`,
+    },
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch mission profile: ${response.statusText}`)
+  }
+
+  const data = (await response.json()) as Partial<MissionProfileSummary>
+  return {
+    darPoints: typeof data.darPoints === 'number' ? data.darPoints : 0,
+    contributorLevel:
+      data.contributorLevel === 'contributor' || data.contributorLevel === 'guardian'
+        ? data.contributorLevel
+        : 'beginner',
+  }
+}
+
+/**
+ * Missions ("Мисии") — gamified quest board
+ */
+
+function transformMissionMedia(mission: any): Mission {
+  return {
+    ...mission,
+    tasks: (mission.tasks ?? []).map((task: any) => ({
+      ...task,
+      beforePhoto: task.beforePhoto
+        ? {...task.beforePhoto, url: getMediaUrl(task.beforePhoto)}
+        : task.beforePhoto,
+      afterPhoto: task.afterPhoto
+        ? {...task.afterPhoto, url: getMediaUrl(task.afterPhoto)}
+        : task.afterPhoto,
+    })),
+    missionBeforePhotos: (mission.missionBeforePhotos ?? []).map((m: any) => ({
+      ...m,
+      url: getMediaUrl(m),
+    })),
+    missionAfterPhotos: (mission.missionAfterPhotos ?? []).map((m: any) => ({
+      ...m,
+      url: getMediaUrl(m),
+    })),
+  }
+}
+
+/**
+ * POST /api/missions
+ * Admin-only mission creation endpoint using collection create access.
+ */
+export async function createMission(
+  input: CreateMissionInput,
+  authToken: string
+): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify(input),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    const message =
+      errorData?.message ||
+      errorData?.errors?.[0]?.message ||
+      errorData?.error ||
+      `Failed to create mission: ${response.statusText}`
+    throw new Error(message)
+  }
+
+  const created = await response.json()
+  return transformMissionMedia(created)
+}
+
+/**
+ * GET /api/missions/feed — quest board: open missions + the citizen's own
+ * missions, each annotated server-side with `locked`/`unlockRequirement`.
+ */
+export async function fetchMissionsFeed(authToken: string): Promise<MissionsFeedResponse> {
+  const response = await fetch(`${getApiUrl()}/api/missions/feed`, {
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to load missions feed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return {
+    ...data,
+    missions: (data.missions ?? []).map(transformMissionMedia),
+  }
+}
+
+/**
+ * Fetch a single mission by id (depth=1 to populate task/media relationships).
+ */
+export async function fetchMissionById(id: string, authToken?: string): Promise<Mission> {
+  const params = new URLSearchParams({depth: '2'})
+
+  params.set('select[id]', 'true')
+  params.set('select[title]', 'true')
+  params.set('select[status]', 'true')
+  params.set('select[description]', 'true')
+  params.set('select[level]', 'true')
+  params.set('select[pointsReward]', 'true')
+  params.set('select[generalInstructions]', 'true')
+  params.set('select[tasks]', 'true')
+  params.set('select[signal][id]', 'true')
+  params.set('select[signal][title]', 'true')
+  params.set('select[signal][location]', 'true')
+  params.set('select[signal][cityObject][type]', 'true')
+  params.set('select[signal][cityObject][referenceId]', 'true')
+  params.set('select[inspector][id]', 'true')
+  params.set('select[inspector][name]', 'true')
+  params.set('select[inspector][email]', 'true')
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}?${params.toString()}`, {
+    headers: authToken ? {Authorization: `JWT ${authToken}`} : {},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch mission: ${response.statusText}`)
+  }
+
+  const mission = await response.json()
+  return transformMissionMedia(mission)
+}
+
+/**
+ * POST /api/missions/:id/claim
+ */
+export async function claimMission(id: string, authToken: string): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}/claim`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to claim mission: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Uploads a single photo to /api/media and returns the created media id.
+ * Mirrors the upload-then-reference pattern used by `createSignal`.
+ */
+async function uploadMissionPhoto(
+  photo: {uri: string; type: string; name: string},
+  authToken: string
+): Promise<number> {
+  const formData = new FormData()
+  formData.append('file', {
+    uri: photo.uri,
+    type: photo.type,
+    name: photo.name,
+  } as any)
+
+  const response = await fetch(`${getApiUrl()}/api/media`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+    body: formData,
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || `Failed to upload photo: ${photo.name}`)
+  }
+
+  const uploaded = await response.json()
+  return uploaded.doc.id
+}
+
+/**
+ * POST /api/missions/:id/submit-task
+ * Uploads before/after photos (if provided) then submits the task progress.
+ */
+export async function submitMissionTask(
+  missionId: string,
+  taskId: string,
+  photos: {
+    before?: {uri: string; type: string; name: string}
+    after?: {uri: string; type: string; name: string}
+  },
+  authToken: string
+): Promise<Mission> {
+  const [beforePhotoId, afterPhotoId] = await Promise.all([
+    photos.before ? uploadMissionPhoto(photos.before, authToken) : Promise.resolve(undefined),
+    photos.after ? uploadMissionPhoto(photos.after, authToken) : Promise.resolve(undefined),
+  ])
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${missionId}/submit-task`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({taskId, beforePhotoId, afterPhotoId}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to submit task: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Uploads mission-level before/after photos (hasMany) and attaches them to
+ * the mission via `POST /:id/photos` (citizens have no generic PATCH access
+ * on missions, so this dedicated endpoint is required).
+ */
+export async function submitMissionOverallPhotos(
+  missionId: string,
+  photos: {
+    before?: {uri: string; type: string; name: string}[]
+    after?: {uri: string; type: string; name: string}[]
+  },
+  authToken: string
+): Promise<Mission> {
+  const beforePhotoIds = photos.before
+    ? await Promise.all(photos.before.map((p) => uploadMissionPhoto(p, authToken)))
+    : []
+  const afterPhotoIds = photos.after
+    ? await Promise.all(photos.after.map((p) => uploadMissionPhoto(p, authToken)))
+    : []
+
+  const response = await fetch(`${getApiUrl()}/api/missions/${missionId}/photos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({beforePhotoIds, afterPhotoIds}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to submit mission photos: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+export async function submitMissionForReview(id: string, authToken: string): Promise<Mission> {
+  const response = await fetch(`${getApiUrl()}/api/missions/${id}/submit-for-review`, {
+    method: 'POST',
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(
+      errorData.error || `Failed to submit mission for review: ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+  return transformMissionMedia(data.mission)
+}
+
+/**
+ * Fetches other citizens' `ready_for_review` missions available for
+ * community verification (excludes the requester's own missions).
+ */
+export async function fetchVerifiableMissions(authToken: string): Promise<Mission[]> {
+  const params = new URLSearchParams({
+    'where[status][equals]': 'ready_for_review',
+    depth: '1',
+    limit: '50',
+  })
+
+  const response = await fetch(`${getApiUrl()}/api/missions?${params}`, {
+    headers: {Authorization: `JWT ${authToken}`},
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    throw new Error(`Failed to load verifiable missions: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  return (data.docs ?? []).map(transformMissionMedia)
+}
+
+/**
+ * Submits a community verification (approve/reject) for another citizen's
+ * `ready_for_review` mission. Purely advisory — never auto-completes the mission.
+ */
+export async function submitMissionVerification(
+  missionId: string,
+  decision: 'approve' | 'reject',
+  comment: string | undefined,
+  authToken: string
+): Promise<void> {
+  const response = await fetch(`${getApiUrl()}/api/mission-verifications`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `JWT ${authToken}`,
+    },
+    body: JSON.stringify({mission: missionId, decision, comment}),
+  })
+  handleAuthError(response)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    const message =
+      errorData.errors?.[0]?.message ||
+      errorData.message ||
+      `Failed to submit verification: ${response.statusText}`
+    throw new Error(message)
+  }
 }
