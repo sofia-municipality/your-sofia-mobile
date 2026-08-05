@@ -25,9 +25,20 @@ trap dump_logcat_and_exit ERR
 # `boot_completed` fires while the system is still busy settling — and the
 # home launcher itself (nexuslauncher) ANRs ("Input dispatching timed out
 # (Application does not have a focused window)"), a *system-wide* focus
-# loss, not just the keyguard. Poking it with settings/input commands while
-# it's in that state doesn't help, so wait for dumpsys to report *any*
-# focused window first, up to 60s, before touching anything else.
+# loss, not just the keyguard. This has recurred even with nothing of ours
+# sending it input (removing the input-keyevent nudge below didn't fully
+# fix it) — logcat around the ANR shows GMS Core/Bluetooth/AppSearch all
+# still initializing, so this is background-service CPU contention on the
+# launcher's own thread, not something we're doing to it.
+#
+# Detox never needs the home launcher — it launches our app directly via
+# `am instrument`. So instead of trying to out-wait however long the
+# launcher takes to settle, just kill it: nothing else is competing for
+# focus once it's gone, and if the system relaunches it later, that's fine,
+# our app will already own focus by then.
+echo "Force-stopping the home launcher (it doesn't need to be running for Detox)..."
+adb shell am force-stop com.google.android.apps.nexuslauncher || true
+
 echo "Waiting for a focused window..."
 for _ in $(seq 1 30); do
   if adb shell dumpsys window 2>/dev/null | grep -q 'mCurrentFocus=Window{'; then
