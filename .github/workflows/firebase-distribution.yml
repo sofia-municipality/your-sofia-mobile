@@ -1,0 +1,143 @@
+name: Firebase App Distribution (Android)
+
+on:
+  workflow_dispatch:
+    inputs:
+      groups:
+        description: 'Tester groups to distribute to (comma separated aliases)'
+        required: false
+        type: string
+  push:
+    branches:
+      - vmutafov/firebase-app-distribution # for testing
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-distribution-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  distribute-android:
+    name: Build & distribute Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID || 'codbex-your-sofia' }}
+      ANDROID_VERSION_CODE: ${{ github.run_number }}
+      APK_PATH: android/app/build/outputs/apk/release/app-release.apk
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify required secrets
+        env:
+          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+        run: |
+          missing=''
+          [ -n "$FIREBASE_ANDROID_APP_ID" ] || missing="$missing FIREBASE_ANDROID_APP_ID"
+          [ -n "$FIREBASE_SERVICE_ACCOUNT" ] || missing="$missing FIREBASE_SERVICE_ACCOUNT"
+          [ -n "$GOOGLE_MAPS_ANDROID_API_KEY" ] || missing="$missing GOOGLE_MAPS_ANDROID_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required repository secrets:$missing — see .github/FIREBASE_DISTRIBUTION.md"
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate native Android project
+        run: pnpm exec expo prebuild --platform android --clean --no-install
+        env:
+          EXPO_NO_TELEMETRY: '1'
+          GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+
+      - name: Raise Gradle memory limits
+        run: |
+          {
+            echo ''
+            echo 'org.gradle.jvmargs=-Xmx5g -XX:MaxMetaspaceSize=2g'
+            echo 'kotlin.daemon.jvmargs=-Xmx2g'
+          } >> android/gradle.properties
+
+      - name: Set build number
+        run: |
+          {
+            echo ''
+            echo '// Appended by .github/workflows/firebase-distribution.yml — CI only.'
+            echo 'android {'
+            echo '    defaultConfig {'
+            echo '        versionCode Integer.parseInt(System.getenv("ANDROID_VERSION_CODE"))'
+            echo '    }'
+            echo '}'
+          } >> android/app/build.gradle
+
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+        env:
+          EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+          EXPO_PUBLIC_STAGING_API_URL: ${{ vars.EXPO_PUBLIC_STAGING_API_URL }}
+          EXPO_PUBLIC_PRODUCTION_API_URL: ${{ vars.EXPO_PUBLIC_PRODUCTION_API_URL }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: your-sofia-android-${{ env.ANDROID_VERSION_CODE }}
+          path: ${{ env.APK_PATH }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          TESTER_GROUPS: ${{ inputs.groups || vars.FIREBASE_TESTER_GROUPS }}
+        run: |
+          creds="$RUNNER_TEMP/firebase-service-account.json"
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$creds"
+          trap 'rm -f "$creds"' EXIT
+          export GOOGLE_APPLICATION_CREDENTIALS="$creds"
+
+          args=(
+            appdistribution:distribute "$APK_PATH"
+            --project "$FIREBASE_PROJECT_ID"
+            --app "$FIREBASE_ANDROID_APP_ID"
+          )
+          if [ -n "$TESTER_GROUPS" ]; then
+            args+=(--groups "$TESTER_GROUPS")
+          else
+            echo '::warning::No tester groups configured — the build is uploaded but not distributed.'
+          fi
+
+          npx --yes firebase-tools@15 "${args[@]}"
