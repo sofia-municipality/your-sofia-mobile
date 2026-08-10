@@ -13,7 +13,7 @@ import {
   Alert,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect} from 'expo-router'
 import {Plus, CheckSquare, Square, AlertTriangle, X, Calendar, Users} from 'lucide-react-native'
 import {useAuth} from '../../contexts/AuthContext'
 import {

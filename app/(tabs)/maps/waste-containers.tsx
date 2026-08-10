@@ -616,6 +616,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       router.setParams({refreshContainerId: undefined})
 
       // Use handleContainerUpdated to fetch and show the container
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleContainerUpdated(refreshContainerId)
     }
   }, [params.refreshContainerId, router, handleContainerUpdated])

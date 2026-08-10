@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useCallback} from 'react'
-import {useFocusEffect} from '@react-navigation/native'
 import {
   View,
   Text,
@@ -10,7 +9,7 @@ import {
   RefreshControl,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useRouter, useLocalSearchParams} from 'expo-router'
+import {useFocusEffect, useRouter, useLocalSearchParams} from 'expo-router'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import {fetchSignals} from '../../../lib/payload'
 import {getUniqueReporterId} from '../../../lib/deviceId'
@@ -79,6 +78,7 @@ export default function SignalsScreen() {
   )
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSignals()
   }, [loadSignals])
 

@@ -11,15 +11,9 @@ import {colors, fontSizes} from '@/styles/tokens'
 export default function EventsMap() {
   const {t} = useTranslation()
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
-  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
-  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
+  const [userBounds, setUserBounds] = useState<MapBounds | null>(null)
+  const [userZoom, setUserZoom] = useState<number | undefined>(undefined)
   const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const {news: events, loading} = useUpdates({
-    categories: ['culture', 'art', 'sports'],
-    limit: 100,
-    bounds: mapBounds,
-    zoom: mapZoom,
-  })
 
   useEffect(() => {
     ;(async () => {
@@ -51,10 +45,18 @@ export default function EventsMap() {
     [location?.coords.latitude, location?.coords.longitude]
   )
 
-  useEffect(() => {
-    setMapBounds(getBoundsFromRegion(region))
-    setMapZoom(estimateZoom(region))
-  }, [region])
+  // Bounds/zoom follow the region by default; panning the map (onRegionChangeComplete) overrides them.
+  const derivedBounds = useMemo(() => getBoundsFromRegion(region), [region])
+  const derivedZoom = useMemo(() => estimateZoom(region), [region])
+  const mapBounds = userBounds ?? derivedBounds
+  const mapZoom = userZoom ?? derivedZoom
+
+  const {news: events, loading} = useUpdates({
+    categories: ['culture', 'art', 'sports'],
+    limit: 100,
+    bounds: mapBounds,
+    zoom: mapZoom,
+  })
 
   useEffect(() => {
     return () => {
@@ -87,8 +89,8 @@ export default function EventsMap() {
         onRegionChangeComplete={(nextRegion: Region) => {
           if (regionDebounceRef.current) clearTimeout(regionDebounceRef.current)
           regionDebounceRef.current = setTimeout(() => {
-            setMapBounds(getBoundsFromRegion(nextRegion))
-            setMapZoom(estimateZoom(nextRegion))
+            setUserBounds(getBoundsFromRegion(nextRegion))
+            setUserZoom(estimateZoom(nextRegion))
           }, 400)
         }}
       >
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   loadingContainer: {
     flex: 1,

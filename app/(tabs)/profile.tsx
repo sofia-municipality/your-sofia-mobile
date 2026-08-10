@@ -134,6 +134,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     // Reload stats when language changes
     if (deviceId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadSignalStats(deviceId)
     }
   }, [i18n.language, deviceId, loadSignalStats])

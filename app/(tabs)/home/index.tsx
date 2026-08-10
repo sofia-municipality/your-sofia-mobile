@@ -8,8 +8,7 @@ import {
   Dimensions,
 } from 'react-native'
 import {useRef, useCallback, useEffect, useState} from 'react'
-import {useFocusEffect} from '@react-navigation/native'
-import {useRouter} from 'expo-router'
+import {useFocusEffect, useRouter} from 'expo-router'
 import {colors, fonts, fontSizes, radius, spacing} from '@/styles/tokens'
 import {useTranslation} from 'react-i18next'
 import {AirQualityCard} from '../../../components/AirQualityCard'
@@ -56,6 +55,8 @@ export default function HomeScreen() {
     const slugs = subscription.categories.map((c) => c.slug).filter(Boolean)
     if (slugs.length > 0) {
       subscriptionSeededRef.current = true
+      // One-time sync from async subscription data, guarded by the ref above.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedTopics(new Set(slugs))
     }
   }, [subscription])

@@ -14,8 +14,7 @@ import {
 } from 'react-native'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
-import {useRouter, useLocalSearchParams} from 'expo-router'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect, useRouter, useLocalSearchParams} from 'expo-router'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import * as Location from 'expo-location'
@@ -91,38 +90,44 @@ export default function NewCityObjectScreen() {
 
   React.useEffect(() => {
     if (!canManageFountains && objectType === 'drinking-fountain') {
+      // Correct a permission change made after this screen mounted (e.g. role revoked mid-session).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setObjectType('waste-container')
     }
   }, [canManageFountains, objectType])
 
+  const loadContainer = useCallback(
+    async (id: string) => {
+      try {
+        setLoadingContainer(true)
+        const data = await fetchWasteContainerById(id)
+        setContainer(data)
+        setCurrentLocation({
+          latitude: data.latitude,
+          longitude: data.longitude,
+        })
+      } catch (error) {
+        console.error('Error loading container:', error)
+        Alert.alert(t('common.error'), t('newCityObject.loadError'), [
+          {
+            text: 'OK',
+            onPress: () => router.back(),
+          },
+        ])
+      } finally {
+        setLoadingContainer(false)
+      }
+    },
+    [t, router]
+  )
+
   // Load existing container if editing
   React.useEffect(() => {
     if (isEditing && containerId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadContainer(containerId)
     }
-  }, [isEditing, containerId])
-
-  const loadContainer = async (id: string) => {
-    try {
-      setLoadingContainer(true)
-      const data = await fetchWasteContainerById(id)
-      setContainer(data)
-      setCurrentLocation({
-        latitude: data.latitude,
-        longitude: data.longitude,
-      })
-    } catch (error) {
-      console.error('Error loading container:', error)
-      Alert.alert(t('common.error'), t('newCityObject.loadError'), [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ])
-    } finally {
-      setLoadingContainer(false)
-    }
-  }
+  }, [isEditing, containerId, loadContainer])
 
   // Update date/time every second
   React.useEffect(() => {

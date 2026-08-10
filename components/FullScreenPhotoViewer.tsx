@@ -80,12 +80,16 @@ export function FullScreenPhotoViewer({visible, photoUri, onClose}: FullScreenPh
   }))
 
   const handleClose = () => {
+    // Reanimated shared values are mutable by design; `.value =` is the correct API here,
+    // not a React state mutation the react-hooks/immutability rule needs to flag.
+    /* eslint-disable react-hooks/immutability */
     scale.value = 1
     savedScale.value = 1
     translateX.value = 0
     translateY.value = 0
     savedTranslateX.value = 0
     savedTranslateY.value = 0
+    /* eslint-enable react-hooks/immutability */
     onClose()
   }
 
