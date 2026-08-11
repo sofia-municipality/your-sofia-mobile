@@ -50,7 +50,6 @@ export default function NewsMap() {
     })()
   }, [])
 
-  // Default to Sofia center if location is not available
   const region = useMemo(
     () => ({
       latitude: location?.coords.latitude || 42.6977,
@@ -74,7 +73,6 @@ export default function NewsMap() {
     }
   }, [])
 
-  // Filter news items that have location data
   const newsWithLocation = news.filter((item) => item.location)
 
   if (loading) {

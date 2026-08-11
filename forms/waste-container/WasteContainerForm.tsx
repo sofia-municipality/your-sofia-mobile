@@ -145,14 +145,12 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
 
     return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Public Number */}
         {renderField(
           'publicNumber',
           t('newCityObject.publicNumber'),
           t('newCityObject.publicNumberPlaceholder')
         )}
 
-        {/* Waste Type */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('newCityObject.wasteType')}</Text>
           {isEditing && canEdit ? (
@@ -191,7 +189,6 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
           )}
         </View>
 
-        {/* Capacity Size */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('newCityObject.capacitySize')}</Text>
           {isEditing && canEdit ? (
@@ -230,19 +227,15 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
           )}
         </View>
 
-        {/* Capacity Volume */}
         {renderField('capacityVolume', t('newCityObject.capacityVolume'), '1.0', {
           keyboardType: 'decimal-pad',
         })}
 
-        {/* Bin Count */}
         {renderField('binCount', t('newCityObject.binCount'), '1', {keyboardType: 'numeric'})}
 
-        {/* Location */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('newCityObject.location')}</Text>
 
-          {/* Info about location */}
           {isEditing && canEdit && (
             <View style={styles.infoRow}>
               <Info size={16} color={colors.primary} />
@@ -270,12 +263,10 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
           )}
         </View>
 
-        {/* Notes */}
         {renderField('notes', t('newCityObject.notes'), t('newCityObject.notesPlaceholder'), {
           multiline: true,
         })}
 
-        {/* Action Buttons */}
         {isEditing && canEdit && (
           <View style={styles.actionsContainer}>
             <TouchableOpacity

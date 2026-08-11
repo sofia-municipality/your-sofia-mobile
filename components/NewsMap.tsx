@@ -32,7 +32,7 @@ export function NewsMap({news, onMarkerPress, onBoundsChange}: NewsMapProps) {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 42.6977, // Sofia's coordinates
+          latitude: 42.6977,
           longitude: 23.3219,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,

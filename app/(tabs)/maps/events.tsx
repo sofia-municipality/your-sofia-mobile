@@ -40,7 +40,6 @@ export default function EventsMap() {
     })()
   }, [])
 
-  // Default to Sofia center if location is not available
   const region = useMemo(
     () => ({
       latitude: location?.coords.latitude || 42.6977,
@@ -64,7 +63,6 @@ export default function EventsMap() {
     }
   }, [])
 
-  // Filter events that have location data
   const eventsWithLocation = events.filter((item) => item.location)
 
   if (loading) {

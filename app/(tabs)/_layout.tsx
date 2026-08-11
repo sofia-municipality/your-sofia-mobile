@@ -110,7 +110,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       <Tabs.Screen
         name="missions"
         options={{
-          href: isAdmin && isAuthenticated ? '/missions' : null, // Only show for authenticated containerAdmin
+          href: isAdmin && isAuthenticated ? '/missions' : null,
           title: t('missions.title'),
           tabBarLabel: t('missions.title'),
           tabBarIcon: ({color}) => <Swords size={24} color={color} />,
@@ -120,7 +120,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
       <Tabs.Screen
         name="assignments"
         options={{
-          href: isContainerAdmin && isAuthenticated ? '/assignments' : null, // Only show for authenticated containerAdmin
+          href: isContainerAdmin && isAuthenticated ? '/assignments' : null,
           title: t('assignments.title'),
           tabBarLabel: t('assignments.title'),
           tabBarIcon: ({color}) => <ClipboardList size={24} color={color} />,

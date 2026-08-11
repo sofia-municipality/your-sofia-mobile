@@ -174,7 +174,6 @@ export default function ArView({onClose}: ArViewProps) {
     }
   }, [])
 
-  // Start GPS watch
   useEffect(() => {
     ;(async () => {
       const {status} = await Location.requestForegroundPermissionsAsync()
@@ -266,7 +265,7 @@ export default function ArView({onClose}: ArViewProps) {
     // Render farthest first so nearest overlays are painted last (on top).
     results.sort((a, b) => b.distance - a.distance)
 
-    // Stagger overlapping cards vertically (±60 px threshold)
+    // Stagger cards vertically when their horizontal positions are within 120px of each other
     for (let i = 0; i < results.length; i++) {
       for (let j = 0; j < i; j++) {
         if (Math.abs(results[i].screenX - results[j].screenX) < 120) {
@@ -306,14 +305,12 @@ export default function ArView({onClose}: ArViewProps) {
 
   return (
     <View style={styles.container}>
-      {/* Full-screen camera */}
       {showCamera ? (
         <CameraView style={StyleSheet.absoluteFill} facing="back" flash="auto" />
       ) : (
         <View style={[StyleSheet.absoluteFill, {backgroundColor: '#000'}]} />
       )}
 
-      {/* AR overlay cards */}
       {projected.map(({container, distance, screenX, screenY, zIndex, turnDirection}) => (
         <View
           key={container.id}
@@ -346,26 +343,22 @@ export default function ArView({onClose}: ArViewProps) {
         </View>
       )}
 
-      {/* No compass warning */}
       {!compassAvailable && (
         <View style={styles.compassWarning}>
           <Text style={styles.compassWarningText}>{t('arView.noCompass')}</Text>
         </View>
       )}
 
-      {/* Loading indicator */}
       {loading && (
         <View style={styles.loadingBadge}>
           <ActivityIndicator size="small" color="#fff" />
         </View>
       )}
 
-      {/* Close button */}
       <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
         <X size={22} color="#fff" />
       </TouchableOpacity>
 
-      {/* Container detail modal */}
       <Modal
         visible={selectedContainer !== null}
         transparent

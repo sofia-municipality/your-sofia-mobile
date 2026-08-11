@@ -31,7 +31,6 @@ export default function WhatsNewScreen() {
     <BottomSheetBackdrop onPress={handleContinue}>
       {/* Bottom sheet — ~2/3 of screen */}
       <View style={styles.sheet}>
-        {/* Drag handle */}
         <View style={styles.handle} />
 
         <ScrollView
@@ -39,7 +38,6 @@ export default function WhatsNewScreen() {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Logo + wordmark */}
           <View style={styles.header}>
             <Image
               source={require('../assets/images/sofia-gerb.png')}
@@ -53,10 +51,8 @@ export default function WhatsNewScreen() {
             </Text>
           </View>
 
-          {/* Heading */}
           <Text style={styles.title}>{t('whatsNew.title')}</Text>
 
-          {/* News items from API */}
           {loading ? (
             <ActivityIndicator color="#2F54C5" style={styles.loader} />
           ) : (

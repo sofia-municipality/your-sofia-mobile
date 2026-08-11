@@ -103,7 +103,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const locationRef = useRef<Location.LocationObject | null>(null)
   const mapCenterRef = useRef<{latitude: number; longitude: number} | null>(null)
 
-  // Cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true
     return () => {
@@ -226,7 +225,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
 
   useEffect(() => {
     ;(async () => {
-      // Request location permissions
       const {status} = await Location.requestForegroundPermissionsAsync()
       setPermissionStatus(status)
 
@@ -234,7 +232,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         return
       }
 
-      // Get current location
       try {
         const currentLocation = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
@@ -247,7 +244,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     })()
   }, [t])
 
-  // Animate to user location when it becomes available
   useEffect(() => {
     if (location && mapRef.current && followMe) {
       const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
@@ -449,7 +445,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const isOperational = (container: WasteContainer) =>
     container.status !== 'inactive' && container.status !== 'pending'
 
-  // Filter containers based on selected filters - use useMemo to avoid recalculating on every render
   const visibleContainers = React.useMemo(() => {
     return containers.filter((container) => {
       const matchesState =
@@ -466,7 +461,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     })
   }, [containers, selectedStateFilters, selectedTypeFilters])
 
-  // Memoize container markers to prevent re-renders during map movement
   const containerMarkers = React.useMemo(() => {
     return visibleContainers.map((container) => ({
       id: container.id,
@@ -572,15 +566,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
       if (!idToFetch) return
 
       try {
-        // Fetch the updated container from the API
         const updatedContainer = await fetchWasteContainerById(idToFetch)
 
-        // Update the container in the containers array
         setContainers((prevContainers) =>
           prevContainers.map((c) => (c.id === updatedContainer.id ? updatedContainer : c))
         )
 
-        // Update the selected container to reflect the new status in the card
         setSelectedContainer(updatedContainer)
       } catch (error) {
         console.error('Error refreshing container:', error)
@@ -609,14 +600,10 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     return () => clearInterval(id)
   }, [fetchClusters])
 
-  // Handle refreshContainerId param from navigation
   useEffect(() => {
     const refreshContainerId = params.refreshContainerId as string | undefined
     if (refreshContainerId) {
-      // Clear the param
       router.setParams({refreshContainerId: undefined})
-
-      // Use handleContainerUpdated to fetch and show the container
       handleContainerUpdated(refreshContainerId)
     }
   }, [params.refreshContainerId, router, handleContainerUpdated])
@@ -633,7 +620,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
     )
   }
 
-  // Use user location if available, otherwise default to Sofia center
   const region = {
     latitude: location?.coords.latitude || 42.683,
     longitude: location?.coords.longitude || 23.315,
@@ -649,7 +635,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         </Text>
       </View>
 
-      {/* Map */}
       <MapViewComponent
         ref={mapRef}
         onPress={() => {
@@ -691,7 +676,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             ))
           )}
 
-        {/* Cluster markers — shown when zoomed out (zoom < INDIVIDUAL_ZOOM) */}
         {zoom < INDIVIDUAL_ZOOM &&
           clusters.map((cluster, i) => (
             <Marker
@@ -699,7 +683,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
               coordinate={{latitude: cluster.lat, longitude: cluster.lng}}
               tracksViewChanges={false}
               onPress={() => {
-                // Zoom into the cluster on tap
                 if (mapRef.current) {
                   const {latitudeDelta, longitudeDelta} = regionDeltaRef.current
                   mapRef.current.animateToRegion(
@@ -722,7 +705,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
             </Marker>
           ))}
 
-        {/* Individual markers — shown when zoomed in (zoom >= INDIVIDUAL_ZOOM) */}
         {zoom >= INDIVIDUAL_ZOOM &&
           containerMarkers.map((marker) => (
             <Marker
@@ -741,9 +723,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           ))}
       </MapViewComponent>
 
-      {/* Expandable filter row - overlay */}
       <View style={styles.filtersRow}>
-        {/* State Filter */}
         <View style={{flex: 1}}>
           <TouchableOpacity
             activeOpacity={1}
@@ -784,7 +764,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
           )}
         </View>
 
-        {/* Type Filter */}
         <View style={{flex: 1}}>
           <TouchableOpacity
             activeOpacity={1}
@@ -840,7 +819,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         </View>
       </View>
 
-      {/* Action Buttons */}
       <View style={styles.actionButtonsContainer}>
         {/* hidden for now - requires backend processes for managing arbitrary signals.
         <TouchableOpacity
@@ -876,14 +854,12 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         </TouchableOpacity>
       </View>
 
-      {/* AR View Button */}
       {onOpenAR && (
         <TouchableOpacity style={styles.arButton} onPress={onOpenAR}>
           <ScanSearch size={22} color={colors.primary} />
         </TouchableOpacity>
       )}
 
-      {/* Container Info Modal */}
       <Modal
         visible={showContainerCard}
         transparent
@@ -909,7 +885,6 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         onClose={() => setSelectedBulkyWasteZone(null)}
       />
 
-      {/* Loading overlay for containers */}
       {containersLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="small" color={colors.primary} />
@@ -928,13 +903,11 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   )
 }
 
-// Helper function to get pin color based on container status.
 // Pass uncollectedMode=true to colour by time since last collection instead.
 function getContainerPinColor(container: WasteContainer, uncollectedMode = false): string {
   if (uncollectedMode && container.publicNumber.startsWith('RTR-')) {
     if (!container.lastCleaned) return 'red'
-    // PostgreSQL timestamps use a space separator and short tz offset: "2026-03-11 07:46:30+00"
-    // Normalise to valid ISO 8601: space → T, and expand +HH / -HH offsets to +HH:00.
+    // PostgreSQL returns "2026-03-11 07:46:30+00" (space separator); Date needs a T separator
     const normalized = container.lastCleaned.replace(' ', 'T')
     const hoursSince = (Date.now() - new Date(normalized).getTime()) / (1000 * 60 * 60)
     if (hoursSince <= 24) return 'green'

@@ -7,7 +7,6 @@ import type {LocationFilterPoint} from '../../../types/subscription'
 import {emitNotificationFilter} from '../../../lib/notificationFilterBridge'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
-// Sofia center
 const SOFIA_REGION: Region = {
   latitude: 42.6977,
   longitude: 23.3219,

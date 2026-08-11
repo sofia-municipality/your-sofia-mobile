@@ -135,12 +135,10 @@ export function WasteContainerCard({
       return
     }
 
-    // Close the card first
     if (onClose) {
       onClose()
     }
 
-    // Navigate to signal creation form with prepopulated container data
     router.push({
       pathname: '/(tabs)/new/new-signal',
       params: {
@@ -157,12 +155,10 @@ export function WasteContainerCard({
     } as any)
   }
 
-  // Fetch last observation photos and signal photos on mount
   React.useEffect(() => {
     const fetchLastObservationPhotos = async () => {
       setLoadingPhotos(true)
       try {
-        // Fetch observation photos
         const observationsResponse = await fetch(
           `${environmentManager.getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&depth=2&sort=-cleanedAt&limit=3`
         )
@@ -179,7 +175,6 @@ export function WasteContainerCard({
             type: 'cleaning',
           }))
 
-        // Fetch signals for this container
         const signalsResponse = await fetch(
           `${environmentManager.getApiUrl()}/api/signals?where[cityObject.referenceId][equals]=${container.publicNumber}&depth=2&sort=-createdAt&limit=3`
         )
@@ -202,7 +197,6 @@ export function WasteContainerCard({
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
 
-        // Take only the first 3 photos
         setLastObservationPhotos(allPhotos.slice(0, 3))
       } catch (error) {
         console.error('Error fetching last observation photos:', error)
@@ -308,7 +302,6 @@ export function WasteContainerCard({
 
       await cleanContainer(container.id, token!, photo, notes)
 
-      // Close form and reset state first
       setShowCleanForm(false)
       setPhotoUri(null)
       setNotes('')
@@ -422,7 +415,6 @@ export function WasteContainerCard({
           style={styles.signalsBadge}
           onPress={() => {
             if (onClose) onClose()
-            // Navigate to Signals tab and apply container filter
             router.push({
               pathname: '/(tabs)/signals',
               params: {containerReferenceId: container.publicNumber},
@@ -456,7 +448,6 @@ export function WasteContainerCard({
             </>
           )}
         </TouchableOpacity>
-        {/* Last Observation Photos */}
         {loadingPhotos ? (
           <View style={styles.lastPhotosLoading}>
             <ActivityIndicator size="small" color={colors.primary} />
@@ -501,7 +492,6 @@ export function WasteContainerCard({
           )
         )}
 
-        {/* Full Info Toggle Button */}
         <TouchableOpacity
           onPress={() => setShowFullInfo(!showFullInfo)}
           style={styles.fullInfoButton}
@@ -518,7 +508,6 @@ export function WasteContainerCard({
           )}
         </TouchableOpacity>
 
-        {/* Extended Info Section */}
         {showFullInfo && (
           <View style={styles.extendedInfoContainer}>
             <View style={styles.extendedInfoRow}>
@@ -652,7 +641,6 @@ export function WasteContainerCard({
           <Text style={styles.reportButtonText}>{t('wasteContainers.reportIssue')}</Text>
         </TouchableOpacity>
 
-        {/* Clean Container button for Container Admins */}
         {isContainerAdmin && (container.status !== 'active' || !container.lastCleaned) && (
           <TouchableOpacity
             style={styles.cleanButton}
@@ -666,7 +654,6 @@ export function WasteContainerCard({
         )}
       </View>
 
-      {/* Photo Modal */}
       <Modal
         visible={showPhotoModal}
         transparent={true}
@@ -712,7 +699,6 @@ export function WasteContainerCard({
         </View>
       </Modal>
 
-      {/* Observations History Modal */}
       <Modal
         visible={showObservations}
         transparent={true}
@@ -774,7 +760,6 @@ export function WasteContainerCard({
         </BottomSheetBackdrop>
       </Modal>
 
-      {/* Edit Container Modal */}
       <Modal
         visible={showEditForm}
         animationType="slide"
@@ -812,7 +797,6 @@ export function WasteContainerCard({
         </BottomSheetBackdrop>
       </Modal>
 
-      {/* Clean Container Form Modal */}
       <Modal
         visible={showCleanForm}
         transparent={true}
@@ -845,7 +829,6 @@ export function WasteContainerCard({
 
             <Text style={styles.formDescription}>{t('wasteContainers.cleanDescription')}</Text>
 
-            {/* Photo Section */}
             <View style={styles.formSection}>
               <Text style={styles.formSectionLabel}>{t('wasteContainers.photoRequired')}</Text>
               {photoUri ? (
@@ -889,7 +872,6 @@ export function WasteContainerCard({
               )}
             </View>
 
-            {/* Notes Section */}
             <View style={styles.formSection}>
               <Text style={styles.formSectionLabel}>{t('wasteContainers.addNotes')}</Text>
               <TextInput
@@ -904,7 +886,6 @@ export function WasteContainerCard({
               />
             </View>
 
-            {/* Action Buttons */}
             <View style={styles.formActions}>
               <TouchableOpacity
                 style={styles.formCancelButton}

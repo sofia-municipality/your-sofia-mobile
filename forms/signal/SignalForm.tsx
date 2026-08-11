@@ -101,7 +101,6 @@ function SignalLifecycleBanner({status}: {status: Signal['status']}) {
 
   return (
     <View style={styles.lifecycleBanner}>
-      {/* Step row */}
       <View style={styles.lifecycleStepsRow}>
         {/* Step 1 — always done */}
         <View style={styles.lifecycleStep}>
@@ -148,7 +147,6 @@ function SignalLifecycleBanner({status}: {status: Signal['status']}) {
         </View>
       </View>
 
-      {/* Message callout */}
       <View style={[styles.lifecycleMessage, messageBoxStyle]}>
         <MessageIcon size={16} color={messageIconColor} />
         <Text style={[styles.lifecycleMessageText, messageTextStyle]}>{message}</Text>
@@ -337,7 +335,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
 
     return (
       <View>
-        {/* Status and Category Badges */}
         <View
           style={{
             flexDirection: 'row',
@@ -372,7 +369,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
         {signal.cityObject?.name && (
           <View style={styles.section}>
             <View style={styles.metaRow}>
-              {/* City Object */}
               <MapPin size={16} color={colors.textSecondary} />
               <Text style={styles.metaText}>{signal.cityObject.name}</Text>
               {isAdmin && (
@@ -393,10 +389,8 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        {/* Lifecycle banner — only shown in read-only view */}
         {!isEditing && <SignalLifecycleBanner status={signal.status} />}
 
-        {/* Title */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('signals.form.title')}</Text>
           {isEditing ? (
@@ -424,7 +418,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           )}
         </View>
 
-        {/* Container State */}
         {signal.category === 'waste-container' && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>{t('signals.form.containerState')}</Text>
@@ -479,7 +472,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        {/* Images */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('signals.form.photos')}</Text>
 
@@ -535,7 +527,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           )}
         </View>
 
-        {/* City Object */}
         {signal.cityObject?.name && (
           <View style={styles.section}>
             <View style={styles.metaRow}>
@@ -545,7 +536,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        {/* Location */}
         {signal.location?.address && (
           <View style={styles.section}>
             <View style={styles.metaRow}>
@@ -555,7 +545,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        {/* Description */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t('signals.form.description')}</Text>
           {isEditing ? (
@@ -583,7 +572,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           )}
         </View>
 
-        {/* Admin Notes */}
         {signal.adminNotes && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>{t('signals.adminNotes')}</Text>
@@ -594,7 +582,6 @@ export const SignalForm = forwardRef<any, SignalFormProps>(
           </View>
         )}
 
-        {/* Edit Permission Info */}
         {!canEdit && !isEditing && (
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>{t('signals.cannotEdit')}</Text>

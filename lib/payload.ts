@@ -1,9 +1,3 @@
-/**
- * Payload CMS API Client
- *
- * Client for fetching content from Payload CMS
- */
-
 import type {WasteContainer, ContainerStatus, CreateContainerInput} from '../types/wasteContainer'
 import type {BulkyWasteZone, BulkyWasteZonesFeatureCollection} from '../types/bulkyWasteZone'
 import type {Signal, CreateSignalInput} from '../types/signal'
@@ -48,9 +42,6 @@ export function setAuthErrorHandler(handler: () => void) {
   globalAuthErrorHandler = handler
 }
 
-/**
- * Handle API response errors and check for authentication issues
- */
 function handleAuthError(response: Response) {
   if (response.status === 401 && globalAuthErrorHandler) {
     console.log('[API] Authentication error detected, triggering logout')
@@ -153,9 +144,6 @@ export async function fetchBulkyWasteZones(signal?: AbortSignal): Promise<BulkyW
   throw new Error('Invalid bulky waste zones response')
 }
 
-/**
- * Fetch news from Payload CMS
- */
 export async function fetchNews(options?: {
   locale?: 'bg' | 'en'
   topic?: string
@@ -164,7 +152,6 @@ export async function fetchNews(options?: {
 }): Promise<PayloadResponse<PayloadNewsItem>> {
   const {locale = 'bg', topic, limit = 10, page = 1} = options || {}
 
-  // Build query parameters
   const params = new URLSearchParams({
     locale,
     limit: limit.toString(),
@@ -173,10 +160,8 @@ export async function fetchNews(options?: {
     sort: '-publishedAt',
   })
 
-  // Add status filter
   params.append('where[status][equals]', 'published')
 
-  // Add topic filter if specified
   if (topic && topic !== 'all') {
     params.append('where[topic][equals]', topic)
   }
@@ -194,9 +179,6 @@ export async function fetchNews(options?: {
   return response.json()
 }
 
-/**
- * Fetch a single news item by ID
- */
 export async function fetchNewsById(
   id: string,
   locale: 'bg' | 'en' = 'bg'
@@ -211,9 +193,6 @@ export async function fetchNewsById(
   return response.json()
 }
 
-/**
- * Fetch media URL
- */
 export function getMediaUrl(media: any): string | undefined {
   if (!media) return undefined
 
@@ -232,10 +211,7 @@ export function getMediaUrl(media: any): string | undefined {
   return undefined
 }
 
-/**
- * Fetch waste containers with aggregated signal counts
- * Uses backend SQL query for efficiency - single database call
- */
+// Uses backend SQL query for efficiency - single database call
 export async function fetchContainersWithSignals(options?: {
   limit?: number
   page?: number
@@ -271,7 +247,6 @@ export async function fetchContainersWithSignals(options?: {
 
   const data = await response.json()
 
-  // Transform image URLs if present
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
@@ -502,9 +477,6 @@ export async function createDrinkingFountain(
   return data.doc
 }
 
-/**
- * Fetch waste containers from Payload CMS
- */
 export async function fetchWasteContainers(options?: {
   status?: ContainerStatus
   wasteType?: string
@@ -513,19 +485,16 @@ export async function fetchWasteContainers(options?: {
 }): Promise<PayloadResponse<WasteContainer>> {
   const {status, wasteType, limit = 3000, page = 1} = options || {}
 
-  // Build query parameters
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
     depth: '2', // Populate image and observations relationships
   })
 
-  // Add status filter - default to active containers
   if (status) {
     params.append('where[status][equals]', status)
   }
 
-  // Add waste type filter if specified
   if (wasteType) {
     params.append('where[wasteType][equals]', wasteType)
   }
@@ -542,7 +511,7 @@ export async function fetchWasteContainers(options?: {
 
   const data = await response.json()
 
-  // Transform image URLs only (observations loaded lazily)
+  // observations are loaded lazily, not transformed here
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
@@ -560,13 +529,7 @@ export async function fetchWasteContainers(options?: {
   return data
 }
 
-/**
- * Fetch nearby waste containers using PostGIS geospatial query
- * @param location User's current location {latitude, longitude}
- * @param radiusMeters Search radius in meters (default: 500m)
- * @param options Optional filters for status and wasteType
- * @returns Promise with array of nearby containers sorted by distance
- */
+// Uses a PostGIS geospatial query; results are sorted by distance
 export async function fetchNearbyWasteContainers(
   location: {latitude: number; longitude: number},
   radiusMeters: number = 500,
@@ -578,7 +541,6 @@ export async function fetchNearbyWasteContainers(
 ): Promise<PayloadResponse<WasteContainer & {distance: number}>> {
   const {status, wasteType, limit = 500} = options || {}
 
-  // Build query parameters
   const params = new URLSearchParams({
     latitude: location.latitude.toString(),
     longitude: location.longitude.toString(),
@@ -586,7 +548,6 @@ export async function fetchNearbyWasteContainers(
     limit: limit.toString(),
   })
 
-  // Add optional filters
   if (status) {
     params.append('status', status)
   }
@@ -615,7 +576,6 @@ export async function fetchNearbyWasteContainers(
 
   const data = await response.json()
 
-  // Transform image URLs if present
   if (data.docs) {
     data.docs = data.docs.map((container: any) => ({
       ...container,
@@ -633,9 +593,6 @@ export async function fetchNearbyWasteContainers(
   return data
 }
 
-/**
- * Fetch a single waste container by ID with latest observation
- */
 export async function fetchWasteContainerById(id: string): Promise<WasteContainer> {
   const response = await fetch(`${getApiUrl()}/api/waste-containers/${id}?depth=1`)
   handleAuthError(response)
@@ -646,7 +603,6 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
 
   const container = await response.json()
 
-  // Transform image URL
   if (container.image) {
     container.image = {
       ...container.image,
@@ -657,7 +613,6 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
   container.latitude = container.location?.[1]
   container.longitude = container.location?.[0]
 
-  // Fetch latest observation with photo for this container
   try {
     const obsResponse = await fetch(
       `${getApiUrl()}/api/waste-container-observations?where[container][equals]=${container.id}&sort=-cleanedAt&limit=1&depth=1`
@@ -678,10 +633,7 @@ export async function fetchWasteContainerById(id: string): Promise<WasteContaine
   return container
 }
 
-/**
- * Clean a waste container (mark signals as resolved and set status to active)
- * Requires authentication token
- */
+// Marks signals as resolved and sets the container status back to active
 export async function cleanContainer(
   containerId: string | number,
   authToken: string,
@@ -729,9 +681,6 @@ export async function cleanContainer(
   return response.json()
 }
 
-/**
- * Fetch signals from Payload CMS
- */
 export async function fetchSignals(options?: {
   status?: string
   category?: string
@@ -751,7 +700,6 @@ export async function fetchSignals(options?: {
     containerReferenceId,
   } = options || {}
 
-  // Build query parameters
   const params = new URLSearchParams({
     limit: limit.toString(),
     page: page.toString(),
@@ -759,27 +707,22 @@ export async function fetchSignals(options?: {
     sort: '-createdAt',
   })
 
-  // Add status filter if specified
   if (status) {
     params.append('where[status][equals]', status)
   }
 
-  // Add category filter if specified
   if (category) {
     params.append('where[category][equals]', category)
   }
 
-  // Add reporterUniqueId filter if specified
   if (reporterUniqueId) {
     params.append('where[reporterUniqueId][equals]', reporterUniqueId)
   }
 
-  // Add reporterUserId filter if specified
   if (reporterUserId !== undefined) {
     params.append('where[reporter][equals]', String(reporterUserId))
   }
 
-  // Add container reference ID filter if specified
   if (containerReferenceId) {
     params.append('where[cityObject.referenceId][equals]', containerReferenceId)
   }
@@ -796,7 +739,6 @@ export async function fetchSignals(options?: {
 
   const data = await response.json()
 
-  // Transform image URLs
   if (data.docs) {
     data.docs = data.docs.map((signal: any) => ({
       ...signal,
@@ -810,9 +752,6 @@ export async function fetchSignals(options?: {
   return data
 }
 
-/**
- * Fetch a single signal by ID
- */
 export async function fetchSignalById(id: string): Promise<Signal> {
   const response = await fetch(`${getApiUrl()}/api/signals/${id}?depth=1`)
   handleAuthError(response)
@@ -823,7 +762,6 @@ export async function fetchSignalById(id: string): Promise<Signal> {
 
   const signal = await response.json()
 
-  // Transform image URLs
   if (signal.images) {
     signal.images = signal.images.map((img: any) => ({
       ...img,
@@ -833,10 +771,6 @@ export async function fetchSignalById(id: string): Promise<Signal> {
 
   return signal
 }
-
-/**
- * Create a new signal with optional photos
- */
 
 /**
  * Serialize a signal's location from {latitude, longitude} object to
@@ -872,7 +806,6 @@ export async function createSignal(
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i]
 
-      // Call progress callback
       if (onUploadProgress) {
         onUploadProgress(i + 1, photos.length)
       }
@@ -908,7 +841,6 @@ export async function createSignal(
       }
     }
 
-    // Create signal with uploaded image IDs
     response = await fetch(`${getApiUrl()}/api/signals`, {
       method: 'POST',
       headers: {
@@ -921,7 +853,6 @@ export async function createSignal(
       }),
     })
   } else {
-    // Create signal without photos
     response = await fetch(`${getApiUrl()}/api/signals`, {
       method: 'POST',
       headers: {
@@ -947,9 +878,6 @@ export async function createSignal(
   return response.json()
 }
 
-/**
- * Check if reporter already has an active signal for the same container
- */
 export async function checkExistingSignal(
   reporterUniqueId: string,
   containerReferenceId: string
@@ -962,7 +890,6 @@ export async function checkExistingSignal(
       limit: 1,
     })
 
-    // Check if there are any non-resolved signals
     const activeSignal = response.docs.find(
       (signal) => signal.status !== 'resolved' && signal.status !== 'rejected'
     )
@@ -977,22 +904,17 @@ export async function checkExistingSignal(
   }
 }
 
-/**
- * Fetch signal statistics for a reporter
- */
 export async function fetchSignalStats(
   reporterUniqueId: string
 ): Promise<{total: number; active: number}> {
   try {
-    // Fetch all signals for this reporter
     const response = await fetchSignals({
       reporterUniqueId,
-      limit: 1000, // High limit to get all signals
+      limit: 1000,
     })
 
     const total = response.totalDocs
 
-    // Count active signals (not resolved or rejected)
     const active = response.docs.filter(
       (signal) => signal.status !== 'resolved' && signal.status !== 'rejected'
     ).length
@@ -1004,9 +926,6 @@ export async function fetchSignalStats(
   }
 }
 
-/**
- * Update an existing signal
- */
 export async function updateSignal(
   id: string,
   signalData: Partial<Signal> & {
@@ -1017,7 +936,6 @@ export async function updateSignal(
 ): Promise<Signal> {
   const {newPhotos, existingPhotoIds, ...updateData} = signalData
 
-  // Upload new photos if provided
   let allImageIds: number[] = existingPhotoIds || []
 
   if (newPhotos && newPhotos.length > 0) {
@@ -1047,8 +965,8 @@ export async function updateSignal(
     }
   }
 
-  // Update signal with all image IDs (existing + new)
-  // Always include images field if existingPhotoIds was provided, even if empty array
+  // Always include the images field if existingPhotoIds was provided, even when empty,
+  // so clearing all photos is possible
   const finalUpdateData = {
     ...updateData,
     ...(updateData.location
@@ -1075,9 +993,6 @@ export async function updateSignal(
   return response.json()
 }
 
-/**
- * Create a new waste container
- */
 export async function createWasteContainer(
   containerData: CreateContainerInput,
   authToken: string,
@@ -1085,7 +1000,6 @@ export async function createWasteContainer(
 ): Promise<WasteContainer> {
   let imageId: string | undefined
 
-  // Upload photo if provided
   if (photo) {
     const formData = new FormData()
     formData.append('file', {
@@ -1110,7 +1024,6 @@ export async function createWasteContainer(
     imageId = uploadData.doc.id
   }
 
-  // Create container
   const response = await fetch(`${getApiUrl()}/api/waste-containers`, {
     method: 'POST',
     headers: {
@@ -1133,9 +1046,6 @@ export async function createWasteContainer(
   return response.json()
 }
 
-/**
- * Update an existing waste container
- */
 export async function updateWasteContainer(
   id: string,
   containerData: CreateContainerInput,
@@ -1144,7 +1054,6 @@ export async function updateWasteContainer(
 ): Promise<WasteContainer> {
   let imageId: string | undefined
 
-  // Upload photo if provided
   if (photo) {
     const formData = new FormData()
     formData.append('file', {
@@ -1169,7 +1078,6 @@ export async function updateWasteContainer(
     imageId = uploadData.doc.id
   }
 
-  // Update container
   const updatePayload = {
     ...containerData,
     ...(imageId && {image: imageId}),
@@ -1193,9 +1101,6 @@ export async function updateWasteContainer(
   return response.json()
 }
 
-/**
- * Fetch assignments from Payload CMS
- */
 export async function fetchAssignments(options?: {
   status?: 'pending' | 'in-progress' | 'completed' | 'cancelled'
   assignedTo?: number
@@ -1234,9 +1139,6 @@ export async function fetchAssignments(options?: {
   return response.json()
 }
 
-/**
- * Fetch a single assignment by ID
- */
 export async function fetchAssignmentById(id: string): Promise<Assignment> {
   const response = await fetch(`${getApiUrl()}/api/assignments/${id}?depth=2`)
   handleAuthError(response)
@@ -1249,9 +1151,6 @@ export async function fetchAssignmentById(id: string): Promise<Assignment> {
   return data
 }
 
-/**
- * Create a new assignment
- */
 export async function createAssignment(
   assignmentData: CreateAssignmentInput,
   authToken: string
@@ -1274,9 +1173,6 @@ export async function createAssignment(
   return response.json()
 }
 
-/**
- * Update an existing assignment
- */
 export async function updateAssignment(
   id: string,
   assignmentData: Partial<Assignment>,
@@ -1300,9 +1196,6 @@ export async function updateAssignment(
   return response.json()
 }
 
-/**
- * Calculate assignment progress based on container states
- */
 export function calculateAssignmentProgress(assignment: Assignment): AssignmentProgress {
   const containers = Array.isArray(assignment.containers) ? assignment.containers : []
   const totalContainers = containers.length
@@ -1401,9 +1294,6 @@ export async function fetchCollectionMetrics(from: string, to: string): Promise<
 
 // ─── Subscriptions ────────────────────────────────────────────────────────────
 
-/**
- * Fetch all city districts ordered by districtId.
- */
 export async function fetchCityDistricts(): Promise<CityDistrict[]> {
   const url = `${getApiUrl()}/api/city-districts?limit=24&sort=districtId`
   const response = await fetch(url)
@@ -1414,10 +1304,6 @@ export async function fetchCityDistricts(): Promise<CityDistrict[]> {
   return data.docs as CityDistrict[]
 }
 
-/**
- * Fetch the subscription for a given Expo push token string.
- * Returns null if no subscription exists yet.
- */
 export async function fetchMySubscription(token: string): Promise<Subscription | null> {
   const url = `${getApiUrl()}/api/subscriptions/mine?token=${encodeURIComponent(token)}`
   const response = await fetch(url)
@@ -1428,9 +1314,6 @@ export async function fetchMySubscription(token: string): Promise<Subscription |
   return data.subscription as Subscription | null
 }
 
-/**
- * Create a new subscription document.
- */
 export async function createSubscription(input: CreateSubscriptionInput): Promise<Subscription> {
   const url = `${getApiUrl()}/api/subscriptions`
   const response = await fetch(url, {
@@ -1445,10 +1328,7 @@ export async function createSubscription(input: CreateSubscriptionInput): Promis
   return data.doc as Subscription
 }
 
-/**
- * Patch an existing subscription document.
- * Pass authToken when the user is authenticated to keep the user field linked.
- */
+// Pass authToken when the user is authenticated, to keep the user field linked
 export async function updateSubscription(
   id: number | string,
   input: UpdateSubscriptionInput,
@@ -1505,10 +1385,7 @@ export async function updateSubscription(
   throw new Error('Cannot update subscription: no auth token and no push token')
 }
 
-/**
- * Resolve the Payload document id for a given Expo push token string.
- * Throws if the token is not yet registered on the server.
- */
+// Throws if the token is not yet registered on the server
 export async function fetchPushTokenId(token: string): Promise<number | string> {
   const url = `${getApiUrl()}/api/push-tokens?where[token][equals]=${encodeURIComponent(token)}&limit=1`
   const response = await fetch(url)
@@ -1518,9 +1395,6 @@ export async function fetchPushTokenId(token: string): Promise<number | string> 
   return data.docs[0].id
 }
 
-/**
- * Fetches mission profile summary for the authenticated user.
- */
 export async function fetchMissionProfileMe(authToken: string): Promise<MissionProfileSummary> {
   const response = await fetch(`${getApiUrl()}/api/mission-profiles/me`, {
     headers: {
@@ -1570,10 +1444,7 @@ function transformMissionMedia(mission: any): Mission {
   }
 }
 
-/**
- * POST /api/missions
- * Admin-only mission creation endpoint using collection create access.
- */
+// Admin-only mission creation endpoint using collection create access
 export async function createMission(
   input: CreateMissionInput,
   authToken: string
@@ -1624,9 +1495,6 @@ export async function fetchMissionsFeed(authToken: string): Promise<MissionsFeed
   }
 }
 
-/**
- * Fetch a single mission by id (depth=1 to populate task/media relationships).
- */
 export async function fetchMissionById(id: string, authToken?: string): Promise<Mission> {
   const params = new URLSearchParams({depth: '2'})
 
@@ -1660,9 +1528,6 @@ export async function fetchMissionById(id: string, authToken?: string): Promise<
   return transformMissionMedia(mission)
 }
 
-/**
- * POST /api/missions/:id/claim
- */
 export async function claimMission(id: string, authToken: string): Promise<Mission> {
   const response = await fetch(`${getApiUrl()}/api/missions/${id}/claim`, {
     method: 'POST',

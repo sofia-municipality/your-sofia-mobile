@@ -54,7 +54,6 @@ export default function NewCityObjectScreen() {
   // plus the dedicated fountain admin.
   const canManageFountains = isInfrastructureAdmin || isFountainAdmin
 
-  // Check if we're editing an existing container
   const containerId = params.containerId as string | undefined
   const isEditing = !!containerId
 
@@ -77,7 +76,6 @@ export default function NewCityObjectScreen() {
   // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
   const [showCamera, setShowCamera] = useState(true)
 
-  // Check permissions
   React.useEffect(() => {
     if (!isContainerAdmin && isEditing) {
       Alert.alert(t('common.error'), t('newCityObject.adminOnly'), [
@@ -95,7 +93,6 @@ export default function NewCityObjectScreen() {
     }
   }, [canManageFountains, objectType])
 
-  // Load existing container if editing
   React.useEffect(() => {
     if (isEditing && containerId) {
       loadContainer(containerId)
@@ -124,7 +121,6 @@ export default function NewCityObjectScreen() {
     }
   }
 
-  // Update date/time every second
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDateTime(new Date())
@@ -132,7 +128,6 @@ export default function NewCityObjectScreen() {
     return () => clearInterval(interval)
   }, [])
 
-  // Get current location
   React.useEffect(() => {
     if (isEditing || currentLocation) return
     let mounted = true
@@ -232,7 +227,6 @@ export default function NewCityObjectScreen() {
 
     setLoading(true)
     try {
-      // Prepare photo files for upload
       const photoFiles =
         photos.length > 0
           ? photos.map((photo) => ({
@@ -243,7 +237,6 @@ export default function NewCityObjectScreen() {
           : undefined
 
       if (isEditing && containerId) {
-        // Update existing container
         if (!token) {
           throw new Error('Authentication required')
         }
@@ -258,7 +251,6 @@ export default function NewCityObjectScreen() {
           },
         ])
       } else {
-        // Create new container
         if (!token) {
           throw new Error('Authentication required')
         }
@@ -317,7 +309,6 @@ export default function NewCityObjectScreen() {
     }
   }
 
-  // Reset form when tab is focused
   useFocusEffect(
     useCallback(() => {
       if (!isEditing) {
@@ -402,7 +393,6 @@ export default function NewCityObjectScreen() {
       >
         {objectTypeSelector}
 
-        {/* Camera Section */}
         {objectType === 'waste-container' && (
           <View style={styles.cameraContainer}>
             {showCamera && !isEditing ? (
@@ -450,7 +440,6 @@ export default function NewCityObjectScreen() {
           </View>
         )}
 
-        {/* Photo Chips */}
         {objectType === 'waste-container' && photos.length > 0 && (
           <View style={styles.photosContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -494,7 +483,6 @@ export default function NewCityObjectScreen() {
         )}
       </KeyboardAwareScrollView>
 
-      {/* Full-Screen Photo Viewer */}
       <FullScreenPhotoViewer
         visible={viewingPhoto !== null}
         photoUri={viewingPhoto}

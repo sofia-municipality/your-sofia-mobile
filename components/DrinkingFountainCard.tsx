@@ -250,7 +250,6 @@ export function DrinkingFountainCard({fountain, onClose}: DrinkingFountainCardPr
             style={styles.signalsBadge}
             onPress={() => {
               if (onClose) onClose()
-              // Navigate to Signals tab filtered for this fountain
               router.push({
                 pathname: '/(tabs)/signals',
                 params: {containerReferenceId: fountain.publicNumber},
@@ -344,7 +343,6 @@ export function DrinkingFountainCard({fountain, onClose}: DrinkingFountainCardPr
         </TouchableOpacity>
       </View>
 
-      {/* Report Issue Modal */}
       <Modal
         visible={showReportForm}
         transparent
