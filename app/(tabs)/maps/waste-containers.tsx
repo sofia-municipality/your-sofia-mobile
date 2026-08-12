@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import MapView, {Marker, Polygon, PROVIDER_DEFAULT, type LatLng} from 'react-native-maps'
 import * as Location from 'expo-location'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {useTranslation} from 'react-i18next'
 import {
   Navigation,
@@ -70,6 +71,7 @@ function getZonePolygons(zone: BulkyWasteZone): {coordinates: LatLng[]; holes: L
 
 export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const {t} = useTranslation()
+  const insets = useSafeAreaInsets()
   const router = useRouter()
   useAuth()
   const params = useLocalSearchParams()
@@ -890,7 +892,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         onRequestClose={handleCloseCard}
       >
         <BottomSheetBackdrop onPress={handleCloseCard}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
             {selectedContainer && (
               <WasteContainerCard
                 container={selectedContainer}

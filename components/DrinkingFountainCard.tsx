@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'
 import {
   AlertTriangle,
@@ -54,6 +55,7 @@ export function DrinkingFountainCard({fountain, onClose}: DrinkingFountainCardPr
   const {t} = useTranslation()
   const router = useRouter()
   const {token, isAuthenticated} = useAuth()
+  const insets = useSafeAreaInsets()
 
   const [showFullInfo, setShowFullInfo] = useState(false)
   const [showReportForm, setShowReportForm] = useState(false)
@@ -352,7 +354,7 @@ export function DrinkingFountainCard({fountain, onClose}: DrinkingFountainCardPr
         onRequestClose={() => setShowReportForm(false)}
       >
         <View style={styles.formModalOverlay}>
-          <View style={styles.formModalContent}>
+          <View style={[styles.formModalContent, {paddingBottom: insets.bottom + spacing.md}]}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>{t('fountains.reportIssue')}</Text>
               <TouchableOpacity

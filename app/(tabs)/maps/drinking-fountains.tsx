@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps'
 import * as Location from 'expo-location'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {useTranslation} from 'react-i18next'
 import {
   Navigation,
@@ -29,6 +30,7 @@ const SOFIA_CENTER = {latitude: 42.6977, longitude: 23.3219}
 
 export default function DrinkingFountains() {
   const {t} = useTranslation()
+  const insets = useSafeAreaInsets()
   const mapRef = useRef<MapView>(null)
   const isMountedRef = useRef(true)
   const watchRef = useRef<Location.LocationSubscription | null>(null)
@@ -325,7 +327,7 @@ export default function DrinkingFountains() {
         onRequestClose={() => setSelected(null)}
       >
         <BottomSheetBackdrop onPress={() => setSelected(null)}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
             {selected && (
               <DrinkingFountainCard fountain={selected} onClose={() => setSelected(null)} />
             )}

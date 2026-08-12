@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react'
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {StyleSheet, TouchableOpacity, View, useWindowDimensions} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
 
 interface BottomSheetBackdropProps {
@@ -8,8 +8,9 @@ interface BottomSheetBackdropProps {
 }
 
 export function BottomSheetBackdrop({children, onPress}: BottomSheetBackdropProps) {
+  const {height} = useWindowDimensions()
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {height}]}>
       <TouchableOpacity
         style={styles.dismissArea}
         activeOpacity={1}
@@ -29,7 +30,6 @@ export function BottomSheetBackdrop({children, onPress}: BottomSheetBackdropProp
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'flex-end',
   },
   dismissArea: {

@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import * as Location from 'expo-location'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {useTranslation} from 'react-i18next'
 import {ChevronLeft, ChevronRight, X} from 'lucide-react-native'
 import {WasteContainerCard} from '../../../components/WasteContainerCard'
@@ -132,6 +133,7 @@ interface ArViewProps {
 
 export default function ArView({onClose}: ArViewProps) {
   const {t} = useTranslation()
+  const insets = useSafeAreaInsets()
   const {width: screenWidth, height: screenHeight} = useWindowDimensions()
   const [permission, requestPermission] = useCameraPermissions()
   const [userLocation, setUserLocation] = useState<{latitude: number; longitude: number} | null>(
@@ -373,7 +375,7 @@ export default function ArView({onClose}: ArViewProps) {
         onRequestClose={() => setSelectedContainer(null)}
       >
         <BottomSheetBackdrop onPress={() => setSelectedContainer(null)}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
             {selectedContainer && (
               <WasteContainerCard
                 container={selectedContainer}
