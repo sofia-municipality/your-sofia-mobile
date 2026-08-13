@@ -19,7 +19,7 @@ import {loadNearbyContainers} from '../../../lib/containerUtils'
 import {getDistanceFromLatLonInMeters} from '../../../lib/mapUtils'
 import {useDeviceHeading} from '../../../hooks/useDeviceHeading'
 import {type WasteContainer} from '../../../types/wasteContainer'
-import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {colors, fonts, fontSizes, spacing} from '@/styles/tokens'
 
 const HORIZONTAL_FOV = 60 // degrees — approximate phone camera horizontal FOV
 const AR_RADIUS_METERS = 50
@@ -375,7 +375,7 @@ export default function ArView({onClose}: ArViewProps) {
         onRequestClose={() => setSelectedContainer(null)}
       >
         <BottomSheetBackdrop onPress={() => setSelectedContainer(null)}>
-          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + spacing.md}]}>
             {selectedContainer && (
               <WasteContainerCard
                 container={selectedContainer}

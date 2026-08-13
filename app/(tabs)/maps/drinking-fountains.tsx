@@ -23,7 +23,7 @@ import {
 import {DrinkingFountainMarker} from '../../../components/DrinkingFountainMarker'
 import {DrinkingFountainCard, getFountainColor} from '../../../components/DrinkingFountainCard'
 import {fetchDrinkingFountains, type DrinkingFountain} from '../../../lib/payload'
-import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {colors, fonts, fontSizes, spacing} from '@/styles/tokens'
 import {BottomSheetBackdrop} from '@/components/BottomSheetBackdrop'
 
 const SOFIA_CENTER = {latitude: 42.6977, longitude: 23.3219}
@@ -327,7 +327,7 @@ export default function DrinkingFountains() {
         onRequestClose={() => setSelected(null)}
       >
         <BottomSheetBackdrop onPress={() => setSelected(null)}>
-          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + spacing.md}]}>
             {selected && (
               <DrinkingFountainCard fountain={selected} onClose={() => setSelected(null)} />
             )}

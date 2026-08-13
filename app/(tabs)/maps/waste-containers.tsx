@@ -34,7 +34,7 @@ import {
   fetchContainerClusters,
   type ContainerCluster,
 } from '../../../lib/payload'
-import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {colors, fonts, fontSizes, spacing} from '@/styles/tokens'
 import {useAuth} from '../../../contexts/AuthContext'
 import {
   type WasteContainer,
@@ -892,7 +892,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         onRequestClose={handleCloseCard}
       >
         <BottomSheetBackdrop onPress={handleCloseCard}>
-          <View style={[styles.modalContent, {paddingBottom: insets.bottom + 16}]}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + spacing.md}]}>
             {selectedContainer && (
               <WasteContainerCard
                 container={selectedContainer}
