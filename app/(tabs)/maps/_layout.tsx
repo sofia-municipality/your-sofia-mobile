@@ -36,6 +36,7 @@ export default function MapsLayout() {
   const openAR = () => setSelectedFilter('arView')
   const closeAR = () => setSelectedFilter('wasteContainers')
 
+  // Determine which map component(s) to render
   const renderMapContent = () => {
     switch (selectedFilter) {
       case 'wasteContainers':
@@ -61,6 +62,7 @@ export default function MapsLayout() {
     <View style={styles.container}>
       <Stack.Screen options={{headerShown: false}} />
 
+      {/* Filter chips */}
       <View style={styles.filtersContainer}>
         <ScrollView
           horizontal
@@ -86,6 +88,7 @@ export default function MapsLayout() {
         </ScrollView>
       </View>
 
+      {/* Map content based on selected filter */}
       <View style={styles.mapContainer}>{renderMapContent()}</View>
     </View>
   )

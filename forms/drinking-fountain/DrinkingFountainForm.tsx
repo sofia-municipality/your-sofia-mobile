@@ -132,6 +132,7 @@ export function DrinkingFountainForm({
 
   return (
     <View style={styles.container}>
+      {/* Address */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>{t('newCityObject.address')}</Text>
         <Controller
@@ -155,6 +156,7 @@ export function DrinkingFountainForm({
         />
       </View>
 
+      {/* Working state */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>{t('newCityObject.fountainIsActive')}</Text>
         <Controller
@@ -190,6 +192,7 @@ export function DrinkingFountainForm({
         />
       </View>
 
+      {/* Location */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>{t('newCityObject.location')}</Text>
         <View style={styles.locationRow}>
@@ -202,10 +205,12 @@ export function DrinkingFountainForm({
         </View>
       </View>
 
+      {/* Optional lookups */}
       {renderLookupSelect('district', t('fountains.district'), districts)}
       {renderLookupSelect('source', t('fountains.source'), sources)}
       {renderLookupSelect('status', t('fountains.condition'), statuses)}
 
+      {/* Action Buttons */}
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.secondaryButton} onPress={onCancel} disabled={isSubmitting}>
           <Text style={styles.secondaryButtonText}>{t('common.cancel')}</Text>

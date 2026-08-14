@@ -72,6 +72,7 @@ export default function SignalDetailsScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  // Check if the current user is the reporter who created this signal
   useEffect(() => {
     if (signal && user) {
       const reporterId = typeof signal.reporter === 'object' ? signal.reporter?.id : signal.reporter
@@ -96,6 +97,7 @@ export default function SignalDetailsScreen() {
       try {
         setSaving(true)
 
+        // Separate new photos from existing ones
         const newPhotos = (data.photos || []).filter((p) => p.isNew)
         const existingPhotoIds = (data.photos || [])
           .filter((p) => !p.isNew && p.id !== undefined)
@@ -166,6 +168,7 @@ export default function SignalDetailsScreen() {
     ])
   }, [signal, token, t])
 
+  // Update header buttons based on editing state
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (

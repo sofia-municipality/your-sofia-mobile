@@ -90,9 +90,11 @@ export function AuthProvider({children}: {children: ReactNode}) {
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Load auth state from AsyncStorage on mount
   useEffect(() => {
     loadAuthState()
 
+    // Register auth error handler that will logout and redirect to login
     setAuthErrorHandler(() => {
       console.log('[AuthContext] Token expired, logging out')
       Alert.alert('Session Expired', 'Your session has expired. Please log in again.', [
@@ -163,6 +165,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         contributorLevel: missionProfile.contributorLevel,
       }
 
+      // Store token and user data
       await Promise.all([
         AsyncStorage.setItem(AUTH_TOKEN_KEY, data.token),
         AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(mergedUser)),
@@ -197,7 +200,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
           name,
           email,
           password,
-          role: 'user',
+          role: 'user', // Default role for new registrations
         }),
       })
 
@@ -245,6 +248,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
         throw new Error(error.error || error.message || 'Failed to delete account')
       }
 
+      // After successful deletion, logout
       await logout()
     } catch (error) {
       console.error('Delete account error:', error)

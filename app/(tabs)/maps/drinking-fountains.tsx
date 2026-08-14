@@ -72,6 +72,7 @@ export default function DrinkingFountains() {
     })()
   }, [t])
 
+  // Request location permission + initial position.
   useEffect(() => {
     ;(async () => {
       const {status} = await Location.requestForegroundPermissionsAsync()
@@ -86,6 +87,7 @@ export default function DrinkingFountains() {
     })()
   }, [])
 
+  // Follow-me location watch.
   useEffect(() => {
     let mounted = true
     const start = async () => {
@@ -188,7 +190,9 @@ export default function DrinkingFountains() {
         ))}
       </MapView>
 
+      {/* Expandable filter row - overlay */}
       <View style={styles.filtersRow}>
+        {/* Condition Filter */}
         <View style={{flex: 1}}>
           <TouchableOpacity
             activeOpacity={1}
@@ -232,6 +236,7 @@ export default function DrinkingFountains() {
           )}
         </View>
 
+        {/* Water Source Filter */}
         <View style={{flex: 1}}>
           <TouchableOpacity
             activeOpacity={1}
@@ -276,6 +281,7 @@ export default function DrinkingFountains() {
         </View>
       </View>
 
+      {/* Action Buttons */}
       <View style={styles.actionButtonsContainer}>
         <TouchableOpacity
           style={[styles.actionButton, followMe && styles.actionButtonActive]}
@@ -311,6 +317,7 @@ export default function DrinkingFountains() {
         </View>
       )}
 
+      {/* Fountain Info Modal */}
       <Modal
         visible={!!selected}
         transparent

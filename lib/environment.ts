@@ -118,6 +118,7 @@ class EnvironmentManager {
     return Object.values(ENVIRONMENTS)
   }
 
+  // Only allow environment switching in development mode
   canSwitchEnvironment(): boolean {
     return __DEV__
   }

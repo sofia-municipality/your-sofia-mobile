@@ -126,16 +126,19 @@ export default function ProfileScreen() {
   useEffect(() => {
     getUniqueReporterId().then((id) => {
       setDeviceId(id)
+      // Fetch signal stats once we have the device ID
       loadSignalStats(id)
     })
   }, [loadSignalStats])
 
   useEffect(() => {
+    // Reload stats when language changes
     if (deviceId) {
       loadSignalStats(deviceId)
     }
   }, [i18n.language, deviceId, loadSignalStats])
 
+  // Refresh stats when tab comes into focus
   useFocusEffect(
     useCallback(() => {
       if (!hasSkippedFirstFocusRef.current) {
@@ -191,11 +194,14 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Notification Bar */}
+
         <TouchableOpacity style={styles.notificationBar}>
           <Text style={styles.notificationText}>{t('profile.anonymity')}</Text>
           <AlertCircle size={24} color={colors.primary} />
         </TouchableOpacity>
 
+        {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
@@ -262,6 +268,7 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Authentication Section */}
         {!isAuthenticated ? (
           <View style={styles.authSection}>
             <Text style={styles.authTitle}>{t('auth.loginToAccess')}</Text>
@@ -298,6 +305,7 @@ export default function ProfileScreen() {
               <Text style={styles.logoutButtonText}>{t('auth.logout')}</Text>
             </TouchableOpacity>
 
+            {/* Forget Me Button */}
             <TouchableOpacity
               style={styles.forgetMeButton}
               onPress={() => setShowForgetMeModal(true)}
@@ -310,6 +318,7 @@ export default function ProfileScreen() {
           </>
         )}
 
+        {/* Quick Stats */}
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>{t('profile.stats.title')}</Text>
           <View style={styles.statsGrid}>
@@ -328,6 +337,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Forget Me Modal */}
         <Modal
           visible={showForgetMeModal}
           transparent={true}
@@ -342,6 +352,7 @@ export default function ProfileScreen() {
               </View>
               <Text style={styles.modalMessage}>{t('auth.forgetMeMessage')}</Text>
 
+              {/* Info Link */}
               <TouchableOpacity
                 style={styles.modalInfoLink}
                 onPress={() => {
@@ -386,6 +397,7 @@ export default function ProfileScreen() {
         {/* Environment Switcher - Dev Only */}
         <EnvironmentSwitcher />
 
+        {/* Profile Sections */}
         {profileSections.map((section: ProfileSection) => (
           <View key={section.id} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -428,6 +440,7 @@ export default function ProfileScreen() {
           </View>
         ))}
 
+        {/* App Version */}
         <View style={styles.versionContainer}>
           <Text style={styles.versionText}>
             Твоята София v{Constants.expoConfig?.version ?? ''}
