@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start --dev-client",
     "dev:staging": "cross-env EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_DEFAULT_ENV=staging expo start --dev-client",
-    "build:web": "expo export --platform web",
+    "generate:api": "openapi-generator-cli generate -i api.yaml -g typescript-axios -o src/api --additional-properties=supportsES6=true,withInterfaces=true",
+    "generate:mock": "openapi-generator-cli generate -i api.yaml -g nodejs-express-server -o mock-server",
+    "build:web": "openapi-generator-cli generate -i api.yaml -g typescript-axios -o src/api --additional-properties=supportsES6=true,withInterfaces=true && expo export --platform web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
     "format": "prettier --write .",
@@ -88,6 +90,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@openapitools/openapi-generator-cli": "^2.40.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",

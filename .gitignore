@@ -44,3 +44,7 @@ ios/build/
 
 /.idea/
 /.vscode/
+
+# openapi-generator output — regenerated from api.yaml, see package.json
+src/api/
+mock-server/
