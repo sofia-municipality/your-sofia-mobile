@@ -1,4 +1,5 @@
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {X} from 'lucide-react-native'
 import {useTranslation} from 'react-i18next'
 import type {BulkyWasteZone} from '../types/bulkyWasteZone'
@@ -27,6 +28,7 @@ export function BulkyWasteZoneDetailsModal({
   onClose,
 }: BulkyWasteZoneDetailsModalProps) {
   const {t} = useTranslation()
+  const insets = useSafeAreaInsets()
 
   if (!zone) return null
 
@@ -39,7 +41,7 @@ export function BulkyWasteZoneDetailsModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <BottomSheetBackdrop onPress={onClose}>
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, {paddingBottom: insets.bottom + spacing.md}]}>
           <View style={styles.header}>
             <Text selectable style={styles.title}>
               {zone.name}
