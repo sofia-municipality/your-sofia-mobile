@@ -13,6 +13,7 @@ import {
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
 import {useRouter} from 'expo-router'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import type {WasteContainer} from '../types/wasteContainer'
 import {
   Trash2,
@@ -96,6 +97,8 @@ export function WasteContainerCard({
   const {t, i18n} = useTranslation()
   const router = useRouter()
   const {isContainerAdmin, token, isAuthenticated} = useAuth()
+  const insets = useSafeAreaInsets()
+  const sheetInset = {paddingBottom: insets.bottom + spacing.md}
   const {
     total: signalsTotal,
     active: signalsActive,
@@ -720,7 +723,7 @@ export function WasteContainerCard({
         onRequestClose={() => setShowObservations(false)}
       >
         <BottomSheetBackdrop onPress={() => setShowObservations(false)}>
-          <View style={styles.formModalContent}>
+          <View style={[styles.formModalContent, sheetInset]}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>{t('wasteContainers.lastObservations')}</Text>
               <TouchableOpacity
@@ -782,7 +785,7 @@ export function WasteContainerCard({
         onRequestClose={() => setShowEditForm(false)}
       >
         <BottomSheetBackdrop onPress={() => setShowEditForm(false)}>
-          <View style={[styles.formModalContent, {maxHeight: '95%'}]}>
+          <View style={[styles.formModalContent, sheetInset, {maxHeight: '95%'}]}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>
                 {t('common.edit')} {t('wasteContainers.name')}
@@ -826,7 +829,7 @@ export function WasteContainerCard({
             setNotes('')
           }}
         >
-          <View style={styles.formModalContent}>
+          <View style={[styles.formModalContent, sheetInset]}>
             <View style={styles.formHeader}>
               <Text style={styles.formTitle}>{t('wasteContainers.cleanContainer')}</Text>
               <TouchableOpacity
