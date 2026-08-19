@@ -12,6 +12,7 @@ import {
 import MapViewComponent, {Marker, Polygon, PROVIDER_DEFAULT, type MapViewRef} from '@/lib/Map'
 import type {LatLng} from 'react-native-maps'
 import * as Location from 'expo-location'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {useTranslation} from 'react-i18next'
 import {
   Navigation,
@@ -34,7 +35,7 @@ import {
   fetchContainerClusters,
   type ContainerCluster,
 } from '../../../lib/payload'
-import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {colors, fonts, fontSizes, spacing} from '@/styles/tokens'
 import {useAuth} from '../../../contexts/AuthContext'
 import {
   type WasteContainer,
@@ -71,6 +72,7 @@ function getZonePolygons(zone: BulkyWasteZone): {coordinates: LatLng[]; holes: L
 
 export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
   const {t} = useTranslation()
+  const insets = useSafeAreaInsets()
   const router = useRouter()
   useAuth()
   const params = useLocalSearchParams()
@@ -867,7 +869,7 @@ export default function WasteContainers({onOpenAR}: {onOpenAR?: () => void}) {
         onRequestClose={handleCloseCard}
       >
         <BottomSheetBackdrop onPress={handleCloseCard}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, {paddingBottom: insets.bottom + spacing.md}]}>
             {selectedContainer && (
               <WasteContainerCard
                 container={selectedContainer}
