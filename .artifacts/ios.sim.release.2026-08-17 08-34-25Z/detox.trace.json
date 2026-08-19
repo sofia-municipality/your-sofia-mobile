@@ -1,0 +1,4153 @@
+[
+  {
+    "ph": "M",
+    "args": {"name": "primary"},
+    "ts": 1786955665720000,
+    "tid": 0,
+    "pid": 1038,
+    "name": "process_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 0},
+    "ts": 1786955665720000,
+    "tid": 0,
+    "pid": 1038,
+    "name": "process_sort_index"
+  },
+  {
+    "ph": "M",
+    "args": {"name": "lifecycle"},
+    "ts": 1786955665720000,
+    "tid": 0,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 0},
+    "ts": 1786955665720000,
+    "tid": 0,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "B",
+    "name": "node_modules/detox/local-cli/cli.js test --configuration ios.sim.release --cleanup",
+    "pid": 1038,
+    "tid": 0,
+    "cat": "lifecycle",
+    "ts": 1786955665720000,
+    "args": {
+      "level": 10,
+      "cwd": "/Users/valentinasenov/your-sofia/your-sofia-mobile",
+      "data": {
+        "id": "1a22a4fb-3822-9446-41f1-bb7030508e20",
+        "detoxConfig": {
+          "configurationName": "ios.sim.release",
+          "apps": {
+            "default": {
+              "type": "ios.app",
+              "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/YourSofia.app",
+              "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+            }
+          },
+          "artifacts": {
+            "rootDir": ".artifacts/ios.sim.release.2026-08-17 08-34-25Z",
+            "plugins": {
+              "log": {"enabled": true, "keepOnlyFailedTestsArtifacts": true},
+              "screenshot": {
+                "enabled": true,
+                "shouldTakeAutomaticSnapshots": true,
+                "keepOnlyFailedTestsArtifacts": true
+              },
+              "video": {"enabled": false, "keepOnlyFailedTestsArtifacts": false},
+              "instruments": {"enabled": false, "keepOnlyFailedTestsArtifacts": false},
+              "uiHierarchy": {"enabled": false, "keepOnlyFailedTestsArtifacts": false}
+            }
+          },
+          "behavior": {
+            "init": {"keepLockFile": false, "reinstallApp": true, "exposeGlobals": true},
+            "cleanup": {"shutdownDevice": true},
+            "launchApp": "auto"
+          },
+          "cli": {"cleanup": true, "configuration": "ios.sim.release", "start": true},
+          "commands": [
+            {
+              "appName": "default",
+              "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+            }
+          ],
+          "device": {"type": "ios.simulator", "device": {"type": "iPhone 16e"}},
+          "logger": {
+            "level": "info",
+            "overrideConsole": true,
+            "options": {
+              "showLoggerName": true,
+              "showPid": true,
+              "showLevel": false,
+              "showMetadata": false,
+              "basepath": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/detox@20.51.4_patch_hash=243f4fb1396d0ba4204110e1fb380dce0954c69273b7351999aba1f3d2eca5_91662811f4238f93586f4790222322c3/node_modules/detox/src",
+              "prefixers": {},
+              "stringifiers": {}
+            }
+          },
+          "testRunner": {
+            "retries": 0,
+            "forwardEnv": false,
+            "detached": false,
+            "bail": false,
+            "noRetryArgs": ["shard"],
+            "jest": {
+              "setupTimeout": 120000,
+              "teardownTimeout": 30000,
+              "retryAfterCircusRetries": false,
+              "reportWorkerAssign": true
+            },
+            "args": {"$0": "jest", "_": [], "config": "e2e/jest.config.js", "--": []}
+          },
+          "session": {"autoStart": true, "debugSynchronization": 10000}
+        },
+        "detoxIPCServer": "primary-1038",
+        "testResults": [],
+        "testSessionIndex": 0,
+        "workersCount": 0
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ipc"},
+    "ts": 1786955665726000,
+    "tid": 1,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 1},
+    "ts": 1786955665726000,
+    "tid": 1,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "Server path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + ipc.config.id /tmp/detox.primary-1038",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955665726000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "starting server on  /tmp/detox.primary-1038 ",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955665726000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "starting TLS server false",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955665726000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "starting server as Unix || Windows Socket",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955665726000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ws-server"},
+    "ts": 1786955665728000,
+    "tid": 2,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 2},
+    "ts": 1786955665728000,
+    "tid": 2,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "Detox server listening on localhost:62318...",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955665728000,
+    "args": {"level": 20, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "Serialized the session state at: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/1a22a4fb-3822-9446-41f1-bb7030508e20.detox.json",
+    "pid": 1038,
+    "tid": 0,
+    "cat": "lifecycle",
+    "ts": 1786955665729000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "jest --config e2e/jest.config.js",
+    "pid": 1038,
+    "tid": 0,
+    "cat": "lifecycle,cli",
+    "ts": 1786955665730000,
+    "args": {"level": 30, "env": {}, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "user"},
+    "ts": 1786955665731000,
+    "tid": 5,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 5},
+    "ts": 1786955665731000,
+    "tid": 5,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "(node:1038) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
+    "pid": 1038,
+    "tid": 5,
+    "cat": "user",
+    "ts": 1786955665731000,
+    "args": {"level": 50, "origin": "at node:internal/process/warning:56:3", "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "secondary"},
+    "ts": 1786955666454000,
+    "tid": 0,
+    "pid": 1045,
+    "name": "process_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 1},
+    "ts": 1786955666454000,
+    "tid": 0,
+    "pid": 1045,
+    "name": "process_sort_index"
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ipc"},
+    "ts": 1786955666454000,
+    "tid": 8,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 8},
+    "ts": 1786955666454000,
+    "tid": 8,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "Service path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + id ",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666454000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "requested connection to  primary-1038 /tmp/detox.primary-1038",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666454000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "Connecting client on Unix Socket : /tmp/detox.primary-1038",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666454000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## socket connection to server detected ##",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666455000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "retrying reset",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666455000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to  primary-1038 /tmp/detox.primary-1038  :  registerContext , { id: 'secondary-1045' }",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666455000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "received event of :  registerContext { id: 'secondary-1045' }",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666456000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to socket  :  registerContextDone {\n  testResults: [],\n  testSessionIndex: 0,\n  unsafe_earlyTeardown: undefined\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666456000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666457000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "detected event registerContextDone { testResults: [], testSessionIndex: 0 }",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666457000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "lifecycle"},
+    "ts": 1786955666530000,
+    "tid": 9,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 9},
+    "ts": 1786955666530000,
+    "tid": 9,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "B",
+    "name": "e2e/login.e2e.js",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955666530000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "set up environment",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955666540000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "received event of :  registerWorker { workerId: 'w1' }",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to socket  :  registerWorkerDone { workersCount: 1 }",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "broadcasting event to all known sockets listening to  /tmp/detox.primary-1038  :   sessionStateUpdate { workersCount: 1 }",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to  primary-1038 /tmp/detox.primary-1038  :  registerWorker , { workerId: 'w1' }",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "detected event registerWorkerDone { workersCount: 1 }",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666541000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666657000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "detected event sessionStateUpdate { workersCount: 1 }",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666657000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "connection :62318<->:62319",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955666662000,
+    "args": {"level": 20, "id": 62319, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ws-client"},
+    "ts": 1786955666662000,
+    "tid": 10,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 10},
+    "ts": 1786955666662000,
+    "tid": 10,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "opened web socket to: ws://localhost:62318",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955666662000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "send message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955666663000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"login\",\"params\":{\"sessionId\":\"753b482f-4b0c-00ea-3fe6-c59a700fb347\",\"role\":\"tester\"},\"messageId\":0}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955666665000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "data": "{\"type\":\"login\",\"params\":{\"sessionId\":\"753b482f-4b0c-00ea-3fe6-c59a700fb347\",\"role\":\"tester\"},\"messageId\":0}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ws-server"},
+    "ts": 1786955666665000,
+    "tid": 3,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 3},
+    "ts": 1786955666665000,
+    "tid": 3,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "created session 753b482f-4b0c-00ea-3fe6-c59a700fb347",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws-session",
+    "ts": 1786955666665000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955666665000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {
+        "type": "loginSuccess",
+        "params": {"testerConnected": true, "appConnected": false},
+        "messageId": 0
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "tester joined session 753b482f-4b0c-00ea-3fe6-c59a700fb347",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws-session",
+    "ts": 1786955666665000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955666666000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"loginSuccess\",\"params\":{\"testerConnected\":true,\"appConnected\":false},\"messageId\":0}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "received event of :  allocateDevice {\n  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955666862000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to  primary-1038 /tmp/detox.primary-1038  :  allocateDevice , {\n  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }\n}",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955666862000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "device"},
+    "ts": 1786955666865000,
+    "tid": 6,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 6},
+    "ts": 1786955666865000,
+    "tid": 6,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "B",
+    "name": "init",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955666865000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955666866000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "allocate",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955666867000,
+    "args": {
+      "level": 10,
+      "data": {"type": "ios.simulator", "device": {"type": "iPhone 16e"}},
+      "id": 0,
+      "v": 0
+    }
+  },
+  {
+    "ph": "M",
+    "args": {"name": "child-process"},
+    "ts": 1786955666886000,
+    "tid": 7,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 7},
+    "ts": 1786955666886000,
+    "tid": 7,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "applesimutils --list --byType \"iPhone 16e\" --fields udid,name,deviceType,os,identifier",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955666886000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --list --byType \"iPhone 16e\" --fields udid,name,deviceType,os,identifier",
+      "trackingId": 0,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Searching for device by type = \"iPhone 16e\" ...",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955666886000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --list --byType \"iPhone 16e\" --fields udid,name,deviceType,os,identifier",
+      "trackingId": 0,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "[\n  {\n    \"os\" : {\n      \"name\" : \"iOS 26.3\",\n      \"identifier\" : \"com.apple.CoreSimulator.SimRuntime.iOS-26-3\"\n    },\n    \"name\" : \"iPhone 16e\",\n    \"udid\" : \"4EC5F74C-5A9C-4D89-8E44-374310E684AE\",\n    \"deviceType\" : {\n      \"name\" : \"iPhone 16e\",\n      \"identifier\" : \"com.apple.CoreSimulator.SimDeviceType.iPhone-16e\"\n    }\n  },\n  {\n    \"os\" : {\n      \"name\" : \"iOS 26.3\",\n      \"identifier\" : \"com.apple.CoreSimulator.SimRuntime.iOS-26-3\"\n    },\n    \"name\" : \"iPhone 16e-Detox\",\n    \"udid\" : \"98FA5BD8-5D12-4B35-9A26-3AEBCADAFC8A\",\n    \"deviceType\" : {\n      \"name\" : \"iPhone 16e\",\n      \"identifier\" : \"com.apple.CoreSimulator.SimDeviceType.iPhone-16e\"\n    }\n  }\n]\n",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667098000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --list --byType \"iPhone 16e\" --fields udid,name,deviceType,os,identifier",
+      "trackingId": 0,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "settled on 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955667098000,
+    "args": {
+      "level": 20,
+      "data": {
+        "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+        "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955667098000,
+    "args": {"level": 10, "id": 0, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "post-allocate: 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955667098000,
+    "args": {
+      "level": 10,
+      "data": {
+        "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+        "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+      },
+      "id": 0,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "applesimutils --list --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --maxResults 1 --fields udid,os,version,state",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667098000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --list --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --maxResults 1 --fields udid,os,version,state",
+      "trackingId": 1,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "[\n  {\n    \"state\" : \"Booted\",\n    \"os\" : {\n      \"version\" : \"26.3.1\"\n    },\n    \"udid\" : \"4EC5F74C-5A9C-4D89-8E44-374310E684AE\"\n  }\n]\n",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667191000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --list --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --maxResults 1 --fields udid,os,version,state",
+      "trackingId": 1,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955667191000,
+    "args": {"level": 10, "id": 0, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to socket  :  allocateDeviceDone {\n  deviceCookie: {\n    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    type: 'ios.simulator',\n    bootArgs: undefined,\n    headless: undefined\n  }\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955667191000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955667192000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "detected event allocateDeviceDone {\n  deviceCookie: {\n    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    type: 'ios.simulator'\n  }\n}",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955667192000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "artifacts-manager"},
+    "ts": 1786955667199000,
+    "tid": 11,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 11},
+    "ts": 1786955667199000,
+    "tid": 11,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "B",
+    "name": "onBootDevice",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667199000,
+    "args": {"level": 10, "args": [{"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"}], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667199000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "device"},
+    "ts": 1786955667199000,
+    "tid": 12,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 12},
+    "ts": 1786955667199000,
+    "tid": 12,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "B",
+    "name": "installUtilBinaries",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667199000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667199000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "selectApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667199000,
+    "args": {"level": 10, "args": ["default"], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667205000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "uninstallApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667205000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeUninstallApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667205000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667205000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "M",
+    "args": {"name": "child-process"},
+    "ts": 1786955667205000,
+    "tid": 13,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 13},
+    "ts": 1786955667205000,
+    "tid": 13,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl uninstall 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667205000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl uninstall 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 0,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Uninstalling bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667205000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl uninstall 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 0,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "bg.sofia.yoursofia uninstalled",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667394000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl uninstall 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 0,
+      "event": "EXEC_SUCCESS",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667394000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "selectApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667395000,
+    "args": {"level": 10, "args": ["default"], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "terminateApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955667395000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667396000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955667396000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667396000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955667396000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668607000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_TRY_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668607000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_TRY",
+      "retryNumber": 2,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "\"/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\nAn error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n (code=3), stdout and stderr:\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_FAIL",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 1,
+      "event": "EXEC_FAIL",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955668714000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955668714000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955668714000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "installApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955668714000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl install 4EC5F74C-5A9C-4D89-8E44-374310E684AE \"/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl install 4EC5F74C-5A9C-4D89-8E44-374310E684AE \"/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\"",
+      "trackingId": 2,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Installing /Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955668714000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl install 4EC5F74C-5A9C-4D89-8E44-374310E684AE \"/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\"",
+      "trackingId": 2,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app installed",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955669067000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl install 4EC5F74C-5A9C-4D89-8E44-374310E684AE \"/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\"",
+      "trackingId": 2,
+      "event": "EXEC_SUCCESS",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955669068000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "selectApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955669068000,
+    "args": {"level": 10, "args": ["default"], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "terminateApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955669068000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955669068000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955669068000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955669068000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955669068000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670164000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_TRY_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670164000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_TRY",
+      "retryNumber": 2,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "\"/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\nAn error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n (code=3), stdout and stderr:\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670265000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670265000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_FAIL",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670265000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 3,
+      "event": "EXEC_FAIL",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670265000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670265000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955670265000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955670265000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955670265000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "login.e2e.js is assigned to 4EC5F74C-5A9C-4D89-8E44-374310E684AE (iPhone 16e)",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle",
+    "ts": 1786955670338000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "run the tests",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955670338000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onRunDescribeStart",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670338000,
+    "args": {"level": 10, "args": [{"name": "ROOT_DESCRIBE_BLOCK"}], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670338000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "Login screen",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955670338000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onRunDescribeStart",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670338000,
+    "args": {"level": 10, "args": [{"name": "Login screen"}], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670339000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "beforeAll",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955670339000,
+    "args": {
+      "level": 10,
+      "functionCode": "async () => {\n    // Auto-grant the notifications permission so the native OS prompt\n    // doesn't block the app from reaching the foreground/active state.\n    await device.launchApp({\n      permissions: {\n        notifications: 'YES',\n        location: 'always'\n      }\n    });\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "launchApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955670340000,
+    "args": {
+      "level": 10,
+      "args": [{"permissions": {"notifications": "YES", "location": "always"}}],
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "terminateApp",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955670341000,
+    "args": {"level": 10, "args": ["bg.sofia.yoursofia"], "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670341000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955670341000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670341000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955670341000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671425000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_TRY_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Terminating bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671426000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_TRY",
+      "retryNumber": 2,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "\"/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia\nAn error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n (code=3), stdout and stderr:\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_FAIL",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_FAIL",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):\nSimulator device failed to terminate bg.sofia.yoursofia.\nfound nothing to terminate\nUnderlying error (domain=NSPOSIXErrorDomain, code=3):\n\tThe request to terminate \"bg.sofia.yoursofia\" failed. found nothing to terminate\n\tfound nothing to terminate\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 4,
+      "event": "EXEC_FAIL",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onTerminateApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 10,
+      "args": [
+        {"deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE", "bundleId": "bg.sofia.yoursofia"}
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955671545000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955671545000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "applesimutils --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --bundle bg.sofia.yoursofia --restartSB --setPermissions notifications=YES",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --bundle bg.sofia.yoursofia --restartSB --setPermissions notifications=YES",
+      "trackingId": 5,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Trying to set permissions with AppleSimUtils: notifications=YES...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671545000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --bundle bg.sofia.yoursofia --restartSB --setPermissions notifications=YES",
+      "trackingId": 5,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "notifications permissions are set",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671912000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "applesimutils --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --bundle bg.sofia.yoursofia --restartSB --setPermissions notifications=YES",
+      "trackingId": 5,
+      "event": "EXEC_SUCCESS",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl privacy 4EC5F74C-5A9C-4D89-8E44-374310E684AE grant location-always bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671912000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl privacy 4EC5F74C-5A9C-4D89-8E44-374310E684AE grant location-always bg.sofia.yoursofia",
+      "trackingId": 6,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Trying to set permissions with Simctl: grant location-always...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955671912000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl privacy 4EC5F74C-5A9C-4D89-8E44-374310E684AE grant location-always bg.sofia.yoursofia",
+      "trackingId": 6,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "location-always permissions are set",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955672024000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl privacy 4EC5F74C-5A9C-4D89-8E44-374310E684AE grant location-always bg.sofia.yoursofia",
+      "trackingId": 6,
+      "event": "EXEC_SUCCESS",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeLaunchApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955672024000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "bundleId": "bg.sofia.yoursofia",
+          "deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+          "launchArgs": {
+            "detoxServer": "ws://localhost:62318",
+            "detoxSessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347"
+          }
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "M",
+    "args": {"name": "artifact"},
+    "ts": 1786955672025000,
+    "tid": 14,
+    "pid": 1045,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 14},
+    "ts": 1786955672025000,
+    "tid": 14,
+    "pid": 1045,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorLogRecording {\n  udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n  bundleId: 'bg.sofia.yoursofia'\n}",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955672025000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955672026000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 7,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955672141000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 7,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955672142000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 8,
+      "cpid": 1164,
+      "event": "SPAWN_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955672193000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "SIMCTL_CHILD_GULGeneratedClassDisposeDisabled=YES SIMCTL_CHILD_DYLD_INSERT_LIBRARIES=\"/Users/valentinasenov/Library/Detox/ios/framework/6e09e705b61096f1cb264334dbbf3b7979d95162/Detox.framework/Detox\" /usr/bin/xcrun simctl launch 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia --args -detoxServer ws://localhost:62318 -detoxSessionId 753b482f-4b0c-00ea-3fe6-c59a700fb347 -detoxDebugVisibility YES -detoxDisableHierarchyDump YES",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955672194000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "SIMCTL_CHILD_GULGeneratedClassDisposeDisabled=YES SIMCTL_CHILD_DYLD_INSERT_LIBRARIES=\"/Users/valentinasenov/Library/Detox/ios/framework/6e09e705b61096f1cb264334dbbf3b7979d95162/Detox.framework/Detox\" /usr/bin/xcrun simctl launch 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia --args -detoxServer ws://localhost:62318 -detoxSessionId 753b482f-4b0c-00ea-3fe6-c59a700fb347 -detoxDebugVisibility YES -detoxDisableHierarchyDump YES",
+      "trackingId": 9,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Launching bg.sofia.yoursofia...",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955672194000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "SIMCTL_CHILD_GULGeneratedClassDisposeDisabled=YES SIMCTL_CHILD_DYLD_INSERT_LIBRARIES=\"/Users/valentinasenov/Library/Detox/ios/framework/6e09e705b61096f1cb264334dbbf3b7979d95162/Detox.framework/Detox\" /usr/bin/xcrun simctl launch 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia --args -detoxServer ws://localhost:62318 -detoxSessionId 753b482f-4b0c-00ea-3fe6-c59a700fb347 -detoxDebugVisibility YES -detoxDisableHierarchyDump YES",
+      "trackingId": 9,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "bg.sofia.yoursofia: 1177\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955675046000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "SIMCTL_CHILD_GULGeneratedClassDisposeDisabled=YES SIMCTL_CHILD_DYLD_INSERT_LIBRARIES=\"/Users/valentinasenov/Library/Detox/ios/framework/6e09e705b61096f1cb264334dbbf3b7979d95162/Detox.framework/Detox\" /usr/bin/xcrun simctl launch 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia --args -detoxServer ws://localhost:62318 -detoxSessionId 753b482f-4b0c-00ea-3fe6-c59a700fb347 -detoxDebugVisibility YES -detoxDisableHierarchyDump YES",
+      "trackingId": 9,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955675046000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 10,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955675254000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 10,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "bg.sofia.yoursofia launched. To watch simulator logs, run:\n        /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate 'process == \"YourSofia\"'",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955675267000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onLaunchApp",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955675268000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "bundleId": "bg.sofia.yoursofia",
+          "deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+          "launchArgs": {
+            "detoxServer": "ws://localhost:62318",
+            "detoxSessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+            "detoxDebugVisibility": "YES",
+            "detoxDisableHierarchyDump": "YES"
+          },
+          "pid": 1177
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955675268000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "connection :62318<->:62320",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955676016000,
+    "args": {"level": 20, "id": 62320, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955676208000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "data": "{\"messageId\":0,\"params\":{\"role\":\"app\",\"sessionId\":\"753b482f-4b0c-00ea-3fe6-c59a700fb347\"},\"type\":\"login\"}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955676208000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": {
+        "messageId": 0,
+        "params": {"testerConnected": true, "appConnected": true},
+        "type": "loginSuccess"
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "M",
+    "args": {"name": "ws-server"},
+    "ts": 1786955676208000,
+    "tid": 4,
+    "pid": 1038,
+    "name": "thread_name"
+  },
+  {
+    "ph": "M",
+    "args": {"sort_index": 4},
+    "ts": 1786955676208000,
+    "tid": 4,
+    "pid": 1038,
+    "name": "thread_sort_index"
+  },
+  {
+    "ph": "i",
+    "name": "app joined session 753b482f-4b0c-00ea-3fe6-c59a700fb347",
+    "pid": 1038,
+    "tid": 4,
+    "cat": "ws-server,ws-session",
+    "ts": 1786955676208000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955676208000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"type": "appConnected"},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955676210000,
+    "args": {"level": 10, "data": "{\"type\":\"appConnected\"}\n ", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955676211000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": "{\"type\":\"isReady\",\"params\":{},\"messageId\":-1000}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955676211000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": {"type": "isReady", "params": {}, "messageId": -1000},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955676211000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"isReady\",\"params\":{},\"messageId\":-1000}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955679783000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955679783000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"messageId": -1000, "params": {}, "type": "ready"},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955679784000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955679784000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"messageId": -1000, "params": {}, "type": "ready"},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955679784000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955679784000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"messageId": -1000, "params": {}, "type": "ready"},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955679784000,
+    "args": {
+      "level": 10,
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955679785000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"waitForActive\",\"params\":{},\"messageId\":1}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955679786000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": "{\"type\":\"waitForActive\",\"params\":{},\"messageId\":1}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955679786000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": {"type": "waitForActive", "params": {}, "messageId": 1},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955679786000,
+    "args": {
+      "level": 10,
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955679786000,
+    "args": {
+      "level": 10,
+      "data": "{\"messageId\":-1000,\"params\":{},\"type\":\"ready\"}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955679788000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"type\":\"waitForActiveDone\",\"messageId\":1,\"params\":{}}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955679788000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"type": "waitForActiveDone", "messageId": 1, "params": {}},
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955679789000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"waitForActiveDone\",\"messageId\":1,\"params\":{}}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onAppReady",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955679789000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "deviceId": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+          "bundleId": "bg.sofia.yoursofia",
+          "pid": 1177
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955679789000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955679789000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955679790000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "navigates from the profile tab to the login screen",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955679791000,
+    "args": {
+      "level": 10,
+      "context": "test",
+      "status": "running",
+      "fullName": "Login screen navigates from the profile tab to the login screen",
+      "invocations": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Login screen: navigates from the profile tab to the login screen",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle",
+    "ts": 1786955679791000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onTestStart",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955679793000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "title": "navigates from the profile tab to the login screen",
+          "fullName": "Login screen navigates from the profile tab to the login screen",
+          "status": "running",
+          "invocations": 1
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorLogRecording",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955679793000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "sending SIGINT to: /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate processImagePath beginsWith \"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955679846000,
+    "args": {"level": 10, "event": "SPAWN_KILL", "cpid": 1164, "signal": "SIGINT", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\" exited with code #0",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955679862000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 8,
+      "cpid": 1164,
+      "event": "SPAWN_END",
+      "signal": "",
+      "code": 0,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorLogRecording",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955679864000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955679865000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 11,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955680004000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 11,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955680005000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 12,
+      "cpid": 1187,
+      "event": "SPAWN_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955680056000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4naOlC.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955680057000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4naOlC.detox.png\"",
+      "trackingId": 13,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4naOlC.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955680181000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4naOlC.detox.png\"",
+      "trackingId": 13,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955680181000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955680181000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "beforeEach",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955680181000,
+    "args": {
+      "level": 10,
+      "functionCode": "() => {\n    if (config.resetModules) {\n      runtime.resetModules();\n    }\n    if (config.clearMocks) {\n      runtime.clearAllMocks();\n    }\n    if (config.resetMocks) {\n      runtime.resetAllMocks();\n      if (\n        config.fakeTimers.enableGlobally &&\n        config.fakeTimers.legacyFakeTimers\n      ) {\n        // during setup, this cannot be null (and it's fine to explode if it is)\n        environment.fakeTimers.useFakeTimers();\n      }\n    }\n    if (config.restoreMocks) {\n      runtime.restoreAllMocks();\n    }\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955680181000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "beforeEach",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955680181000,
+    "args": {
+      "level": 10,
+      "functionCode": "async () => {\n    await device.reloadReactNative();\n\n    // First launch shows a one-time \"what's new\" screen; dismiss it if present.\n    // On Android its (async, remotely-checked) content can take a while to\n    // mount, so this needs a generous timeout — a race here leaves the modal\n    // covering the header when the next step tries to tap the profile icon.\n    //\n    // atIndex(0): the button's own accessibilityLabel and its inner Text's\n    // text both equal \"Напред\", so by.label('Напред') matches two views\n    // (the touchable and its label) — same ambiguity as \"Вход\" below.\n    // Without it, Espresso can resolve the match to either view non-\n    // deterministically, and toBeVisible()/tap() silently fail against the\n    // wrong one, leaving the modal up for the rest of the test.\n    try {\n      await waitFor(element(by.label('Напред')).atIndex(0)).toBeVisible().withTimeout(15000);\n      await element(by.label('Напред')).atIndex(0).tap();\n    } catch {\n      // already dismissed in a prior test, nothing to do\n    }\n\n    // \"profile\" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —\n    // it's reached via the person icon in the home header. That icon's\n    // accessibilityLabel is literally \"profile.title\" (a missing i18n key\n    // in app/_layout.tsx — t('profile.title') has no matching translation).\n    // Wait for it rather than tapping immediately: the \"what's new\" dismiss\n    // above may still be mid-animation.\n    await waitFor(element(by.label('profile.title'))).toBeVisible().withTimeout(10000);\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955680182000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": "{\"type\":\"reactNativeReload\",\"params\":{},\"messageId\":-1000}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955680182000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": {"type": "reactNativeReload", "params": {}, "messageId": -1000},
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "reloadReactNative",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955680182000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "send message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955680182000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"reactNativeReload\",\"params\":{},\"messageId\":-1000}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955680187000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"type\":\"AppWillTerminateWithError\",\"messageId\":-10000,\"params\":{\"errorDetails\":\"Invalid AppDelegate\\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\\n(\\n\\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\\n\\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\\n\\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\\n\\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\\n\\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\\n\\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\\n\\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\\n\\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\\n\\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\\n\\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\\n\\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\\n\\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\\n\\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\\n\\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\\n\\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\\n\\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\\n\\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\\n\\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\\n\\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\\n\\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\\n\\t20  YourSofia                           0x000000010285fea8 main + 116\\n\\t21  dyld                                0x00000001045b13d0 start_sim + 20\\n\\t22  ???                                 0x000000010479be00 0x0 + 4370054656\\n)\",\"queueName\":\"com.apple.main-thread\",\"threadNumber\":1}}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955680187000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {
+        "type": "AppWillTerminateWithError",
+        "messageId": -10000,
+        "params": {
+          "errorDetails": "Invalid AppDelegate\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\n(\n\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\n\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\n\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t20  YourSofia                           0x000000010285fea8 main + 116\n\t21  dyld                                0x00000001045b13d0 start_sim + 20\n\t22  ???                                 0x000000010479be00 0x0 + 4370054656\n)",
+          "queueName": "com.apple.main-thread",
+          "threadNumber": 1
+        }
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955680187000,
+    "args": {
+      "level": 10,
+      "data": "{\"type\":\"AppWillTerminateWithError\",\"messageId\":-10000,\"params\":{\"errorDetails\":\"Invalid AppDelegate\\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\\n(\\n\\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\\n\\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\\n\\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\\n\\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\\n\\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\\n\\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\\n\\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\\n\\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\\n\\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\\n\\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\\n\\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\\n\\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\\n\\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\\n\\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\\n\\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\\n\\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\\n\\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\\n\\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\\n\\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\\n\\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\\n\\t20  YourSofia                           0x000000010285fea8 main + 116\\n\\t21  dyld                                0x00000001045b13d0 start_sim + 20\\n\\t22  ???                                 0x000000010479be00 0x0 + 4370054656\\n)\",\"queueName\":\"com.apple.main-thread\",\"threadNumber\":1}}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955682200000,
+    "args": {
+      "level": 10,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "data": "{\"messageId\":-10000,\"type\":\"AppWillTerminateWithError\",\"params\":{\"threadNumber\":1,\"queueName\":\"com.apple.main-thread\",\"errorDetails\":\"Signal 6 raised\\n(\\n\\t0   Detox                               0x0000000104c2e58c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\\n\\t1   Detox                               0x0000000104c31f70 __DTXHandleCrash + 568\\n\\t2   Detox                               0x0000000104c3256c __DTXHandleSignal + 72\\n\\t3   libsystem_platform.dylib            0x000000010466f540 _sigtramp + 52\\n\\t4   libsystem_pthread.dylib             0x000000010471a338 pthread_kill + 264\\n\\t5   libsystem_c.dylib                   0x00000001801b5994 abort + 100\\n\\t6   libc++abi.dylib                     0x000000018030326c __cxxabiv1::__aligned_malloc_with_fallback(unsigned long) + 0\\n\\t7   libc++abi.dylib                     0x00000001802f31a4 demangling_unexpected_handler() + 0\\n\\t8   libobjc.A.dylib                     0x0000000180077218 _objc_terminate() + 124\\n\\t9   Detox                               0x0000000104c32a04 __dtx_terminate() + 176\\n\\t10  libc++abi.dylib                     0x0000000180302758 std::__terminate(void (*)()) + 12\\n\\t11  libc++abi.dylib                     0x00000001803057c0 __cxa_get_exception_ptr + 0\\n\\t12  libc++abi.dylib                     0x00000001803057a0 __cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*) + 0\\n\\t13  libobjc.A.dylib                     0x000000018009c1cc objc_exception_throw + 384\\n\\t14  CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\\n\\t15  Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\\n\\t16  Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\\n\\t17  Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\\n\\t18  DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\\n\\t19  libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\\n\\t20  libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\\n\\t21  libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\\n\\t22  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\\n\\t23  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\\n\\t24  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\\n\\t25  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\\n\\t26  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\\n\\t27  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\\n\\t28  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\\n\\t29  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\\n\\t30  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\\n\\t31  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\\n\\t32  YourSofia                           0x000000010285fea8 main + 116\\n\\t33  dyld                                0x00000001045b13d0 start_sim + 20\\n\\t34  ???                                 0x000000010479be00 0x0 + 4370054656\\n)\"}}",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955682200000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {
+        "messageId": -10000,
+        "type": "AppWillTerminateWithError",
+        "params": {
+          "threadNumber": 1,
+          "queueName": "com.apple.main-thread",
+          "errorDetails": "Signal 6 raised\n(\n\t0   Detox                               0x0000000104c2e58c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\n\t1   Detox                               0x0000000104c31f70 __DTXHandleCrash + 568\n\t2   Detox                               0x0000000104c3256c __DTXHandleSignal + 72\n\t3   libsystem_platform.dylib            0x000000010466f540 _sigtramp + 52\n\t4   libsystem_pthread.dylib             0x000000010471a338 pthread_kill + 264\n\t5   libsystem_c.dylib                   0x00000001801b5994 abort + 100\n\t6   libc++abi.dylib                     0x000000018030326c __cxxabiv1::__aligned_malloc_with_fallback(unsigned long) + 0\n\t7   libc++abi.dylib                     0x00000001802f31a4 demangling_unexpected_handler() + 0\n\t8   libobjc.A.dylib                     0x0000000180077218 _objc_terminate() + 124\n\t9   Detox                               0x0000000104c32a04 __dtx_terminate() + 176\n\t10  libc++abi.dylib                     0x0000000180302758 std::__terminate(void (*)()) + 12\n\t11  libc++abi.dylib                     0x00000001803057c0 __cxa_get_exception_ptr + 0\n\t12  libc++abi.dylib                     0x00000001803057a0 __cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*) + 0\n\t13  libobjc.A.dylib                     0x000000018009c1cc objc_exception_throw + 384\n\t14  CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t15  Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t16  Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t17  Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t18  DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t19  libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t20  libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t21  libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t22  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t23  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t24  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t25  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t26  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t27  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t28  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t29  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t30  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t31  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t32  YourSofia                           0x000000010285fea8 main + 116\n\t33  dyld                                0x00000001045b13d0 start_sim + 20\n\t34  ???                                 0x000000010479be00 0x0 + 4370054656\n)"
+        }
+      },
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955682214000,
+    "args": {
+      "level": 10,
+      "data": "{\"messageId\":-10000,\"type\":\"AppWillTerminateWithError\",\"params\":{\"threadNumber\":1,\"queueName\":\"com.apple.main-thread\",\"errorDetails\":\"Signal 6 raised\\n(\\n\\t0   Detox                               0x0000000104c2e58c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\\n\\t1   Detox                               0x0000000104c31f70 __DTXHandleCrash + 568\\n\\t2   Detox                               0x0000000104c3256c __DTXHandleSignal + 72\\n\\t3   libsystem_platform.dylib            0x000000010466f540 _sigtramp + 52\\n\\t4   libsystem_pthread.dylib             0x000000010471a338 pthread_kill + 264\\n\\t5   libsystem_c.dylib                   0x00000001801b5994 abort + 100\\n\\t6   libc++abi.dylib                     0x000000018030326c __cxxabiv1::__aligned_malloc_with_fallback(unsigned long) + 0\\n\\t7   libc++abi.dylib                     0x00000001802f31a4 demangling_unexpected_handler() + 0\\n\\t8   libobjc.A.dylib                     0x0000000180077218 _objc_terminate() + 124\\n\\t9   Detox                               0x0000000104c32a04 __dtx_terminate() + 176\\n\\t10  libc++abi.dylib                     0x0000000180302758 std::__terminate(void (*)()) + 12\\n\\t11  libc++abi.dylib                     0x00000001803057c0 __cxa_get_exception_ptr + 0\\n\\t12  libc++abi.dylib                     0x00000001803057a0 __cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*) + 0\\n\\t13  libobjc.A.dylib                     0x000000018009c1cc objc_exception_throw + 384\\n\\t14  CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\\n\\t15  Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\\n\\t16  Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\\n\\t17  Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\\n\\t18  DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\\n\\t19  libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\\n\\t20  libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\\n\\t21  libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\\n\\t22  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\\n\\t23  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\\n\\t24  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\\n\\t25  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\\n\\t26  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\\n\\t27  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\\n\\t28  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\\n\\t29  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\\n\\t30  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\\n\\t31  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\\n\\t32  YourSofia                           0x000000010285fea8 main + 116\\n\\t33  dyld                                0x00000001045b13d0 start_sim + 20\\n\\t34  ???                                 0x000000010479be00 0x0 + 4370054656\\n)\"}}\n ",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "app exited session 753b482f-4b0c-00ea-3fe6-c59a700fb347",
+    "pid": 1038,
+    "tid": 4,
+    "cat": "ws-server,ws-session",
+    "ts": 1786955684227000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "send",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955684227000,
+    "args": {
+      "level": 10,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "data": {"type": "appDisconnected"},
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws",
+    "ts": 1786955684228000,
+    "args": {
+      "level": 20,
+      "id": 62320,
+      "trackingId": "app",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "app",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "get message",
+    "pid": 1045,
+    "tid": 10,
+    "cat": "ws-client,ws",
+    "ts": 1786955684228000,
+    "args": {"level": 10, "data": "{\"type\":\"appDisconnected\"}\n ", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955684229000,
+    "args": {
+      "level": 10,
+      "success": false,
+      "error": "The pending request #-1000 (\"reactNativeReload\") has been rejected due to the following error:\n\nThe app has crashed, see the details below:\n\nInvalid AppDelegate\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\n(\n\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\n\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\n\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t20  YourSofia                           0x000000010285fea8 main + 116\n\t21  dyld                                0x00000001045b13d0 start_sim + 20\n\t22  ???                                 0x000000010479be00 0x0 + 4370054656\n)",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onHookFailure",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684230000,
+    "args": {
+      "level": 10,
+      "args": [{"error": {"name": "DetoxRuntimeError"}, "hook": "beforeEach"}],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684230000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-c9qbwc.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684233000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-c9qbwc.detox.png\"",
+      "trackingId": 14,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-c9qbwc.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684446000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-c9qbwc.detox.png\"",
+      "trackingId": 14,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684446000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684446000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684446000,
+    "args": {
+      "level": 10,
+      "success": false,
+      "error": "The pending request #-1000 (\"reactNativeReload\") has been rejected due to the following error:\n\nThe app has crashed, see the details below:\n\nInvalid AppDelegate\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\n(\n\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\n\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\n\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t20  YourSofia                           0x000000010285fea8 main + 116\n\t21  dyld                                0x00000001045b13d0 start_sim + 20\n\t22  ???                                 0x000000010479be00 0x0 + 4370054656\n)",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "test_fn",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684446000,
+    "args": {
+      "level": 10,
+      "functionCode": "async () => {\n    await element(by.label('profile.title')).tap();\n    await element(by.label('Вход')).atIndex(0).tap();\n    await expect(element(by.label('Имейл')).atIndex(0)).toBeVisible();\n    await expect(element(by.label('Парола')).atIndex(0)).toBeVisible();\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onTestDone",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684447000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "title": "navigates from the profile tab to the login screen",
+          "fullName": "Login screen navigates from the profile tab to the login screen",
+          "status": "failed",
+          "invocations": 1,
+          "timedOut": false
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684447000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-w5rMJf.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684448000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-w5rMJf.detox.png\"",
+      "trackingId": 15,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-w5rMJf.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684603000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-w5rMJf.detox.png\"",
+      "trackingId": 15,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684603000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorLogRecording",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684604000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/testStart.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684604000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4naOlC.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/testStart.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684604000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/beforeEachFailure.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684605000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-c9qbwc.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/beforeEachFailure.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684605000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/testDone.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684605000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-w5rMJf.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/testDone.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684605000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "sending SIGINT to: /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate processImagePath beginsWith \"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955684656000,
+    "args": {"level": 10, "event": "SPAWN_KILL", "cpid": 1187, "signal": "SIGINT", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\" exited with code #0",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955684664000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 12,
+      "cpid": 1187,
+      "event": "SPAWN_END",
+      "signal": "",
+      "code": 0,
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684664000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684665000,
+    "args": {"level": 10, "status": "failed", "timedOut": false, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "Login screen: navigates from the profile tab to the login screen [FAIL]",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle",
+    "ts": 1786955684665000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "shows a validation alert when submitting the form empty",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684666000,
+    "args": {
+      "level": 10,
+      "context": "test",
+      "status": "running",
+      "fullName": "Login screen shows a validation alert when submitting the form empty",
+      "invocations": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Login screen: shows a validation alert when submitting the form empty",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle",
+    "ts": 1786955684666000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onTestStart",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684666000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "title": "shows a validation alert when submitting the form empty",
+          "fullName": "Login screen shows a validation alert when submitting the form empty",
+          "status": "running",
+          "invocations": 1
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorLogRecording",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684667000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorLogRecording to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/device.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684667000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-0ti5kr.detox.log\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen navigates from the profile tab to the login screen/device.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684667000,
+    "args": {"level": 20, "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684667000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 16,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorLogRecording to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/4EC5F74C-5A9C-4D89-8E44-374310E684AE 2026-08-17 08-34-44Z.startup.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684668000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-LlQrui.detox.log\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/4EC5F74C-5A9C-4D89-8E44-374310E684AE 2026-08-17 08-34-44Z.startup.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684668000,
+    "args": {"level": 20, "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684772000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia",
+      "trackingId": 16,
+      "event": "EXEC_SUCCESS",
+      "stdout": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955684772000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 17,
+      "cpid": 1205,
+      "event": "SPAWN_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684823000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-1AqMD7.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684824000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-1AqMD7.detox.png\"",
+      "trackingId": 18,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-1AqMD7.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684981000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-1AqMD7.detox.png\"",
+      "trackingId": 18,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684981000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684981000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "beforeEach",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684981000,
+    "args": {
+      "level": 10,
+      "functionCode": "() => {\n    if (config.resetModules) {\n      runtime.resetModules();\n    }\n    if (config.clearMocks) {\n      runtime.clearAllMocks();\n    }\n    if (config.resetMocks) {\n      runtime.resetAllMocks();\n      if (\n        config.fakeTimers.enableGlobally &&\n        config.fakeTimers.legacyFakeTimers\n      ) {\n        // during setup, this cannot be null (and it's fine to explode if it is)\n        environment.fakeTimers.useFakeTimers();\n      }\n    }\n    if (config.restoreMocks) {\n      runtime.restoreAllMocks();\n    }\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684981000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "beforeEach",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955684981000,
+    "args": {
+      "level": 10,
+      "functionCode": "async () => {\n    await device.reloadReactNative();\n\n    // First launch shows a one-time \"what's new\" screen; dismiss it if present.\n    // On Android its (async, remotely-checked) content can take a while to\n    // mount, so this needs a generous timeout — a race here leaves the modal\n    // covering the header when the next step tries to tap the profile icon.\n    //\n    // atIndex(0): the button's own accessibilityLabel and its inner Text's\n    // text both equal \"Напред\", so by.label('Напред') matches two views\n    // (the touchable and its label) — same ambiguity as \"Вход\" below.\n    // Without it, Espresso can resolve the match to either view non-\n    // deterministically, and toBeVisible()/tap() silently fail against the\n    // wrong one, leaving the modal up for the rest of the test.\n    try {\n      await waitFor(element(by.label('Напред')).atIndex(0)).toBeVisible().withTimeout(15000);\n      await element(by.label('Напред')).atIndex(0).tap();\n    } catch {\n      // already dismissed in a prior test, nothing to do\n    }\n\n    // \"profile\" has no bottom tab (href: null in app/(tabs)/_layout.tsx) —\n    // it's reached via the person icon in the home header. That icon's\n    // accessibilityLabel is literally \"profile.title\" (a missing i18n key\n    // in app/_layout.tsx — t('profile.title') has no matching translation).\n    // Wait for it rather than tapping immediately: the \"what's new\" dismiss\n    // above may still be mid-animation.\n    await waitFor(element(by.label('profile.title'))).toBeVisible().withTimeout(10000);\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "reloadReactNative",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955684981000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 12,
+    "cat": "device",
+    "ts": 1786955684981000,
+    "args": {
+      "level": 10,
+      "success": false,
+      "error": "The app has crashed, see the details below:\n\nInvalid AppDelegate\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\n(\n\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\n\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\n\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t20  YourSofia                           0x000000010285fea8 main + 116\n\t21  dyld                                0x00000001045b13d0 start_sim + 20\n\t22  ???                                 0x000000010479be00 0x0 + 4370054656\n)",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onHookFailure",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955684981000,
+    "args": {
+      "level": 10,
+      "args": [{"error": {"name": "DetoxRuntimeError"}, "hook": "beforeEach"}],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955684981000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-BObq0j.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955684982000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-BObq0j.detox.png\"",
+      "trackingId": 19,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-BObq0j.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685140000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-BObq0j.detox.png\"",
+      "trackingId": 19,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685140000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685140000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685140000,
+    "args": {
+      "level": 10,
+      "success": false,
+      "error": "The app has crashed, see the details below:\n\nInvalid AppDelegate\nCould not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory'\n(\n\t0   CoreFoundation                      0x00000001804f733c __exceptionPreprocess + 160\n\t1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72\n\t2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0\n\t3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428\n\t4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172\n\t5   Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28\n\t6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172\n\t7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24\n\t8   libdispatch.dylib                   0x00000001801db4b0 _dispatch_client_callout + 12\n\t9   libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24\n\t10  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184\n\t11  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40\n\t12  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12\n\t13  CoreFoundation                      0x0000000180455180 __CFRunLoopRun + 1884\n\t14  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t15  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116\n\t16  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772\n\t17  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80\n\t18  UIKitCore                           0x000000018640e42c UIApplicationMain + 124\n\t19  UIKitCore                           0x000000018563f6b8 block_destroy_helper.15 + 5152\n\t20  YourSofia                           0x000000010285fea8 main + 116\n\t21  dyld                                0x00000001045b13d0 start_sim + 20\n\t22  ???                                 0x000000010479be00 0x0 + 4370054656\n)",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "test_fn",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685141000,
+    "args": {
+      "level": 10,
+      "functionCode": "async () => {\n    await element(by.label('profile.title')).tap();\n    await element(by.label('Вход')).atIndex(0).tap();\n\n    // On the login screen itself, \"Вход\" also matches the screen's own\n    // heading text (atIndex(0)) before the actual submit button\n    // (atIndex(1)) — verified via `detox test --loglevel verbose`.\n    await element(by.label('Вход')).atIndex(1).tap();\n    await expect(element(by.text('Грешка'))).toBeVisible();\n    await expect(element(by.text('Моля, попълнете всички полета'))).toBeVisible();\n    await element(by.text('OK')).tap();\n  }",
+      "v": 0
+    }
+  },
+  {
+    "ph": "B",
+    "name": "onTestDone",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685141000,
+    "args": {
+      "level": 10,
+      "args": [
+        {
+          "title": "shows a validation alert when submitting the form empty",
+          "fullName": "Login screen shows a validation alert when submitting the form empty",
+          "status": "failed",
+          "invocations": 1,
+          "timedOut": false
+        }
+      ],
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "starting SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685141000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_START", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-oxSxze.detox.png\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685141000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-oxSxze.detox.png\"",
+      "trackingId": 20,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Detected file type from extension: PNG\nNote: No display specified. Defaulting to display: 00543357-53AE-4C7E-9892-14AC0E353577 (screenID: 1, name: LCD)\nWrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-oxSxze.detox.png\n",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685292000,
+    "args": {
+      "level": 10,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-oxSxze.detox.png\"",
+      "trackingId": 20,
+      "event": "EXEC_SUCCESS",
+      "stderr": true,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorScreenshot",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685292000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "stopping SimulatorLogRecording",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685292000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_STOP", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/testStart.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685292000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-1AqMD7.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/testStart.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685292000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/beforeEachFailure.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685293000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-BObq0j.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/beforeEachFailure.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685293000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/testDone.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685293000,
+    "args": {"level": 10, "class": "SimulatorScreenshot", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-oxSxze.detox.png\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/testDone.png",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685293000,
+    "args": {"level": 20, "class": "SimulatorScreenshot", "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "sending SIGINT to: /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate processImagePath beginsWith \"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\"",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955685345000,
+    "args": {"level": 10, "event": "SPAWN_KILL", "cpid": 1205, "signal": "SIGINT", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\" exited with code #0",
+    "pid": 1045,
+    "tid": 13,
+    "cat": "child-process,child-process-spawn",
+    "ts": 1786955685354000,
+    "args": {
+      "level": 20,
+      "fn": "spawnAndLog",
+      "command": "/usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate \"processImagePath beginsWith \\\"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app\\\"\"",
+      "trackingId": 17,
+      "cpid": 1205,
+      "event": "SPAWN_END",
+      "signal": "",
+      "code": 0,
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685354000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685354000,
+    "args": {"level": 10, "status": "failed", "timedOut": false, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "Login screen: shows a validation alert when submitting the form empty [FAIL]",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle",
+    "ts": 1786955685354000,
+    "args": {"level": 30, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onRunDescribeFinish",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "args": [{"name": "Login screen"}], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onRunDescribeFinish",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "args": [{"name": "ROOT_DESCRIBE_BLOCK"}], "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685355000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "tear down environment",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685369000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "onBeforeCleanup",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685369000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving SimulatorLogRecording to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/device.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685369000,
+    "args": {"level": 10, "class": "SimulatorLogRecording", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "moving \"/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-1045-4FzUVK.detox.log\" to .artifacts/ios.sim.release.2026-08-17 08-34-25Z/✗ Login screen shows a validation alert when submitting the form empty/device.log",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685370000,
+    "args": {"level": 20, "event": "MOVE_FILE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving FileArtifact to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/detox_pid_1045.json.log { append: true }",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685370000,
+    "args": {"level": 10, "class": "FileArtifact", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "saving FileArtifact to: .artifacts/ios.sim.release.2026-08-17 08-34-25Z/detox_pid_1045.log { append: true }",
+    "pid": 1045,
+    "tid": 14,
+    "cat": "artifact",
+    "ts": 1786955685370000,
+    "args": {"level": 10, "class": "FileArtifact", "event": "ARTIFACT_SAVE", "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 11,
+    "cat": "artifacts-manager,artifact",
+    "ts": 1786955685370000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "tester exited session 753b482f-4b0c-00ea-3fe6-c59a700fb347",
+    "pid": 1038,
+    "tid": 3,
+    "cat": "ws-server,ws-session",
+    "ts": 1786955685371000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955685371000,
+    "args": {
+      "level": 20,
+      "id": 62319,
+      "trackingId": "tester",
+      "sessionId": "753b482f-4b0c-00ea-3fe6-c59a700fb347",
+      "role": "tester",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "received event of :  deallocateDevice {\n  deviceCookie: {\n    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    type: 'ios.simulator'\n  }\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685372000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "free: 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955685372000,
+    "args": {"level": 10, "data": {}, "id": 0, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to  primary-1038 /tmp/detox.primary-1038  :  deallocateDevice , {\n  deviceCookie: {\n    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',\n    type: 'ios.simulator'\n  }\n}",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955685372000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "id": 0, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to socket  :  deallocateDeviceDone {}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "detected event deallocateDeviceDone {}",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1045,
+    "tid": 9,
+    "cat": "lifecycle,jest-environment",
+    "ts": 1786955685373000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "received event of :  reportTestResults {\n  testResults: [\n    {\n      success: false,\n      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',\n      isPermanentFailure: false\n    }\n  ]\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685376000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to socket  :  reportTestResultsDone {\n  testResults: [\n    {\n      success: false,\n      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',\n      isPermanentFailure: false\n    }\n  ]\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685376000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "broadcasting event to all known sockets listening to  /tmp/detox.primary-1038  :   sessionStateUpdate {\n  testResults: [\n    {\n      success: false,\n      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',\n      isPermanentFailure: false\n    }\n  ]\n}",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685376000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "dispatching event to  primary-1038 /tmp/detox.primary-1038  :  reportTestResults , {\n  testResults: [\n    {\n      success: false,\n      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',\n      testExecError: undefined,\n      isPermanentFailure: false\n    }\n  ]\n}",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955685376000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "## received events ##",
+    "pid": 1045,
+    "tid": 8,
+    "cat": "ipc",
+    "ts": 1786955685376000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "socket disconnected secondary-1045",
+    "pid": 1038,
+    "tid": 1,
+    "cat": "ipc,ipc-server",
+    "ts": 1786955685377000,
+    "args": {"level": 10, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 0,
+    "cat": "lifecycle,cli",
+    "ts": 1786955685382000,
+    "args": {"level": 50, "success": false, "code": 1, "signal": null, "v": 0}
+  },
+  {
+    "ph": "B",
+    "name": "cleanup",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955685382000,
+    "args": {"level": 10, "args": [], "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "/usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685383000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+      "trackingId": 2,
+      "event": "EXEC_CMD",
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "Shutting down 4EC5F74C-5A9C-4D89-8E44-374310E684AE...",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685383000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+      "trackingId": 2,
+      "event": "EXEC_TRY",
+      "retryNumber": 1,
+      "v": 0
+    }
+  },
+  {
+    "ph": "i",
+    "name": "4EC5F74C-5A9C-4D89-8E44-374310E684AE shut down",
+    "pid": 1038,
+    "tid": 7,
+    "cat": "child-process,child-process-exec",
+    "ts": 1786955685763000,
+    "args": {
+      "level": 20,
+      "fn": "execWithRetriesAndLogs",
+      "cmd": "/usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+      "trackingId": 2,
+      "event": "EXEC_SUCCESS",
+      "v": 0
+    }
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 6,
+    "cat": "device,device-allocation",
+    "ts": 1786955685765000,
+    "args": {"level": 10, "success": true, "v": 0}
+  },
+  {
+    "ph": "i",
+    "name": "Detox server has been closed gracefully",
+    "pid": 1038,
+    "tid": 2,
+    "cat": "ws-server,ws",
+    "ts": 1786955685765000,
+    "args": {"level": 20, "v": 0}
+  },
+  {
+    "ph": "E",
+    "pid": 1038,
+    "tid": 0,
+    "cat": "lifecycle",
+    "ts": 1786955685767000,
+    "args": {"level": 10, "v": 0}
+  }
+]

@@ -1,0 +1,106 @@
+Filtering the log data using "processImagePath BEGINSWITH "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/F3147808-5ECA-491B-9ADC-3DA9921C01A2/YourSofia.app""
+Timestamp               Ty Process[PID:TID]
+2026-08-17 11:34:42.190 Df YourSofia[1177:323578] (CoreFoundation) *** Terminating app due to uncaught exception 'Invalid AppDelegate', reason: 'Could not access rootViewFactory. Make sure your AppDelegate either: Inherits from RCTAppDelegate or defines 'reactNativeFactory''
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x00000001804f7348 __exceptionPreprocess + 172
+	1   libobjc.A.dylib                     0x000000018009c094 objc_exception_throw + 72
+	2   CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0
+	3   Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428
+	4   Detox                               0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172
+	5   Detox                               0x0000000104c6d834 $sIeg_IeyB_TRTm + 28
+	6   DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172
+	7   libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24
+	8   li<…>
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Message was too long and was split into 7 parts
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 1/7: App crashed: Signal 6 raised
+(
+	0   Detox                               0x0000000104c2e58c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36
+	1   Detox                               0x0000000104c31f70 __DTXHandleCrash + 568
+	2   Detox                               0x0000000104c3256c __DTXHandleSignal + 72
+	3   libsystem_platform.dylib            0x000000010466f540 _sigtramp + 52
+	4   libsystem_pthread.dylib             0x000000010471a338 pthread_kill + 264
+	5   libsystem_c.dylib                   0
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 2/7: x00000001801b5994 abort + 100
+	6   libc++abi.dylib                     0x000000018030326c __cxxabiv1::__aligned_malloc_with_fallback(unsigned long) + 0
+	7   libc++abi.dylib                     0x00000001802f31a4 demangling_unexpected_handler() + 0
+	8   libobjc.A.dylib                     0x0000000180077218 _objc_terminate() + 124
+	9   Detox                               0x0000000104c32a04 __dtx_terminate() + 176
+	10  libc++abi.dylib                     0x0000000180302758 std::__terminate(void (*)()) + 12
+	1
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 3/7: 1  libc++abi.dylib                     0x00000001803057c0 __cxa_get_exception_ptr + 0
+	12  libc++abi.dylib                     0x00000001803057a0 __cxxabiv1::failed_throw(__cxxabiv1::__cxa_exception*) + 0
+	13  libobjc.A.dylib                     0x000000018009c1cc objc_exception_throw + 384
+	14  CoreFoundation                      0x00000001804f7258 -[NSException initWithCoder:] + 0
+	15  Detox                               0x0000000104c1eb1c +[ReactNativeSupport getReactHost] + 428
+	16  Detox
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 4/7:                 0x0000000104c1e858 +[ReactNativeSupport reloadApp] + 172
+	17  Detox                               0x0000000104c6d834 merged reabstraction thunk helper from @escaping @callee_guaranteed () -> () to @escaping @callee_unowned @convention(block) () -> () + 28
+	18  DetoxSync                           0x0000000104a67184 __36+[DTXSyncManager _tryIdleBlocksNow:]_block_invoke.66 + 172
+	19  libdispatch.dylib                   0x00000001801c07a8 _dispatch_call_block_and_release + 24
+	20  libdispatch.dy
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 5/7: lib                   0x00000001801db4b0 _dispatch_client_callout + 12
+	21  libdispatch.dylib                   0x00000001801f74a0 _dispatch_main_queue_drain.cold.7 + 24
+	22  libdispatch.dylib                   0x00000001801d031c _dispatch_main_queue_drain + 1184
+	23  libdispatch.dylib                   0x00000001801cfe6c _dispatch_main_queue_callback_4CF + 40
+	24  CoreFoundation                      0x0000000180455fa8 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__ + 12
+	25  CoreFoundation
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 6/7:         0x0000000180455180 __CFRunLoopRun + 1884
+	26  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496
+	27  GraphicsServices                    0x0000000192b809bc GSEventRunModal + 116
+	28  UIKitCore                           0x000000018640a204 -[UIApplication _run] + 772
+	29  DetoxSync                           0x0000000104a62f38 __detox_sync_UIApplication_run + 80
+	30  UIKitCore                           0x000000018640e42c UIApplicationMain + 124
+	31  UIKitCore
+2026-08-17 11:34:42.194 E  YourSofia[1177:323578] [com.wix.Detox:DetoxManager] Part 7/7:                            0x000000018563f6b8 block_destroy_helper.15 + 5152
+	32  YourSofia                           0x000000010285fea8 main + 116
+	33  dyld                                0x00000001045b13d0 start_sim + 20
+	34  ???                                 0x000000010479be00 0x0 + 4370054656
+)
+2026-08-17 11:34:42.195 I  YourSofia[1177:323578] [com.wix.Detox:DetoxInstrumentsManager] Called stop but no recording in progress
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_socket_handle_socket_event [C3.1.1.1:3] Event mask: 0x2
+2026-08-17 11:34:44.150 Df YourSofia[1177:3235b6] [com.apple.network:connection] nw_socket_handle_socket_event [C3.1.1.1:3] Socket received READ_CLOSE event
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] nw_protocol_boringssl_input_finished(2329) [C3.1.1.1:2][0x10b304850] session state: connected [2]
+2026-08-17 11:34:44.150 Df YourSofia[1177:3235b6] [com.apple.CFNetwork:Default] Connection 3: read-side closed
+2026-08-17 11:34:44.150 Df YourSofia[1177:3235b6] [com.apple.CFNetwork:Default] Connection 3: cleaning up
+2026-08-17 11:34:44.150 Df YourSofia[1177:3235b6] [com.apple.network:connection] [C3 B948AF32-E3D3-4D84-86E8-B0B2FDFA956D Hostname#57c872f4:443 quic-connection, url: https://your.sofia.bg/api/news, definite, attribution: developer] cancel
+2026-08-17 11:34:44.150 Df YourSofia[1177:3235b6] [com.apple.network:connection] [C3 B948AF32-E3D3-4D84-86E8-B0B2FDFA956D Hostname#57c872f4:443 quic-connection, url: https://your.sofia.bg/api/news, definite, attribution: developer] cancelled
+	[C3.1.1.1 ED65E774-78FA-4759-8964-DA40885B47BC 192.168.21.118:62326<->IPv4#ed082075:443]
+	Connected Path: satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown
+	Privacy Stance: Not Eligible
+	Duration: 7.156s, DNS @0.015s took 1.054s, TCP @1.071s took 0.006s, TLS 1.2 took 0.041s
+	bytes in/out: 10335/2025, packets in/out: 7/4, rtt: 0.004s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 4/3/0/0
+2026-08-17 11:34:44.150 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_endpoint_handler_cancel [C3 IPv4#ed082075:443 ready parent-flow (satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown)]
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] began nw_protocol_boringssl_disconnect: boringssl session state is: connected
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_set_state(830) [C3.1.1.1:2][0x10b304850] boringssl session state changed from connected to disconnecting
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_disconnect(649) [C3.1.1.1:2][0x10b304850] calling SSL_shutdown.
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_context_log_message(2529) [C3.1.1.1:2][0x10b304850] Writing SSL3_RT_ALERT 2 bytes
+2026-08-17 11:34:44.150 I  YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_context_handle_warning_alert(2407) [C3.1.1.1:2][0x10b304850] write alert, level: warning, description: close notify
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_disconnect(651) [C3.1.1.1:2][0x10b304850] SSL_shutdown returned. Disconnect successful? yes
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_set_state(830) [C3.1.1.1:2][0x10b304850] boringssl session state changed from disconnecting to disconnecting
+2026-08-17 11:34:44.150 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_set_state(830) [C3.1.1.1:2][0x10b304850] boringssl session state changed from disconnecting to disconnected
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_flow_passthrough_disconnected [C3.1.1.1 IPv4#ed082075:443 ready socket-flow (satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown)] deferring fail on disconnected
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl called disconnect down the stack
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_endpoint_handler_cancel [C3.1 Hostname#57c872f4:443 ready transform (satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown)]
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_association_schedule_deactivation <nw_association Hostname#57c872f4:443> will become dormant after 10000ms of inactivity
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_endpoint_handler_cancel [C3.1.1 Hostname#57c872f4:443 ready resolver (satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown)]
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_association_schedule_deactivation <nw_association Hostname#57c872f4:443> will become dormant after 10000ms of inactivity
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_endpoint_handler_cancel [C3.1.1.1 IPv4#ed082075:443 ready socket-flow (satisfied (Path is satisfied), interface: en0[802.11], uses wifi, LQM: unknown)]
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] nw_association_schedule_deactivation <nw_association IPv4#ed082075:443> will become dormant after 10000ms of inactivity
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_endpoint_flow_stitch_stack_without_passthrough [C3.1.1.1 IPv4#ed082075:443 cancelled socket-flow ((null))] Not stitching the stack since passthrough is directly below a flow
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] began nw_protocol_boringssl_disconnect: boringssl session state is: disconnected
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_session_set_state(830) [C3.1.1.1:2][0x10b304850] boringssl session state changed from disconnected to disconnected
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_flow_passthrough_disconnected [C3.1.1.1 IPv4#ed082075:443 cancelled socket-flow ((null))] deferring fail on disconnected
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl called disconnect down the stack
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_flow_cancel_read_write_requests [C3.1.1.1 IPv4#ed082075:443 cancelled socket-flow ((null))] cancelling read/write requests
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_resolver_cancel [C3.1.1] 0x1053e77e0
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:connection] nw_flow_cancel_read_write_requests [C3 Hostname#57c872f4:443 cancelled parent-flow ((null))] cancelling read/write requests
+2026-08-17 11:34:44.151 Df YourSofia[1177:3235b6] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C3] reporting state cancelled
+2026-08-17 11:34:44.151 Df YourSofia[1177:3235b6] [com.apple.CFNetwork:Default] Connection 3: done
+2026-08-17 11:34:44.151 I  YourSofia[1177:3235b6] [com.apple.network:connection] [C3 Hostname#57c872f4:443 quic-connection, url: https://your.sofia.bg/api/news, definite, attribution: developer] dealloc
+2026-08-17 11:34:44.151 Db YourSofia[1177:3235b6] [com.apple.network:boringssl] boringssl_bio_destroy(196)
+2026-08-17 11:34:44.152 Db YourSofia[1177:3235b6] [com.apple.network:] nw_fd_wrapper_close closed <fd_wrapper 16, guarded: true>
+2026-08-17 11:34:44.196 Df YourSofia[1177:323578] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-08-17 11:34:44.196 Df YourSofia[1177:323578] [com.apple.CoreAnalytics:client] Exiting exit handler.
+

@@ -79,4 +79,8 @@ echo "Running Detox tests..."
 # timeout at least once even after the tests themselves passed (jest.config.js's
 # `forceExit` is the real fix for that). If it ever hangs again for a
 # different reason, fail in 10 minutes instead of burning the whole budget.
-timeout 600 pnpm e2e:test:android
+if ! timeout 600 pnpm e2e:test:android; then
+  echo "First Detox attempt failed, retrying once after a short settle..."
+  adb shell input keyevent 3 || true
+  timeout 600 pnpm e2e:test:android
+fi

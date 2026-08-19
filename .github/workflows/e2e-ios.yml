@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -51,7 +51,10 @@ jobs:
       - name: Install applesimutils
         run: |
           brew tap wix/brew
-          brew trust --formula wix/brew/applesimutils
+          # Homebrew tap trust became strict on GitHub runners.
+          brew tap aws/tap
+          brew trust wix/brew
+          brew trust aws/tap
           brew install applesimutils
 
       - name: Build Detox framework cache

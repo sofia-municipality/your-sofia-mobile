@@ -1,0 +1,672 @@
+11:27:52.278 detox[99446] B node_modules/detox/local-cli/cli.js test --configuration ios.sim.release --cleanup
+  data: {
+    "id": "e8e5e882-3c97-e513-7e39-b10c6a0a73c6",
+    "detoxConfig": {
+      "configurationName": "ios.sim.release",
+      "apps": {
+        "default": {
+          "type": "ios.app",
+          "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/YourSofia.app",
+          "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+        }
+      },
+      "artifacts": {
+        "rootDir": ".artifacts/ios.sim.release.2026-08-17 08-27-52Z",
+        "plugins": {
+          "log": {
+            "enabled": true,
+            "keepOnlyFailedTestsArtifacts": true
+          },
+          "screenshot": {
+            "enabled": true,
+            "shouldTakeAutomaticSnapshots": true,
+            "keepOnlyFailedTestsArtifacts": true
+          },
+          "video": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          },
+          "instruments": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          },
+          "uiHierarchy": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          }
+        }
+      },
+      "behavior": {
+        "init": {
+          "keepLockFile": false,
+          "reinstallApp": true,
+          "exposeGlobals": true
+        },
+        "cleanup": {
+          "shutdownDevice": true
+        },
+        "launchApp": "auto"
+      },
+      "cli": {
+        "cleanup": true,
+        "configuration": "ios.sim.release",
+        "start": true
+      },
+      "commands": [
+        {
+          "appName": "default",
+          "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+        }
+      ],
+      "device": {
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone 16e"
+        }
+      },
+      "logger": {
+        "level": "info",
+        "overrideConsole": true,
+        "options": {
+          "showLoggerName": true,
+          "showPid": true,
+          "showLevel": false,
+          "showMetadata": false,
+          "basepath": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/detox@20.51.4_patch_hash=243f4fb1396d0ba4204110e1fb380dce0954c69273b7351999aba1f3d2eca5_91662811f4238f93586f4790222322c3/node_modules/detox/src",
+          "prefixers": {},
+          "stringifiers": {}
+        }
+      },
+      "testRunner": {
+        "retries": 0,
+        "forwardEnv": false,
+        "detached": false,
+        "bail": false,
+        "noRetryArgs": [
+          "shard"
+        ],
+        "jest": {
+          "setupTimeout": 120000,
+          "teardownTimeout": 30000,
+          "retryAfterCircusRetries": false,
+          "reportWorkerAssign": true
+        },
+        "args": {
+          "$0": "jest",
+          "_": [],
+          "config": "e2e/jest.config.js",
+          "--": []
+        }
+      },
+      "session": {
+        "autoStart": true,
+        "debugSynchronization": 10000
+      }
+    },
+    "detoxIPCServer": "primary-99446",
+    "testResults": [],
+    "testSessionIndex": 0,
+    "workersCount": 0
+  }
+11:27:52.283 detox[99446] i Server path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + ipc.config.id /tmp/detox.primary-99446
+11:27:52.284 detox[99446] i starting server on  /tmp/detox.primary-99446 
+11:27:52.284 detox[99446] i starting TLS server false
+11:27:52.284 detox[99446] i starting server as Unix || Windows Socket
+11:27:52.285 detox[99446] i Detox server listening on localhost:62211...
+11:27:52.287 detox[99446] i Serialized the session state at: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/e8e5e882-3c97-e513-7e39-b10c6a0a73c6.detox.json
+11:27:52.287 detox[99446] B jest --config e2e/jest.config.js
+11:27:52.289 detox[99446] i (node:99446) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+11:27:52.997 detox[99452] i Service path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + id 
+11:27:52.998 detox[99446] i ## socket connection to server detected ##
+11:27:52.998 detox[99452] i requested connection to  primary-99446 /tmp/detox.primary-99446
+11:27:52.998 detox[99452] i Connecting client on Unix Socket : /tmp/detox.primary-99446
+11:27:52.998 detox[99452] i retrying reset
+11:27:52.999 detox[99452] i dispatching event to  primary-99446 /tmp/detox.primary-99446  :  registerContext , { id: 'secondary-99452' }
+11:27:53.001 detox[99446] i received event of :  registerContext { id: 'secondary-99452' }
+11:27:53.001 detox[99446] i dispatching event to socket  :  registerContextDone {
+  testResults: [],
+  testSessionIndex: 0,
+  unsafe_earlyTeardown: undefined
+}
+11:27:53.002 detox[99452] i ## received events ##
+11:27:53.002 detox[99452] i detected event registerContextDone { testResults: [], testSessionIndex: 0 }
+11:27:53.076 detox[99452] B e2e/login.e2e.js
+11:27:53.083 detox[99452] B set up environment
+11:27:53.084 detox[99446] i received event of :  registerWorker { workerId: 'w1' }
+11:27:53.084 detox[99446] i dispatching event to socket  :  registerWorkerDone { workersCount: 1 }
+11:27:53.084 detox[99446] i broadcasting event to all known sockets listening to  /tmp/detox.primary-99446  :   sessionStateUpdate { workersCount: 1 }
+11:27:53.084 detox[99452] i dispatching event to  primary-99446 /tmp/detox.primary-99446  :  registerWorker , { workerId: 'w1' }
+11:27:53.084 detox[99452] i ## received events ##
+11:27:53.084 detox[99452] i detected event registerWorkerDone { workersCount: 1 }
+11:27:53.197 detox[99452] i ## received events ##
+11:27:53.197 detox[99452] i detected event sessionStateUpdate { workersCount: 1 }
+11:27:53.200 detox[99446] B connection :62211<->:62212
+11:27:53.201 detox[99452] i opened web socket to: ws://localhost:62211
+11:27:53.202 detox[99452] i send message
+  data: {"type":"login","params":{"sessionId":"a5e36739-d9d1-072d-9d66-b5cad52411f8","role":"tester"},"messageId":0}
+11:27:53.203 detox[99446] i get
+  data: {"type":"login","params":{"sessionId":"a5e36739-d9d1-072d-9d66-b5cad52411f8","role":"tester"},"messageId":0}
+11:27:53.203 detox[99446] i created session a5e36739-d9d1-072d-9d66-b5cad52411f8
+11:27:53.203 detox[99446] i send
+  data: {
+    "type": "loginSuccess",
+    "params": {
+      "testerConnected": true,
+      "appConnected": false
+    },
+    "messageId": 0
+  }
+11:27:53.204 detox[99446] i tester joined session a5e36739-d9d1-072d-9d66-b5cad52411f8
+11:27:53.204 detox[99452] i get message
+  data: {"type":"loginSuccess","params":{"testerConnected":true,"appConnected":false},"messageId":0}
+   
+11:27:53.376 detox[99446] i received event of :  allocateDevice {
+  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }
+}
+11:27:53.376 detox[99452] i dispatching event to  primary-99446 /tmp/detox.primary-99446  :  allocateDevice , {
+  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }
+}
+11:27:53.378 detox[99446] B init
+  args: ()
+11:27:53.380 detox[99446] E init
+11:27:53.380 detox[99446] B allocate
+  data: {
+    "type": "ios.simulator",
+    "device": {
+      "type": "iPhone 16e"
+    }
+  }
+11:27:53.397 detox[99446] i applesimutils --list --byType "iPhone 16e" --fields udid,name,deviceType,os,identifier
+11:27:53.398 detox[99446] i Searching for device by type = "iPhone 16e" ...
+11:27:53.621 detox[99446] i [
+  {
+    "os" : {
+      "name" : "iOS 26.3",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-26-3"
+    },
+    "name" : "iPhone 16e",
+    "udid" : "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "deviceType" : {
+      "name" : "iPhone 16e",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-16e"
+    }
+  },
+  {
+    "os" : {
+      "name" : "iOS 26.3",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-26-3"
+    },
+    "name" : "iPhone 16e-Detox",
+    "udid" : "98FA5BD8-5D12-4B35-9A26-3AEBCADAFC8A",
+    "deviceType" : {
+      "name" : "iPhone 16e",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-16e"
+    }
+  }
+]
+
+11:27:53.622 detox[99446] i settled on 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {
+    "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+11:27:53.622 detox[99446] E allocate
+11:27:53.622 detox[99446] B post-allocate: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {
+    "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+11:27:53.622 detox[99446] i applesimutils --list --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --maxResults 1 --fields udid,os,version,state
+11:27:53.714 detox[99446] i [
+  {
+    "state" : "Shutdown",
+    "os" : {
+      "version" : "26.3.1"
+    },
+    "udid" : "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+]
+
+11:27:53.714 detox[99446] i /usr/bin/xcrun simctl boot 4EC5F74C-5A9C-4D89-8E44-374310E684AE 
+11:27:53.714 detox[99446] i Booting device 4EC5F74C-5A9C-4D89-8E44-374310E684AE...
+11:27:54.295 detox[99446] i 
+11:27:54.295 detox[99446] i /usr/bin/xcrun simctl bootstatus 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+11:28:00.917 detox[99446] i Monitoring boot status for iPhone 16e (4EC5F74C-5A9C-4D89-8E44-374310E684AE).
+[2026-08-17 08:27:55 +0000] Status=1, isTerminal=NO, Elapsed=00:01.
+	Waiting on BackBoard
+
+[2026-08-17 08:28:00 +0000] Status=4294967295, isTerminal=YES, Elapsed=00:06.
+	Finished
+
+
+11:28:00.917 detox[99446] i open -a Simulator --args -CurrentDeviceUDID 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+11:28:00.984 detox[99446] i 
+11:28:00.989 detox[99446] E post-allocate: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+11:28:00.989 detox[99446] i dispatching event to socket  :  allocateDeviceDone {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator',
+    bootArgs: undefined,
+    headless: undefined
+  }
+}
+11:28:00.991 detox[99452] i ## received events ##
+11:28:00.991 detox[99452] i detected event allocateDeviceDone {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+11:28:01.005 detox[99452] B onBootDevice
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE"})
+11:28:01.005 detox[99452] E onBootDevice
+11:28:01.006 detox[99452] B installUtilBinaries
+  args: ()
+11:28:01.006 detox[99452] E installUtilBinaries
+11:28:01.006 detox[99452] B selectApp
+  args: ("default")
+11:28:01.020 detox[99452] E selectApp
+11:28:01.020 detox[99452] B uninstallApp
+  args: ()
+11:28:01.020 detox[99452] B onBeforeUninstallApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:01.020 detox[99452] E onBeforeUninstallApp
+11:28:01.021 detox[99452] i /usr/bin/xcrun simctl uninstall 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:01.021 detox[99452] i Uninstalling bg.sofia.yoursofia...
+11:28:04.601 detox[99452] i bg.sofia.yoursofia uninstalled
+11:28:04.602 detox[99452] E uninstallApp
+11:28:04.602 detox[99452] B selectApp
+  args: ("default")
+11:28:04.603 detox[99452] B terminateApp
+  args: ()
+11:28:04.603 detox[99452] B onBeforeTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:04.603 detox[99452] E onBeforeTerminateApp
+11:28:04.603 detox[99452] i /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:04.603 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:05.811 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:05.811 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:05.997 detox[99452] i "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+ (code=3), stdout and stderr:
+
+11:28:05.997 detox[99452] i 
+11:28:05.997 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:05.998 detox[99452] B onTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:05.998 detox[99452] E onTerminateApp
+11:28:05.998 detox[99452] E terminateApp
+11:28:05.998 detox[99452] E selectApp
+11:28:05.998 detox[99452] B installApp
+  args: ()
+11:28:05.998 detox[99452] i /usr/bin/xcrun simctl install 4EC5F74C-5A9C-4D89-8E44-374310E684AE "/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app"
+11:28:05.998 detox[99452] i Installing /Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app...
+11:28:10.581 detox[99452] i /Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app installed
+11:28:10.581 detox[99452] E installApp
+11:28:10.582 detox[99452] B selectApp
+  args: ("default")
+11:28:10.582 detox[99452] B terminateApp
+  args: ()
+11:28:10.582 detox[99452] B onBeforeTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:10.582 detox[99452] E onBeforeTerminateApp
+11:28:10.582 detox[99452] i /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:10.582 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:11.770 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:11.770 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:11.888 detox[99452] i "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+ (code=3), stdout and stderr:
+
+11:28:11.888 detox[99452] i 
+11:28:11.888 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:11.889 detox[99452] B onTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:11.889 detox[99452] E onTerminateApp
+11:28:11.889 detox[99452] E terminateApp
+11:28:11.889 detox[99452] E selectApp
+11:28:11.889 detox[99452] E set up environment
+11:28:12.001 detox[99452] i login.e2e.js is assigned to 4EC5F74C-5A9C-4D89-8E44-374310E684AE (iPhone 16e)
+11:28:12.002 detox[99452] B run the tests
+11:28:12.002 detox[99452] B onRunDescribeStart
+  args: ({"name":"ROOT_DESCRIBE_BLOCK"})
+11:28:12.002 detox[99452] E onRunDescribeStart
+11:28:12.003 detox[99452] B Login screen
+11:28:12.003 detox[99452] B onRunDescribeStart
+  args: ({"name":"Login screen"})
+11:28:12.003 detox[99452] E onRunDescribeStart
+11:28:12.003 detox[99452] B beforeAll
+11:28:12.005 detox[99452] B launchApp
+  args: ({"permissions":{"notifications":"YES","location":"always"}})
+11:28:12.005 detox[99452] B terminateApp
+  args: ("bg.sofia.yoursofia")
+11:28:12.005 detox[99452] B onBeforeTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:12.005 detox[99452] E onBeforeTerminateApp
+11:28:12.005 detox[99452] i /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:12.005 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:13.102 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:13.102 detox[99452] i Terminating bg.sofia.yoursofia...
+11:28:13.201 detox[99452] i "/usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia" failed with error = Error: Command failed: /usr/bin/xcrun simctl terminate 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+ (code=3), stdout and stderr:
+
+11:28:13.201 detox[99452] i 
+11:28:13.201 detox[99452] i An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=3):
+Simulator device failed to terminate bg.sofia.yoursofia.
+found nothing to terminate
+Underlying error (domain=NSPOSIXErrorDomain, code=3):
+	The request to terminate "bg.sofia.yoursofia" failed. found nothing to terminate
+	found nothing to terminate
+
+11:28:13.201 detox[99452] B onTerminateApp
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","bundleId":"bg.sofia.yoursofia"})
+11:28:13.201 detox[99452] E onTerminateApp
+11:28:13.201 detox[99452] E terminateApp
+11:28:13.202 detox[99452] i applesimutils --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --bundle bg.sofia.yoursofia --restartSB --setPermissions notifications=YES
+11:28:13.202 detox[99452] i Trying to set permissions with AppleSimUtils: notifications=YES...
+11:28:13.577 detox[99452] i notifications permissions are set
+11:28:13.578 detox[99452] i /usr/bin/xcrun simctl privacy 4EC5F74C-5A9C-4D89-8E44-374310E684AE grant location-always bg.sofia.yoursofia
+11:28:13.578 detox[99452] i Trying to set permissions with Simctl: grant location-always...
+11:28:13.686 detox[99452] i location-always permissions are set
+11:28:13.687 detox[99452] B onBeforeLaunchApp
+  args: ({"bundleId":"bg.sofia.yoursofia","deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","launchArgs":{"detoxServer":"ws://localhost:62211","detoxSessionId":"a5e36739-d9d1-072d-9d66-b5cad52411f8"}})
+11:28:13.687 detox[99452] i starting SimulatorLogRecording {
+  udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+  bundleId: 'bg.sofia.yoursofia'
+}
+11:28:13.688 detox[99452] i /usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:13.789 detox[99452] i /Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/A01C5F69-BB9C-48BF-96DA-638EDBEBF8DB/YourSofia.app
+
+11:28:13.790 detox[99452] i /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate "processImagePath beginsWith \"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/A01C5F69-BB9C-48BF-96DA-638EDBEBF8DB/YourSofia.app\""
+11:28:13.841 detox[99452] E onBeforeLaunchApp
+11:28:13.841 detox[99452] i SIMCTL_CHILD_GULGeneratedClassDisposeDisabled=YES SIMCTL_CHILD_DYLD_INSERT_LIBRARIES="/Users/valentinasenov/Library/Detox/ios/framework/6e09e705b61096f1cb264334dbbf3b7979d95162/Detox.framework/Detox" /usr/bin/xcrun simctl launch 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia --args -detoxServer ws://localhost:62211 -detoxSessionId a5e36739-d9d1-072d-9d66-b5cad52411f8 -detoxDebugVisibility YES -detoxDisableHierarchyDump YES
+11:28:13.841 detox[99452] i Launching bg.sofia.yoursofia...
+11:28:16.581 detox[99452] i bg.sofia.yoursofia: 99787
+
+11:28:16.581 detox[99452] i /usr/bin/xcrun simctl get_app_container 4EC5F74C-5A9C-4D89-8E44-374310E684AE bg.sofia.yoursofia
+11:28:16.812 detox[99452] i /Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/A01C5F69-BB9C-48BF-96DA-638EDBEBF8DB/YourSofia.app
+
+11:28:16.826 detox[99452] i bg.sofia.yoursofia launched. To watch simulator logs, run:
+        /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate 'process == "YourSofia"'
+11:28:16.826 detox[99452] B onLaunchApp
+  args: ({"bundleId":"bg.sofia.yoursofia","deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE","launchArgs":{"detoxServer":"ws://localhost:62211","detoxSessionId":"a5e36739-d9d1-072d-9d66-b5cad52411f8","detoxDebugVisibility":"YES","detoxDisableHierarchyDump":"YES"},"pid":99787})
+11:28:16.827 detox[99452] E onLaunchApp
+11:28:17.540 detox[99446] B connection :62211<->:62248
+11:28:17.719 detox[99446] i get
+  data: {"type":"login","params":{"role":"app","sessionId":"a5e36739-d9d1-072d-9d66-b5cad52411f8"},"messageId":0}
+11:28:17.719 detox[99446] i send
+  data: {
+    "type": "loginSuccess",
+    "params": {
+      "testerConnected": true,
+      "appConnected": true
+    },
+    "messageId": 0
+  }
+11:28:17.719 detox[99446] i app joined session a5e36739-d9d1-072d-9d66-b5cad52411f8
+11:28:17.719 detox[99446] i send
+  data: {
+    "type": "appConnected"
+  }
+11:28:17.720 detox[99452] i get message
+  data: {"type":"appConnected"}
+   
+11:28:17.722 detox[99452] i send message
+  data: {"type":"isReady","params":{},"messageId":-1000}
+11:28:17.723 detox[99446] i get
+  data: {"type":"isReady","params":{},"messageId":-1000}
+11:28:17.723 detox[99446] i send
+  data: {
+    "type": "isReady",
+    "params": {},
+    "messageId": -1000
+  }
+11:28:17.815 detox[99446] i get
+  data: {"messageId":-10000,"params":{"threadNumber":9,"queueName":"com.apple.root.default-qos.overcommit","errorDetails":"Signal 11 raised\n(\n\t0   Detox                               0x000000010450658c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\n\t1   Detox                               0x0000000104509f70 __DTXHandleCrash + 568\n\t2   Detox                               0x000000010450a56c __DTXHandleSignal + 72\n\t3   libsystem_platform.dylib            0x00000001046b3540 _sigtramp + 52\n\t4   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t5   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t6   React                               0x00000001060bbe14 facebook::react::Task::execute(facebook::jsi::Runtime&, bool) + 240\n\t7   React                               0x00000001060b8df0 facebook::react::RuntimeScheduler_Modern::executeTask(facebook::jsi::Runtime&, facebook::react::Task&, bool) const + 116\n\t8   React                               0x00000001060b94c0 facebook::react::RuntimeScheduler_Modern::runEventLoopTick(facebook::jsi::Runtime&, facebook::react::Task&) + 160\n\t9   React                               0x00000001060b9260 facebook::react::RuntimeScheduler_Modern::runEventLoop(facebook::jsi::Runtime&) + 104\n\t10  React                               0x00000001060ddf84 _ZNSt3__110__function6__funcIZZN8facebook5react13ReactInstanceC1ENS_10unique_ptrINS3_9JSRuntimeENS_14default_deleteIS6_EEEENS_10shared_ptrINS3_18MessageQueueThreadEEENSA_INS3_12TimerManagerEEENS_8functionIFvRNS2_3jsi7RuntimeERKNS3_14JsErrorHandler14ProcessedErrorEEEEPNS3_18jsinspector_modern10HostTargetEENK3$_0clINSF_IFvSI_EEEEEDaT_EUlvE_NS_9allocatorISY_EEFvvEEclEv + 116\n\t11  React                               0x0000000105efed94 facebook::react::tryAndReturnError(std::__1::function<void ()> const&) + 32\n\t12  React                               0x0000000105ef9d98 facebook::react::RCTMessageThread::tryFunc(std::__1::function<void ()> const&) + 24\n\t13  React                               0x0000000105ef9b9c invocation function for block in facebook::react::RCTMessageThread::runAsync(std::__1::function<void ()>) + 44\n\t14  DetoxSync                           0x0000000104c656b8 ____detox_sync_CFRunLoopPerformBlock_block_invoke + 44\n\t15  CoreFoundation                      0x0000000180456240 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__ + 20\n\t16  CoreFoundation                      0x00000001804559c8 __CFRunLoopDoBlocks + 340\n\t17  CoreFoundation                      0x000000018045530c __CFRunLoopRun + 2280\n\t18  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t19  React                               0x00000001060f39b0 +[RCTJSThreadManager runRunLoop] + 252\n\t20  DetoxSync                           0x0000000104c66998 swz_runRunLoopThread + 252\n\t21  Foundation                          0x0000000181132e1c __NSThread__start__ + 716\n\t22  libsystem_pthread.dylib             0x00000001048aa63c _pthread_start + 104\n\t23  libsystem_pthread.dylib             0x00000001048a5a34 thread_start + 8\n)"},"type":"AppWillTerminateWithError"}
+11:28:17.816 detox[99446] i send
+  data: {
+    "messageId": -10000,
+    "params": {
+      "threadNumber": 9,
+      "queueName": "com.apple.root.default-qos.overcommit",
+      "errorDetails": "Signal 11 raised\n(\n\t0   Detox                               0x000000010450658c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\n\t1   Detox                               0x0000000104509f70 __DTXHandleCrash + 568\n\t2   Detox                               0x000000010450a56c __DTXHandleSignal + 72\n\t3   libsystem_platform.dylib            0x00000001046b3540 _sigtramp + 52\n\t4   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t5   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t6   React                               0x00000001060bbe14 facebook::react::Task::execute(facebook::jsi::Runtime&, bool) + 240\n\t7   React                               0x00000001060b8df0 facebook::react::RuntimeScheduler_Modern::executeTask(facebook::jsi::Runtime&, facebook::react::Task&, bool) const + 116\n\t8   React                               0x00000001060b94c0 facebook::react::RuntimeScheduler_Modern::runEventLoopTick(facebook::jsi::Runtime&, facebook::react::Task&) + 160\n\t9   React                               0x00000001060b9260 facebook::react::RuntimeScheduler_Modern::runEventLoop(facebook::jsi::Runtime&) + 104\n\t10  React                               0x00000001060ddf84 _ZNSt3__110__function6__funcIZZN8facebook5react13ReactInstanceC1ENS_10unique_ptrINS3_9JSRuntimeENS_14default_deleteIS6_EEEENS_10shared_ptrINS3_18MessageQueueThreadEEENSA_INS3_12TimerManagerEEENS_8functionIFvRNS2_3jsi7RuntimeERKNS3_14JsErrorHandler14ProcessedErrorEEEEPNS3_18jsinspector_modern10HostTargetEENK3$_0clINSF_IFvSI_EEEEEDaT_EUlvE_NS_9allocatorISY_EEFvvEEclEv + 116\n\t11  React                               0x0000000105efed94 facebook::react::tryAndReturnError(std::__1::function<void ()> const&) + 32\n\t12  React                               0x0000000105ef9d98 facebook::react::RCTMessageThread::tryFunc(std::__1::function<void ()> const&) + 24\n\t13  React                               0x0000000105ef9b9c invocation function for block in facebook::react::RCTMessageThread::runAsync(std::__1::function<void ()>) + 44\n\t14  DetoxSync                           0x0000000104c656b8 ____detox_sync_CFRunLoopPerformBlock_block_invoke + 44\n\t15  CoreFoundation                      0x0000000180456240 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__ + 20\n\t16  CoreFoundation                      0x00000001804559c8 __CFRunLoopDoBlocks + 340\n\t17  CoreFoundation                      0x000000018045530c __CFRunLoopRun + 2280\n\t18  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t19  React                               0x00000001060f39b0 +[RCTJSThreadManager runRunLoop] + 252\n\t20  DetoxSync                           0x0000000104c66998 swz_runRunLoopThread + 252\n\t21  Foundation                          0x0000000181132e1c __NSThread__start__ + 716\n\t22  libsystem_pthread.dylib             0x00000001048aa63c _pthread_start + 104\n\t23  libsystem_pthread.dylib             0x00000001048a5a34 thread_start + 8\n)"
+    },
+    "type": "AppWillTerminateWithError"
+  }
+11:28:17.817 detox[99452] i get message
+  data: {"messageId":-10000,"params":{"threadNumber":9,"queueName":"com.apple.root.default-qos.overcommit","errorDetails":"Signal 11 raised\n(\n\t0   Detox                               0x000000010450658c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36\n\t1   Detox                               0x0000000104509f70 __DTXHandleCrash + 568\n\t2   Detox                               0x000000010450a56c __DTXHandleSignal + 72\n\t3   libsystem_platform.dylib            0x00000001046b3540 _sigtramp + 52\n\t4   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t5   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156\n\t6   React                               0x00000001060bbe14 facebook::react::Task::execute(facebook::jsi::Runtime&, bool) + 240\n\t7   React                               0x00000001060b8df0 facebook::react::RuntimeScheduler_Modern::executeTask(facebook::jsi::Runtime&, facebook::react::Task&, bool) const + 116\n\t8   React                               0x00000001060b94c0 facebook::react::RuntimeScheduler_Modern::runEventLoopTick(facebook::jsi::Runtime&, facebook::react::Task&) + 160\n\t9   React                               0x00000001060b9260 facebook::react::RuntimeScheduler_Modern::runEventLoop(facebook::jsi::Runtime&) + 104\n\t10  React                               0x00000001060ddf84 _ZNSt3__110__function6__funcIZZN8facebook5react13ReactInstanceC1ENS_10unique_ptrINS3_9JSRuntimeENS_14default_deleteIS6_EEEENS_10shared_ptrINS3_18MessageQueueThreadEEENSA_INS3_12TimerManagerEEENS_8functionIFvRNS2_3jsi7RuntimeERKNS3_14JsErrorHandler14ProcessedErrorEEEEPNS3_18jsinspector_modern10HostTargetEENK3$_0clINSF_IFvSI_EEEEEDaT_EUlvE_NS_9allocatorISY_EEFvvEEclEv + 116\n\t11  React                               0x0000000105efed94 facebook::react::tryAndReturnError(std::__1::function<void ()> const&) + 32\n\t12  React                               0x0000000105ef9d98 facebook::react::RCTMessageThread::tryFunc(std::__1::function<void ()> const&) + 24\n\t13  React                               0x0000000105ef9b9c invocation function for block in facebook::react::RCTMessageThread::runAsync(std::__1::function<void ()>) + 44\n\t14  DetoxSync                           0x0000000104c656b8 ____detox_sync_CFRunLoopPerformBlock_block_invoke + 44\n\t15  CoreFoundation                      0x0000000180456240 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__ + 20\n\t16  CoreFoundation                      0x00000001804559c8 __CFRunLoopDoBlocks + 340\n\t17  CoreFoundation                      0x000000018045530c __CFRunLoopRun + 2280\n\t18  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496\n\t19  React                               0x00000001060f39b0 +[RCTJSThreadManager runRunLoop] + 252\n\t20  DetoxSync                           0x0000000104c66998 swz_runRunLoopThread + 252\n\t21  Foundation                          0x0000000181132e1c __NSThread__start__ + 716\n\t22  libsystem_pthread.dylib             0x00000001048aa63c _pthread_start + 104\n\t23  libsystem_pthread.dylib             0x00000001048a5a34 thread_start + 8\n)"},"type":"AppWillTerminateWithError"}
+   
+11:28:17.827 detox[99446] i app exited session a5e36739-d9d1-072d-9d66-b5cad52411f8
+11:28:17.827 detox[99446] i send
+  data: {
+    "type": "appDisconnected"
+  }
+11:28:17.827 detox[99446] E connection :62211<->:62248
+11:28:17.828 detox[99452] i get message
+  data: {"type":"appDisconnected"}
+   
+11:28:17.828 detox[99452] E launchApp
+  error: The pending request #-1000 ("isReady") has been rejected due to the following error:
+  
+  The app has crashed, see the details below:
+  
+  Signal 11 raised
+  (
+  	0   Detox                               0x000000010450658c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36
+  	1   Detox                               0x0000000104509f70 __DTXHandleCrash + 568
+  	2   Detox                               0x000000010450a56c __DTXHandleSignal + 72
+  	3   libsystem_platform.dylib            0x00000001046b3540 _sigtramp + 52
+  	4   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156
+  	5   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156
+  	6   React                               0x00000001060bbe14 facebook::react::Task::execute(facebook::jsi::Runtime&, bool) + 240
+  	7   React                               0x00000001060b8df0 facebook::react::RuntimeScheduler_Modern::executeTask(facebook::jsi::Runtime&, facebook::react::Task&, bool) const + 116
+  	8   React                               0x00000001060b94c0 facebook::react::RuntimeScheduler_Modern::runEventLoopTick(facebook::jsi::Runtime&, facebook::react::Task&) + 160
+  	9   React                               0x00000001060b9260 facebook::react::RuntimeScheduler_Modern::runEventLoop(facebook::jsi::Runtime&) + 104
+  	10  React                               0x00000001060ddf84 _ZNSt3__110__function6__funcIZZN8facebook5react13ReactInstanceC1ENS_10unique_ptrINS3_9JSRuntimeENS_14default_deleteIS6_EEEENS_10shared_ptrINS3_18MessageQueueThreadEEENSA_INS3_12TimerManagerEEENS_8functionIFvRNS2_3jsi7RuntimeERKNS3_14JsErrorHandler14ProcessedErrorEEEEPNS3_18jsinspector_modern10HostTargetEENK3$_0clINSF_IFvSI_EEEEEDaT_EUlvE_NS_9allocatorISY_EEFvvEEclEv + 116
+  	11  React                               0x0000000105efed94 facebook::react::tryAndReturnError(std::__1::function<void ()> const&) + 32
+  	12  React                               0x0000000105ef9d98 facebook::react::RCTMessageThread::tryFunc(std::__1::function<void ()> const&) + 24
+  	13  React                               0x0000000105ef9b9c invocation function for block in facebook::react::RCTMessageThread::runAsync(std::__1::function<void ()>) + 44
+  	14  DetoxSync                           0x0000000104c656b8 ____detox_sync_CFRunLoopPerformBlock_block_invoke + 44
+  	15  CoreFoundation                      0x0000000180456240 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__ + 20
+  	16  CoreFoundation                      0x00000001804559c8 __CFRunLoopDoBlocks + 340
+  	17  CoreFoundation                      0x000000018045530c __CFRunLoopRun + 2280
+  	18  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496
+  	19  React                               0x00000001060f39b0 +[RCTJSThreadManager runRunLoop] + 252
+  	20  DetoxSync                           0x0000000104c66998 swz_runRunLoopThread + 252
+  	21  Foundation                          0x0000000181132e1c __NSThread__start__ + 716
+  	22  libsystem_pthread.dylib             0x00000001048aa63c _pthread_start + 104
+  	23  libsystem_pthread.dylib             0x00000001048a5a34 thread_start + 8
+  )
+11:28:17.829 detox[99452] B onHookFailure
+  args: ({"error":{"name":"DetoxRuntimeError"},"hook":"beforeAll"})
+11:28:17.829 detox[99452] i starting SimulatorScreenshot
+11:28:17.830 detox[99452] i /usr/bin/xcrun simctl io 4EC5F74C-5A9C-4D89-8E44-374310E684AE screenshot "/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-99452-lwlEQs.detox.png"
+11:28:18.022 detox[99452] i Detected file type from extension: PNG
+Note: No display specified. Defaulting to display: 5B1AE977-EB42-4787-9A4A-FD3FE6934913 (screenID: 1, name: LCD)
+Wrote screenshot to: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-99452-lwlEQs.detox.png
+
+11:28:18.022 detox[99452] i stopping SimulatorScreenshot
+11:28:18.022 detox[99452] E onHookFailure
+11:28:18.022 detox[99452] E beforeAll
+  error: The pending request #-1000 ("isReady") has been rejected due to the following error:
+  
+  The app has crashed, see the details below:
+  
+  Signal 11 raised
+  (
+  	0   Detox                               0x000000010450658c +[NSThread(DetoxUtils) dtx_demangledCallStackSymbols] + 36
+  	1   Detox                               0x0000000104509f70 __DTXHandleCrash + 568
+  	2   Detox                               0x000000010450a56c __DTXHandleSignal + 72
+  	3   libsystem_platform.dylib            0x00000001046b3540 _sigtramp + 52
+  	4   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156
+  	5   React                               0x00000001060e1694 std::__1::__function::__func<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0, std::__1::allocator<facebook::react::ReactInstance::initializeRuntime(facebook::react::ReactInstance::JSRuntimeFlags, std::__1::function<void (facebook::jsi::Runtime&)>)::$_0>, void (facebook::jsi::Runtime&)>::operator()(facebook::jsi::Runtime&) + 156
+  	6   React                               0x00000001060bbe14 facebook::react::Task::execute(facebook::jsi::Runtime&, bool) + 240
+  	7   React                               0x00000001060b8df0 facebook::react::RuntimeScheduler_Modern::executeTask(facebook::jsi::Runtime&, facebook::react::Task&, bool) const + 116
+  	8   React                               0x00000001060b94c0 facebook::react::RuntimeScheduler_Modern::runEventLoopTick(facebook::jsi::Runtime&, facebook::react::Task&) + 160
+  	9   React                               0x00000001060b9260 facebook::react::RuntimeScheduler_Modern::runEventLoop(facebook::jsi::Runtime&) + 104
+  	10  React                               0x00000001060ddf84 _ZNSt3__110__function6__funcIZZN8facebook5react13ReactInstanceC1ENS_10unique_ptrINS3_9JSRuntimeENS_14default_deleteIS6_EEEENS_10shared_ptrINS3_18MessageQueueThreadEEENSA_INS3_12TimerManagerEEENS_8functionIFvRNS2_3jsi7RuntimeERKNS3_14JsErrorHandler14ProcessedErrorEEEEPNS3_18jsinspector_modern10HostTargetEENK3$_0clINSF_IFvSI_EEEEEDaT_EUlvE_NS_9allocatorISY_EEFvvEEclEv + 116
+  	11  React                               0x0000000105efed94 facebook::react::tryAndReturnError(std::__1::function<void ()> const&) + 32
+  	12  React                               0x0000000105ef9d98 facebook::react::RCTMessageThread::tryFunc(std::__1::function<void ()> const&) + 24
+  	13  React                               0x0000000105ef9b9c invocation function for block in facebook::react::RCTMessageThread::runAsync(std::__1::function<void ()>) + 44
+  	14  DetoxSync                           0x0000000104c656b8 ____detox_sync_CFRunLoopPerformBlock_block_invoke + 44
+  	15  CoreFoundation                      0x0000000180456240 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__ + 20
+  	16  CoreFoundation                      0x00000001804559c8 __CFRunLoopDoBlocks + 340
+  	17  CoreFoundation                      0x000000018045530c __CFRunLoopRun + 2280
+  	18  CoreFoundation                      0x000000018044fdbc _CFRunLoopRunSpecificWithOptions + 496
+  	19  React                               0x00000001060f39b0 +[RCTJSThreadManager runRunLoop] + 252
+  	20  DetoxSync                           0x0000000104c66998 swz_runRunLoopThread + 252
+  	21  Foundation                          0x0000000181132e1c __NSThread__start__ + 716
+  	22  libsystem_pthread.dylib             0x00000001048aa63c _pthread_start + 104
+  	23  libsystem_pthread.dylib             0x00000001048a5a34 thread_start + 8
+  )
+11:28:18.023 detox[99452] B navigates from the profile tab to the login screen
+11:28:18.024 detox[99452] i Login screen: navigates from the profile tab to the login screen
+11:28:18.025 detox[99452] E navigates from the profile tab to the login screen
+11:28:18.025 detox[99452] i Login screen: navigates from the profile tab to the login screen [FAIL]
+11:28:18.025 detox[99452] B shows a validation alert when submitting the form empty
+11:28:18.025 detox[99452] i Login screen: shows a validation alert when submitting the form empty
+11:28:18.025 detox[99452] E shows a validation alert when submitting the form empty
+11:28:18.025 detox[99452] i Login screen: shows a validation alert when submitting the form empty [FAIL]
+11:28:18.026 detox[99452] B onRunDescribeFinish
+  args: ({"name":"Login screen"})
+11:28:18.026 detox[99452] E onRunDescribeFinish
+11:28:18.026 detox[99452] E Login screen
+11:28:18.026 detox[99452] B onRunDescribeFinish
+  args: ({"name":"ROOT_DESCRIBE_BLOCK"})
+11:28:18.026 detox[99452] E onRunDescribeFinish
+11:28:18.026 detox[99452] E run the tests
+11:28:18.039 detox[99452] B tear down environment
+11:28:18.039 detox[99452] B onBeforeCleanup
+  args: ()
+11:28:18.040 detox[99452] i saving SimulatorScreenshot to: .artifacts/ios.sim.release.2026-08-17 08-27-52Z/beforeAllFailure.png
+11:28:18.040 detox[99452] i moving "/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-99452-lwlEQs.detox.png" to .artifacts/ios.sim.release.2026-08-17 08-27-52Z/beforeAllFailure.png
+11:28:18.040 detox[99452] i saving SimulatorLogRecording to: .artifacts/ios.sim.release.2026-08-17 08-27-52Z/4EC5F74C-5A9C-4D89-8E44-374310E684AE 2026-08-17 08-28-18Z.startup.log
+11:28:18.040 detox[99452] i stopping SimulatorLogRecording
+11:28:18.093 detox[99452] i sending SIGINT to: /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate processImagePath beginsWith "/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/A01C5F69-BB9C-48BF-96DA-638EDBEBF8DB/YourSofia.app"
+11:28:18.100 detox[99452] i /usr/bin/xcrun simctl spawn 4EC5F74C-5A9C-4D89-8E44-374310E684AE log stream --level debug --style compact --predicate "processImagePath beginsWith \"/Users/valentinasenov/Library/Developer/CoreSimulator/Devices/4EC5F74C-5A9C-4D89-8E44-374310E684AE/data/Containers/Bundle/Application/A01C5F69-BB9C-48BF-96DA-638EDBEBF8DB/YourSofia.app\"" exited with code #0
+11:28:18.101 detox[99452] i moving "/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/detox-99452-b80l8K.detox.log" to .artifacts/ios.sim.release.2026-08-17 08-27-52Z/4EC5F74C-5A9C-4D89-8E44-374310E684AE 2026-08-17 08-28-18Z.startup.log
+11:28:18.102 detox[99452] i saving FileArtifact to: .artifacts/ios.sim.release.2026-08-17 08-27-52Z/detox_pid_99452.json.log { append: true }
+11:28:18.102 detox[99452] i saving FileArtifact to: .artifacts/ios.sim.release.2026-08-17 08-27-52Z/detox_pid_99452.log { append: true }
+11:28:18.102 detox[99452] E onBeforeCleanup
+11:28:18.104 detox[99446] i tester exited session a5e36739-d9d1-072d-9d66-b5cad52411f8
+11:28:18.104 detox[99446] E connection :62211<->:62212
+11:28:18.104 detox[99446] i received event of :  deallocateDevice {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+11:28:18.104 detox[99452] i dispatching event to  primary-99446 /tmp/detox.primary-99446  :  deallocateDevice , {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+11:28:18.105 detox[99446] B free: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {}
+11:28:18.106 detox[99446] E free: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+11:28:18.106 detox[99446] i dispatching event to socket  :  deallocateDeviceDone {}
+11:28:18.106 detox[99452] i ## received events ##
+11:28:18.106 detox[99452] i detected event deallocateDeviceDone {}
+11:28:18.106 detox[99452] E tear down environment
+11:28:18.106 detox[99452] E e2e/login.e2e.js
+11:28:18.109 detox[99446] i received event of :  reportTestResults {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      isPermanentFailure: false
+    }
+  ]
+}
+11:28:18.109 detox[99452] i dispatching event to  primary-99446 /tmp/detox.primary-99446  :  reportTestResults , {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      testExecError: undefined,
+      isPermanentFailure: false
+    }
+  ]
+}
+11:28:18.110 detox[99446] i dispatching event to socket  :  reportTestResultsDone {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      isPermanentFailure: false
+    }
+  ]
+}
+11:28:18.110 detox[99446] i broadcasting event to all known sockets listening to  /tmp/detox.primary-99446  :   sessionStateUpdate {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      isPermanentFailure: false
+    }
+  ]
+}
+11:28:18.110 detox[99452] i ## received events ##
+11:28:18.112 detox[99446] i socket disconnected secondary-99452
+11:28:18.118 detox[99446] E Command failed with exit code = 1:
+jest --config e2e/jest.config.js
+11:28:18.119 detox[99446] B cleanup
+  args: ()
+11:28:18.119 detox[99446] i /usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+11:28:18.119 detox[99446] i Shutting down 4EC5F74C-5A9C-4D89-8E44-374310E684AE...
+11:28:21.301 detox[99446] i 4EC5F74C-5A9C-4D89-8E44-374310E684AE shut down
+11:28:21.302 detox[99446] E cleanup
+11:28:21.303 detox[99446] i Detox server has been closed gracefully
+11:28:21.304 detox[99446] E node_modules/detox/local-cli/cli.js test --configuration ios.sim.release --cleanup

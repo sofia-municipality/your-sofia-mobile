@@ -1,0 +1,455 @@
+10:45:47.358 detox[78057] [90mB[39m node_modules/detox/local-cli/cli.js test --configuration ios.sim.release --cleanup
+  data: {
+    "id": "ddc4f67a-d47a-f755-3984-5dc19ebd32fe",
+    "detoxConfig": {
+      "configurationName": "ios.sim.release",
+      "apps": {
+        "default": {
+          "type": "ios.app",
+          "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/YourSofia.app",
+          "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+        }
+      },
+      "artifacts": {
+        "rootDir": ".artifacts/ios.sim.release.2026-08-17 07-45-47Z",
+        "plugins": {
+          "log": {
+            "enabled": true,
+            "keepOnlyFailedTestsArtifacts": true
+          },
+          "screenshot": {
+            "enabled": true,
+            "shouldTakeAutomaticSnapshots": true,
+            "keepOnlyFailedTestsArtifacts": true
+          },
+          "video": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          },
+          "instruments": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          },
+          "uiHierarchy": {
+            "enabled": false,
+            "keepOnlyFailedTestsArtifacts": false
+          }
+        }
+      },
+      "behavior": {
+        "init": {
+          "keepLockFile": false,
+          "reinstallApp": true,
+          "exposeGlobals": true
+        },
+        "cleanup": {
+          "shutdownDevice": true
+        },
+        "launchApp": "auto"
+      },
+      "cli": {
+        "cleanup": true,
+        "configuration": "ios.sim.release",
+        "start": true
+      },
+      "commands": [
+        {
+          "appName": "default",
+          "build": "xcodebuild -workspace ios/YourSofia.xcworkspace -scheme YourSofia -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'generic/platform=iOS Simulator'"
+        }
+      ],
+      "device": {
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone 16e"
+        }
+      },
+      "logger": {
+        "level": "info",
+        "overrideConsole": true,
+        "options": {
+          "showLoggerName": true,
+          "showPid": true,
+          "showLevel": false,
+          "showMetadata": false,
+          "basepath": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/detox@20.51.4_patch_hash=243f4fb1396d0ba4204110e1fb380dce0954c69273b7351999aba1f3d2eca5_91662811f4238f93586f4790222322c3/node_modules/detox/src",
+          "prefixers": {},
+          "stringifiers": {}
+        }
+      },
+      "testRunner": {
+        "retries": 0,
+        "forwardEnv": false,
+        "detached": false,
+        "bail": false,
+        "noRetryArgs": [
+          "shard"
+        ],
+        "jest": {
+          "setupTimeout": 120000,
+          "teardownTimeout": 30000,
+          "retryAfterCircusRetries": false,
+          "reportWorkerAssign": true
+        },
+        "args": {
+          "$0": "jest",
+          "_": [],
+          "config": "e2e/jest.config.js",
+          "--": []
+        }
+      },
+      "session": {
+        "autoStart": true,
+        "debugSynchronization": 10000
+      }
+    },
+    "detoxIPCServer": "primary-78057",
+    "testResults": [],
+    "testSessionIndex": 0,
+    "workersCount": 0
+  }
+10:45:47.365 detox[78057] [90mi[39m Server path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + ipc.config.id /tmp/detox.primary-78057
+10:45:47.365 detox[78057] [90mi[39m starting server on  /tmp/detox.primary-78057 
+10:45:47.365 detox[78057] [90mi[39m starting TLS server false
+10:45:47.365 detox[78057] [90mi[39m starting server as Unix || Windows Socket
+10:45:47.367 detox[78057] [90mi[39m Detox server listening on localhost:61407...
+10:45:47.368 detox[78057] [90mi[39m Serialized the session state at: /private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/ddc4f67a-d47a-f755-3984-5dc19ebd32fe.detox.json
+10:45:47.369 detox[78057] [90mB[39m jest --config e2e/jest.config.js
+10:45:47.370 detox[78057] [90mi[39m (node:78057) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+10:45:47.850 detox[78063] [90mi[39m Service path not specified, so defaulting to ipc.config.socketRoot + ipc.config.appspace + id 
+10:45:47.850 detox[78063] [90mi[39m requested connection to  primary-78057 /tmp/detox.primary-78057
+10:45:47.850 detox[78063] [90mi[39m Connecting client on Unix Socket : /tmp/detox.primary-78057
+10:45:47.851 detox[78057] [90mi[39m ## socket connection to server detected ##
+10:45:47.851 detox[78063] [90mi[39m retrying reset
+10:45:47.852 detox[78057] [90mi[39m received event of :  registerContext { id: 'secondary-78063' }
+10:45:47.852 detox[78057] [90mi[39m dispatching event to socket  :  registerContextDone {
+  testResults: [],
+  testSessionIndex: 0,
+  unsafe_earlyTeardown: undefined
+}
+10:45:47.852 detox[78063] [90mi[39m dispatching event to  primary-78057 /tmp/detox.primary-78057  :  registerContext , { id: 'secondary-78063' }
+10:45:47.853 detox[78063] [90mi[39m ## received events ##
+10:45:47.853 detox[78063] [90mi[39m detected event registerContextDone { testResults: [], testSessionIndex: 0 }
+10:45:47.922 detox[78063] [90mB[39m e2e/login.e2e.js
+10:45:47.929 detox[78057] [90mi[39m received event of :  registerWorker { workerId: 'w1' }
+10:45:47.929 detox[78057] [90mi[39m dispatching event to socket  :  registerWorkerDone { workersCount: 1 }
+10:45:47.929 detox[78063] [90mB[39m set up environment
+10:45:47.929 detox[78063] [90mi[39m dispatching event to  primary-78057 /tmp/detox.primary-78057  :  registerWorker , { workerId: 'w1' }
+10:45:47.930 detox[78057] [90mi[39m broadcasting event to all known sockets listening to  /tmp/detox.primary-78057  :   sessionStateUpdate { workersCount: 1 }
+10:45:47.930 detox[78063] [90mi[39m ## received events ##
+10:45:47.930 detox[78063] [90mi[39m detected event registerWorkerDone { workersCount: 1 }
+10:45:48.043 detox[78063] [90mi[39m ## received events ##
+10:45:48.043 detox[78063] [90mi[39m detected event sessionStateUpdate { workersCount: 1 }
+10:45:48.045 detox[78057] [90mB[39m connection :61407<->:61408
+10:45:48.045 detox[78063] [90mi[39m opened web socket to: ws://localhost:61407
+10:45:48.046 detox[78063] [90mi[39m send message
+  data: {"type":"login","params":{"sessionId":"833dbaa1-f46b-efba-dfee-f57c496c79c9","role":"tester"},"messageId":0}
+10:45:48.047 detox[78057] [90mi[39m get
+  data: {"type":"login","params":{"sessionId":"833dbaa1-f46b-efba-dfee-f57c496c79c9","role":"tester"},"messageId":0}
+10:45:48.048 detox[78057] [90mi[39m created session 833dbaa1-f46b-efba-dfee-f57c496c79c9
+10:45:48.048 detox[78057] [90mi[39m send
+  data: {
+    "type": "loginSuccess",
+    "params": {
+      "testerConnected": true,
+      "appConnected": false
+    },
+    "messageId": 0
+  }
+10:45:48.048 detox[78057] [90mi[39m tester joined session 833dbaa1-f46b-efba-dfee-f57c496c79c9
+10:45:48.049 detox[78063] [90mi[39m get message
+  data: {"type":"loginSuccess","params":{"testerConnected":true,"appConnected":false},"messageId":0}
+   
+10:45:48.287 detox[78063] [90mi[39m dispatching event to  primary-78057 /tmp/detox.primary-78057  :  allocateDevice , {
+  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }
+}
+10:45:48.288 detox[78057] [90mi[39m received event of :  allocateDevice {
+  deviceConfig: { type: 'ios.simulator', device: { type: 'iPhone 16e' } }
+}
+10:45:48.290 detox[78057] [90mB[39m init
+  args: ()
+10:45:48.292 detox[78057] [90mE[39m init
+10:45:48.292 detox[78057] [90mB[39m allocate
+  data: {
+    "type": "ios.simulator",
+    "device": {
+      "type": "iPhone 16e"
+    }
+  }
+10:45:48.362 detox[78057] [90mi[39m applesimutils --list --byType "iPhone 16e" --fields udid,name,deviceType,os,identifier
+10:45:48.362 detox[78057] [90mi[39m Searching for device by type = "iPhone 16e" ...
+10:45:48.971 detox[78057] [90mi[39m [
+  {
+    "os" : {
+      "name" : "iOS 26.3",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-26-3"
+    },
+    "name" : "iPhone 16e",
+    "udid" : "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "deviceType" : {
+      "name" : "iPhone 16e",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-16e"
+    }
+  }
+]
+
+10:45:48.971 detox[78057] [90mi[39m settled on 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {
+    "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+10:45:48.971 detox[78057] [90mE[39m allocate
+10:45:48.971 detox[78057] [90mB[39m post-allocate: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {
+    "id": "4EC5F74C-5A9C-4D89-8E44-374310E684AE",
+    "udid": "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+10:45:48.971 detox[78057] [90mi[39m applesimutils --list --byId 4EC5F74C-5A9C-4D89-8E44-374310E684AE --maxResults 1 --fields udid,os,version,state
+10:45:49.067 detox[78057] [90mi[39m [
+  {
+    "state" : "Shutdown",
+    "os" : {
+      "version" : "26.3.1"
+    },
+    "udid" : "4EC5F74C-5A9C-4D89-8E44-374310E684AE"
+  }
+]
+
+10:45:49.067 detox[78057] [90mi[39m /usr/bin/xcrun simctl boot 4EC5F74C-5A9C-4D89-8E44-374310E684AE 
+10:45:49.067 detox[78057] [90mi[39m Booting device 4EC5F74C-5A9C-4D89-8E44-374310E684AE...
+10:45:50.522 detox[78057] [90mi[39m 
+10:45:50.522 detox[78057] [90mi[39m /usr/bin/xcrun simctl bootstatus 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+10:45:56.296 detox[78057] [90mi[39m Monitoring boot status for iPhone 16e (4EC5F74C-5A9C-4D89-8E44-374310E684AE).
+[2026-08-17 07:45:51 +0000] Status=1, isTerminal=NO, Elapsed=00:02.
+	Waiting on BackBoard
+
+[2026-08-17 07:45:52 +0000] Status=4, isTerminal=NO, Elapsed=00:02.
+	Waiting on System App
+
+[2026-08-17 07:45:52 +0000] Status=4, isTerminal=NO, Elapsed=00:02.
+	Waiting on System App
+
+[2026-08-17 07:45:54 +0000] Status=4, isTerminal=NO, Elapsed=00:04.
+	Waiting on System App
+
+[2026-08-17 07:45:56 +0000] Status=4294967295, isTerminal=YES, Elapsed=00:06.
+	Finished
+
+
+10:45:56.296 detox[78057] [90mi[39m open -a Simulator --args -CurrentDeviceUDID 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+10:45:56.375 detox[78057] [90mi[39m 
+10:45:56.376 detox[78057] [90mE[39m post-allocate: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+10:45:56.376 detox[78057] [90mi[39m dispatching event to socket  :  allocateDeviceDone {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator',
+    bootArgs: undefined,
+    headless: undefined
+  }
+}
+10:45:56.377 detox[78063] [90mi[39m ## received events ##
+10:45:56.377 detox[78063] [90mi[39m detected event allocateDeviceDone {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+10:45:56.393 detox[78063] [90mB[39m onBootDevice
+  args: ({"deviceId":"4EC5F74C-5A9C-4D89-8E44-374310E684AE"})
+10:45:56.393 detox[78063] [90mE[39m onBootDevice
+10:45:56.394 detox[78063] [90mB[39m installUtilBinaries
+  args: ()
+10:45:56.395 detox[78063] [90mE[39m installUtilBinaries
+10:45:56.395 detox[78063] [90mB[39m selectApp
+  args: ("default")
+10:45:56.396 detox[78063] [90mE[39m selectApp
+  error: Failed to find the app binary at:
+  /Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app
+  
+  HINT: Make sure that:
+  1. You built the app before running tests:
+    detox build -c <your-configuration-name>
+  2. The app binary can be found at the given path.
+10:45:56.396 detox[78063] [90mE[39m set up environment
+  error: Failed to find the app binary at:
+  /Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app
+  
+  HINT: Make sure that:
+  1. You built the app before running tests:
+    detox build -c <your-configuration-name>
+  2. The app binary can be found at the given path.
+10:45:56.396 detox[78063] [90mB[39m tear down environment
+10:45:56.396 detox[78063] [90mB[39m onBeforeCleanup
+  args: ()
+10:45:56.398 detox[78063] [90mE[39m onBeforeCleanup
+10:45:56.401 detox[78057] [90mi[39m tester exited session 833dbaa1-f46b-efba-dfee-f57c496c79c9
+10:45:56.402 detox[78057] [90mE[39m connection :61407<->:61408
+10:45:56.402 detox[78057] [90mi[39m received event of :  deallocateDevice {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+10:45:56.402 detox[78057] [90mB[39m free: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+  data: {}
+10:45:56.402 detox[78063] [90mi[39m dispatching event to  primary-78057 /tmp/detox.primary-78057  :  deallocateDevice , {
+  deviceCookie: {
+    id: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    udid: '4EC5F74C-5A9C-4D89-8E44-374310E684AE',
+    type: 'ios.simulator'
+  }
+}
+10:45:56.403 detox[78057] [90mE[39m free: 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+10:45:56.403 detox[78057] [90mi[39m dispatching event to socket  :  deallocateDeviceDone {}
+10:45:56.404 detox[78063] [90mi[39m ## received events ##
+10:45:56.404 detox[78063] [90mi[39m detected event deallocateDeviceDone {}
+10:45:56.404 detox[78063] [90mE[39m tear down environment
+10:45:56.404 detox[78063] [90mE[39m e2e/login.e2e.js
+10:45:56.421 detox[78063] [90mi[39m dispatching event to  primary-78057 /tmp/detox.primary-78057  :  reportTestResults , {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      testExecError: {
+        name: 'DetoxRuntimeError',
+        message: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.',
+        stack: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.\n' +
+          '    at _reinstallAppsOnDevice.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at DetoxWorker.runner (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:293:5)\n' +
+          '    at DetoxWorker.instance [as _reinstallAppsOnDevice] (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:63:32)\n' +
+          '    at init.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at processTicksAndRejections (node:internal/process/task_queues:104:5)'
+      },
+      isPermanentFailure: false
+    }
+  ]
+}
+10:45:56.422 detox[78057] [90mi[39m received event of :  reportTestResults {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      testExecError: {
+        name: 'DetoxRuntimeError',
+        message: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.',
+        stack: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.\n' +
+          '    at _reinstallAppsOnDevice.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at DetoxWorker.runner (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:293:5)\n' +
+          '    at DetoxWorker.instance [as _reinstallAppsOnDevice] (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:63:32)\n' +
+          '    at init.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at processTicksAndRejections (node:internal/process/task_queues:104:5)'
+      },
+      isPermanentFailure: false
+    }
+  ]
+}
+10:45:56.423 detox[78057] [90mi[39m dispatching event to socket  :  reportTestResultsDone {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      testExecError: {
+        name: 'DetoxRuntimeError',
+        message: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.',
+        stack: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.\n' +
+          '    at _reinstallAppsOnDevice.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at DetoxWorker.runner (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:293:5)\n' +
+          '    at DetoxWorker.instance [as _reinstallAppsOnDevice] (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:63:32)\n' +
+          '    at init.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at processTicksAndRejections (node:internal/process/task_queues:104:5)'
+      },
+      isPermanentFailure: false
+    }
+  ]
+}
+10:45:56.423 detox[78057] [90mi[39m broadcasting event to all known sockets listening to  /tmp/detox.primary-78057  :   sessionStateUpdate {
+  testResults: [
+    {
+      success: false,
+      testFilePath: '/Users/valentinasenov/your-sofia/your-sofia-mobile/e2e/login.e2e.js',
+      testExecError: {
+        name: 'DetoxRuntimeError',
+        message: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.',
+        stack: 'Failed to find the app binary at:\n' +
+          '/Users/valentinasenov/your-sofia/your-sofia-mobile/ios/build/Build/Products/Release-iphonesimulator/YourSofia.app\n' +
+          '\n' +
+          'HINT: Make sure that:\n' +
+          '1. You built the app before running tests:\n' +
+          '  detox build -c <your-configuration-name>\n' +
+          '2. The app binary can be found at the given path.\n' +
+          '    at _reinstallAppsOnDevice.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at DetoxWorker.runner (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:293:5)\n' +
+          '    at DetoxWorker.instance [as _reinstallAppsOnDevice] (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:63:32)\n' +
+          '    at init.next (<anonymous>)\n' +
+          '    at getNextResult (/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/caf@15.0.1/node_modules/caf/src/caf.js:253:25)\n' +
+          '    at processTicksAndRejections (node:internal/process/task_queues:104:5)'
+      },
+      isPermanentFailure: false
+    }
+  ]
+}
+10:45:56.423 detox[78063] [90mi[39m ## received events ##
+10:45:56.425 detox[78057] [90mi[39m socket disconnected secondary-78063
+10:45:56.435 detox[78057] [90mE[39m Command failed with exit code = 1:
+jest --config e2e/jest.config.js
+10:45:56.435 detox[78057] [90mB[39m cleanup
+  args: ()
+10:45:56.436 detox[78057] [90mi[39m /usr/bin/xcrun simctl shutdown 4EC5F74C-5A9C-4D89-8E44-374310E684AE
+10:45:56.436 detox[78057] [90mi[39m Shutting down 4EC5F74C-5A9C-4D89-8E44-374310E684AE...
+10:45:59.715 detox[78057] [90mi[39m 4EC5F74C-5A9C-4D89-8E44-374310E684AE shut down
+10:45:59.718 detox[78057] [90mE[39m cleanup
+10:45:59.719 detox[78057] [90mi[39m Detox server has been closed gracefully
+10:45:59.721 detox[78057] [90mE[39m node_modules/detox/local-cli/cli.js test --configuration ios.sim.release --cleanup
