@@ -96,6 +96,7 @@
     "@openapitools/openapi-generator-cli": "^2.40.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",
+    "@types/node": "^24.5.2",
     "@types/react": "~19.1.0",
     "baseline-browser-mapping": "^2.9.11",
     "cross-env": "^10.1.0",
