@@ -9,21 +9,11 @@
  * through the real `fetchDrinkingFountains()` client code — exercising the
  * full HTTP round trip instead of mocking `fetch` directly.
  */
-import path from 'path'
-import http from 'http'
+
 import {environmentManager} from '../../lib/environment'
 import {fetchDrinkingFountains} from '../../lib/payload'
-
-const MOCK_SERVER_DIR = path.join(__dirname, '../../mock-server')
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const ExpressServer = require('../../mock-server/expressServer')
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Service = require('../../mock-server/services/Service')
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const DrinkingFountainsService = require('../../mock-server/services/DrinkingFountainsService')
-
-const PORT = 4123
+import {Service, DrinkingFountainsService, MockServer} from '../helpers/mockServerlib'
+import {addFetchShim, removeFetchShim} from '../helpers/fetchShim'
 
 const FIXTURE_DOCS = [
   {
@@ -39,42 +29,7 @@ const FIXTURE_DOCS = [
   },
 ]
 
-let httpServer: http.Server
-let originalFetch: typeof fetch
-
-interface ShimResponse {
-  ok: boolean
-  status: number
-  statusText: string
-  json: () => Promise<any>
-  text: () => Promise<string>
-}
-
-// jest-expo's test environment stubs out React Native's fetch (there's no native
-// bridge in a Jest process, so it never touches the network) — real Node fetch
-// isn't reachable from inside the test either, since jest-expo's setup replaces
-// the global before this file runs. This is a plain Node `http` shim that's just
-// enough to exercise a real HTTP round trip against the mock server.
-function nodeFetchShim(url: string): Promise<ShimResponse> {
-  return new Promise((resolve, reject) => {
-    http
-      .get(url, (res) => {
-        let data = ''
-        res.on('data', (chunk) => (data += chunk))
-        res.on('end', () => {
-          const status = res.statusCode ?? 0
-          resolve({
-            ok: status >= 200 && status < 300,
-            status,
-            statusText: res.statusMessage ?? '',
-            json: async () => JSON.parse(data),
-            text: async () => data,
-          })
-        })
-      })
-      .on('error', reject)
-  })
-}
+const server = new MockServer(4132)
 
 describe('fetchDrinkingFountains against the generated OpenAPI mock server', () => {
   beforeAll(async () => {
@@ -83,24 +38,17 @@ describe('fetchDrinkingFountains against the generated OpenAPI mock server', () 
     DrinkingFountainsService.listDrinkingFountains = () =>
       Promise.resolve(Service.successResponse({docs: FIXTURE_DOCS}))
 
-    const server = new ExpressServer(PORT, path.join(MOCK_SERVER_DIR, 'api/openapi.yaml'))
-    // Reproduce launch()'s two side effects ourselves so we can keep a handle on
-    // the underlying http.Server to close it afterwards — the generated
-    // launch()/close() pair never actually stores that reference.
-    server.app.use((err: any, _req: any, res: any, _next: any) => {
-      res.status(err.status || 500).json({message: err.message || err, errors: err.errors || ''})
-    })
-    httpServer = http.createServer(server.app).listen(PORT)
+    jest.spyOn(environmentManager, 'getApiUrl').mockReturnValue(server.getUrl())
+    addFetchShim()
 
-    jest.spyOn(environmentManager, 'getApiUrl').mockReturnValue(`http://localhost:${PORT}`)
-    originalFetch = globalThis.fetch
-    globalThis.fetch = nodeFetchShim as unknown as typeof fetch
+    await server.listen()
   })
 
   afterAll(async () => {
+    await server.close()
+
     jest.restoreAllMocks()
-    globalThis.fetch = originalFetch
-    await new Promise((resolve) => httpServer.close(() => resolve(undefined)))
+    removeFetchShim()
   })
 
   it('fetches and flattens the fountain docs returned by the mock endpoint', async () => {
