@@ -16,14 +16,12 @@ import {fetchDrinkingFountains} from '../../lib/payload'
 
 const MOCK_SERVER_DIR = path.join(__dirname, '../../mock-server')
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ExpressServer = require(path.join(MOCK_SERVER_DIR, 'expressServer'))
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Service = require(path.join(MOCK_SERVER_DIR, 'services/Service'))
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const DrinkingFountainsService = require(
-  path.join(MOCK_SERVER_DIR, 'services/DrinkingFountainsService')
-)
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ExpressServer = require('../../mock-server/expressServer')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Service = require('../../mock-server/services/Service')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const DrinkingFountainsService = require('../../mock-server/services/DrinkingFountainsService')
 
 const PORT = 4123
 
