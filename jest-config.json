@@ -1,0 +1,148 @@
+{
+  "configs": [
+    {
+      "automock": false,
+      "cache": true,
+      "cacheDirectory": "/private/var/folders/s6/yd_zk8tj44q3s0_kpq1gwzqc0000gn/T/jest_dx",
+      "clearMocks": false,
+      "collectCoverageFrom": [],
+      "coverageDirectory": "/Users/valentinasenov/your-sofia/your-sofia-mobile/coverage",
+      "coveragePathIgnorePatterns": ["/node_modules/"],
+      "cwd": "/Users/valentinasenov/your-sofia/your-sofia-mobile",
+      "detectLeaks": false,
+      "detectOpenHandles": false,
+      "errorOnDeprecated": false,
+      "extensionsToTreatAsEsm": [],
+      "fakeTimers": {
+        "enableGlobally": false
+      },
+      "forceCoverageMatch": [],
+      "globals": {},
+      "haste": {
+        "defaultPlatform": "ios",
+        "platforms": ["android", "ios", "native"]
+      },
+      "id": "b8e29397dc685647ed11c18d5476d4e2",
+      "injectGlobals": true,
+      "moduleDirectories": ["node_modules"],
+      "moduleFileExtensions": ["js", "mjs", "cjs", "jsx", "ts", "tsx", "json", "node"],
+      "moduleNameMapper": [
+        [
+          "^@react-native-async-storage/async-storage$",
+          "@react-native-async-storage/async-storage/jest/async-storage-mock"
+        ],
+        ["^@/(.*)$", "/Users/valentinasenov/your-sofia/your-sofia-mobile/$1"],
+        ["^react-native-vector-icons$", "@expo/vector-icons"],
+        ["^react-native-vector-icons/(.*)", "@expo/vector-icons/$1"]
+      ],
+      "modulePathIgnorePatterns": [],
+      "openHandlesTimeout": 1000,
+      "prettierPath": "prettier",
+      "resetMocks": false,
+      "resetModules": false,
+      "resolver": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/react-native@0.81.5_@babel+core@7.29.7_@types+react@19.1.17_react@19.1.0/node_modules/react-native/jest/resolver.js",
+      "restoreMocks": false,
+      "rootDir": "/Users/valentinasenov/your-sofia/your-sofia-mobile",
+      "roots": ["/Users/valentinasenov/your-sofia/your-sofia-mobile"],
+      "runner": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/index.js",
+      "sandboxInjectedGlobals": [],
+      "setupFiles": [
+        "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/react-native@0.81.5_@babel+core@7.29.7_@types+react@19.1.17_react@19.1.0/node_modules/react-native/jest/setup.js",
+        "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/jest-expo@54.0.16_@babel+core@7.29.7_expo@54.0.32_jest@29.7.0_@types+node@24.5.2__react_036bc6e88089e0924d82863937061444/node_modules/jest-expo/src/preset/setup.js"
+      ],
+      "setupFilesAfterEnv": [],
+      "skipFilter": false,
+      "slowTestThreshold": 5,
+      "snapshotFormat": {
+        "escapeString": false,
+        "printBasicPrototype": false
+      },
+      "snapshotSerializers": [],
+      "testEnvironment": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/react-native@0.81.5_@babel+core@7.29.7_@types+react@19.1.17_react@19.1.0/node_modules/react-native/jest/react-native-env.js",
+      "testEnvironmentOptions": {},
+      "testLocationInResults": false,
+      "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
+      "testPathIgnorePatterns": ["/node_modules/"],
+      "testRegex": [],
+      "testRunner": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/runner.js",
+      "transform": [
+        [
+          "^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|svg|webp)$",
+          "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/react-native@0.81.5_@babel+core@7.29.7_@types+react@19.1.17_react@19.1.0/node_modules/react-native/jest/assetFileTransformer.js",
+          {}
+        ],
+        [
+          "\\.[jt]sx?$",
+          "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/babel-jest@29.7.0_@babel+core@7.29.7/node_modules/babel-jest/build/index.js",
+          {
+            "caller": {
+              "name": "metro",
+              "bundler": "metro",
+              "platform": "ios"
+            },
+            "configFile": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/expo@54.0.32_@babel+core@7.29.7_@expo+metro-runtime@6.1.2_expo-router@6.0.22_react-nati_3c0d8b2e1316054e8b17556c32b8376f/node_modules/expo/internal/babel-preset.js"
+          }
+        ],
+        [
+          "^.+\\.(bmp|gif|jpg|jpeg|png|psd|svg|webp|xml|m4v|mov|mp4|mpeg|mpg|webm|aac|aiff|caf|m4a|mp3|wav|html|pdf|yaml|yml|otf|ttf|zip|heic|avif|db)$",
+          "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/jest-expo@54.0.16_@babel+core@7.29.7_expo@54.0.32_jest@29.7.0_@types+node@24.5.2__react_036bc6e88089e0924d82863937061444/node_modules/jest-expo/src/preset/assetFileTransformer.js",
+          {}
+        ]
+      ],
+      "transformIgnorePatterns": [
+        "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base))",
+        "/node_modules/react-native-reanimated/plugin/"
+      ],
+      "watchPathIgnorePatterns": []
+    }
+  ],
+  "globalConfig": {
+    "bail": 0,
+    "changedFilesWithAncestor": false,
+    "ci": false,
+    "collectCoverage": false,
+    "collectCoverageFrom": [],
+    "coverageDirectory": "/Users/valentinasenov/your-sofia/your-sofia-mobile/coverage",
+    "coverageProvider": "babel",
+    "coverageReporters": ["json", "text", "lcov", "clover"],
+    "detectLeaks": false,
+    "detectOpenHandles": false,
+    "errorOnDeprecated": false,
+    "expand": false,
+    "findRelatedTests": false,
+    "forceExit": false,
+    "json": false,
+    "lastCommit": false,
+    "listTests": false,
+    "logHeapUsage": false,
+    "maxConcurrency": 5,
+    "maxWorkers": 9,
+    "noStackTrace": false,
+    "nonFlagArgs": [],
+    "notify": false,
+    "notifyMode": "failure-change",
+    "onlyChanged": false,
+    "onlyFailures": false,
+    "openHandlesTimeout": 1000,
+    "passWithNoTests": false,
+    "projects": [],
+    "rootDir": "/Users/valentinasenov/your-sofia/your-sofia-mobile",
+    "runTestsByPath": false,
+    "seed": -915649919,
+    "skipFilter": false,
+    "snapshotFormat": {
+      "escapeString": false,
+      "printBasicPrototype": false
+    },
+    "testFailureExitCode": 1,
+    "testPathPattern": "",
+    "testSequencer": "/Users/valentinasenov/your-sofia/your-sofia-mobile/node_modules/.pnpm/@jest+test-sequencer@29.7.0/node_modules/@jest/test-sequencer/build/index.js",
+    "updateSnapshot": "new",
+    "useStderr": false,
+    "watch": false,
+    "watchAll": false,
+    "watchman": true,
+    "workerThreads": false
+  },
+  "version": "29.7.0"
+}
