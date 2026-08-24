@@ -29,7 +29,7 @@ const FIXTURE_DOCS = [
   },
 ]
 
-const server = new MockServer(4132)
+const server = new MockServer(4123)
 
 describe('fetchDrinkingFountains against the generated OpenAPI mock server', () => {
   beforeAll(async () => {
