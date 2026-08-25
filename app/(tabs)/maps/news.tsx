@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useMemo, useRef} from 'react'
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native'
-import MapView, {Marker, type Region} from 'react-native-maps'
+import MapView, {Marker, type Region} from '@/lib/Map'
 import * as Location from 'expo-location'
 import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
@@ -50,7 +50,6 @@ export default function NewsMap() {
     })()
   }, [])
 
-  // Default to Sofia center if location is not available
   const region = useMemo(
     () => ({
       latitude: location?.coords.latitude || 42.6977,
@@ -74,7 +73,6 @@ export default function NewsMap() {
     }
   }, [])
 
-  // Filter news items that have location data
   const newsWithLocation = news.filter((item) => item.location)
 
   if (loading) {

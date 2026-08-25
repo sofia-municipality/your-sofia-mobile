@@ -15,7 +15,7 @@ import {
   Modal,
   Linking,
 } from 'react-native'
-import MapView, {Marker, type Region} from 'react-native-maps'
+import MapView, {Marker, type Region} from '@/lib/Map'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
 import {useRouter, useLocalSearchParams} from 'expo-router'
@@ -97,7 +97,6 @@ export default function NewSignal() {
   // Hide camera temporarily before navigation to avoid iOS Fabric unmount assertion
   const [showCamera, setShowCamera] = useState(true)
 
-  // Use nearby objects hook
   const {
     nearbyObjects,
     setNearbyObjects,
@@ -111,7 +110,6 @@ export default function NewSignal() {
     containerLocation,
   })
 
-  // Use signal form hook
   const {
     photos,
     selectedObjectType,
@@ -135,7 +133,6 @@ export default function NewSignal() {
     setNearbyObjects,
   })
 
-  // Wrapper for resetFormState to also reset selectedObject
   const resetFormState = useCallback(() => {
     setSelectedObject(null)
     resetFormStateAction()
@@ -143,7 +140,6 @@ export default function NewSignal() {
     setShowCamera(true)
   }, [resetFormStateAction])
 
-  // Wrapper for handleCancel to pass selectedObject and returnTo
   const handleCancel = useCallback(() => {
     // Hide camera first to ensure native camera view is unmounted cleanly
     setShowCamera(false)
@@ -171,14 +167,12 @@ export default function NewSignal() {
     {id: 'other', label: t('newSignal.objectTypes.other')},
   ]
 
-  // Set default object type to waste-container
   React.useEffect(() => {
     if (!prefilledObjectType && !selectedObjectType) {
       setSelectedObjectType('waste-container')
     }
   }, [prefilledObjectType, selectedObjectType, setSelectedObjectType])
 
-  // Load nearby containers when selectedObject becomes null
   React.useEffect(() => {
     console.log('[useEffect] selectedObject changed:', selectedObject?.name)
     console.log('[useEffect] prefilledMapObject:', prefilledMapObject?.name)
@@ -209,7 +203,6 @@ export default function NewSignal() {
     setSelectedObjectType,
   ])
 
-  // Get device unique ID from secure storage
   React.useEffect(() => {
     getUniqueReporterId()
       .then((id) => {
@@ -220,7 +213,6 @@ export default function NewSignal() {
       })
   }, [])
 
-  // Update date/time every second
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDateTime(new Date())
@@ -228,18 +220,14 @@ export default function NewSignal() {
     return () => clearInterval(interval)
   }, [])
 
-  // Wrapper for takePhoto to pass cameraRef
   const takePhoto = async () => {
     await takePhotoAction(cameraRef)
   }
 
-  // Reset form when tab is focused/clicked
   useFocusEffect(
     useCallback(() => {
-      // Only reset if there are no prefilled params
       if (!params.containerPublicNumber) {
         resetFormState()
-        // Reload nearby containers
         loadNearbyObjectsCallback(null)
       }
     }, [params.containerPublicNumber, resetFormState, loadNearbyObjectsCallback])
@@ -251,7 +239,6 @@ export default function NewSignal() {
       return
     }
 
-    // Validate container states for waste-container type
     if (selectedObjectType === 'waste-container' && selectedStates.length === 0) {
       Alert.alert(t('common.error'), t('newSignal.selectContainerState'))
       return
@@ -302,7 +289,6 @@ export default function NewSignal() {
       let title = ''
 
       if (selectedObjectType) {
-        // Map object type to category
         const categoryMap: Record<string, CreateSignalInput['category']> = {
           'waste-container': 'waste-container',
           'street-light': 'lighting',
@@ -317,15 +303,12 @@ export default function NewSignal() {
         }
         category = categoryMap[selectedObjectType] || 'other'
 
-        // Create city object reference
         cityObject = {
           type: selectedObjectType as any,
           name: selectedObject ? selectedObject.name : undefined,
-          // Include referenceId if a specific object was selected
           referenceId: selectedObject ? selectedObject.id : undefined,
         }
 
-        // Generate signal title from object type and states
         if (selectedObjectType === 'waste-container' && selectedStates.length > 0) {
           const statesText = selectedStates
             .map((state) => t(`signals.containerStates.${state}`))
@@ -335,7 +318,6 @@ export default function NewSignal() {
           title = t(`newSignal.objectTypes.${selectedObjectType.replace('-', '')}`)
         }
       } else if (selectedObject) {
-        // Selected an existing nearby object
         title = selectedObject.name
         category = selectedObject.type as CreateSignalInput['category']
         cityObject = {
@@ -345,7 +327,6 @@ export default function NewSignal() {
         }
       }
 
-      // Prepare signal data
       const signalData: CreateSignalInput = {
         title,
         description: description.trim(),
@@ -361,14 +342,12 @@ export default function NewSignal() {
 
       console.log('[handleSubmit] Creating signal:', signalData)
 
-      // Prepare photos for upload
       const photoFiles = photos.map((photo) => ({
         uri: photo.uri,
         type: 'image/jpeg',
         name: `signal-photo-${photo.id}.jpg`,
       }))
 
-      // Create signal via API with photos
       const newSignal = await createSignal(
         signalData,
         photoFiles.length > 0 ? photoFiles : undefined,
@@ -390,10 +369,8 @@ export default function NewSignal() {
             // Small delay to allow unmount to happen cleanly on iOS Fabric
             await new Promise((r) => setTimeout(r, 80))
 
-            // Reset form state
             resetFormState()
 
-            // Navigate back with containerId if available
             const returnTo = params.returnTo as string | undefined
             const containerId = params.containerId as string | undefined
 
@@ -465,7 +442,6 @@ export default function NewSignal() {
         enableOnAndroid={false}
         extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
       >
-        {/* Camera Section */}
         <View style={styles.cameraContainer}>
           {showCamera ? (
             <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
@@ -473,7 +449,6 @@ export default function NewSignal() {
             // Keep a placeholder view to preserve layout while camera is hidden
             <View style={styles.camera} />
           )}
-          {/* Coordinates Overlay */}
           {currentLocation && (
             <View style={styles.coordinatesOverlay}>
               <MapPinIcon size={14} color="#fff" />
@@ -482,7 +457,6 @@ export default function NewSignal() {
               </Text>
             </View>
           )}
-          {/* Date/Time Overlay */}
           <View style={styles.dateTimeOverlay}>
             <Text style={styles.dateTimeText}>
               {currentDateTime.toLocaleDateString('bg-BG', {
@@ -510,7 +484,6 @@ export default function NewSignal() {
           </View>
         </View>
 
-        {/* Photo Chips */}
         {photos.length > 0 && (
           <View style={styles.photosContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -534,7 +507,6 @@ export default function NewSignal() {
           </View>
         )}
 
-        {/* Location Required Banner */}
         {!currentLocation && !loadingNearbyObjects && (
           <View style={styles.locationBanner}>
             <MapPinIcon size={20} color={colors.error} />
@@ -556,7 +528,6 @@ export default function NewSignal() {
           </View>
         )}
 
-        {/* Nearby Objects Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.nearbyObjects')}</Text>
 
@@ -577,7 +548,6 @@ export default function NewSignal() {
             </TouchableOpacity>
           )}
 
-          {/* Nearby Objects List */}
           {loadingNearbyObjects ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color={colors.primary} />
@@ -613,7 +583,6 @@ export default function NewSignal() {
           )}
         </View>
 
-        {/* Object Type Selection - only show when new object is selected */}
         {!selectedObject && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('newSignal.objectType')}</Text>
@@ -673,7 +642,6 @@ export default function NewSignal() {
           </View>
         </View>
 
-        {/* Description Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('newSignal.description')}</Text>
           <TextInput
@@ -688,7 +656,6 @@ export default function NewSignal() {
           />
         </View>
 
-        {/* Upload Progress */}
         {uploadProgress.stage && (
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
@@ -712,7 +679,6 @@ export default function NewSignal() {
           </View>
         )}
 
-        {/* Action Buttons */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.secondaryButton}
@@ -735,14 +701,12 @@ export default function NewSignal() {
         <View style={styles.bottomSpacer} />
       </KeyboardAwareScrollView>
 
-      {/* Full-Screen Photo Viewer */}
       <FullScreenPhotoViewer
         visible={viewingPhoto !== null}
         photoUri={viewingPhoto}
         onClose={() => setViewingPhoto(null)}
       />
 
-      {/* New Object Location Map Modal */}
       <Modal
         visible={showObjectLocationMap}
         animationType="slide"

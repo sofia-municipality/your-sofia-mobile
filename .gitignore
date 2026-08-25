@@ -36,3 +36,19 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 .gstack/
+
+# detox
+/artifacts/
+ios/build/
+
+
+/.idea/
+/.vscode/
+
+# openapi-generator output — regenerated from api.yaml, see package.json
+src/api/
+mock-server/
+
+# winston logs written by the mock server when it runs
+combined.log
+error.log
