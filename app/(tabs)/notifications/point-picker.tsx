@@ -2,11 +2,12 @@ import {View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView} from
 import {useState} from 'react'
 import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
-import MapView, {Marker, type Region} from '@/lib/Map'
+import MapView, {Marker, type Region} from 'react-native-maps'
 import type {LocationFilterPoint} from '../../../types/subscription'
 import {emitNotificationFilter} from '../../../lib/notificationFilterBridge'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
+// Sofia center
 const SOFIA_REGION: Region = {
   latitude: 42.6977,
   longitude: 23.3219,

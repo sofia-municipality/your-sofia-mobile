@@ -2,7 +2,7 @@ import {View, Text, TouchableOpacity, StyleSheet, SafeAreaView} from 'react-nati
 import {useState} from 'react'
 import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
-import MapView, {Marker, Polygon, type Region} from '@/lib/Map'
+import MapView, {Marker, Polygon, type Region} from 'react-native-maps'
 import type {LocationFilterArea} from '../../../types/subscription'
 import {emitNotificationFilter} from '../../../lib/notificationFilterBridge'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
