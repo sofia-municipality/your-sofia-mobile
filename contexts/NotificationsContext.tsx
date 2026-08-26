@@ -65,8 +65,7 @@ export function NotificationsProvider({children}: {children: React.ReactNode}) {
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       const notifData = response.notification.request.content.data as
-        | Record<string, unknown>
-        | undefined
+        Record<string, unknown> | undefined
       if (notifData?.type === 'signal-status-update' || notifData?.type === 'signal-closed') {
         const signalId = notifData.signalId as string | undefined
         if (signalId) {

@@ -16,6 +16,7 @@ interface UseUpdatesOptions {
   zoom?: number
   limit?: number
   enabled?: boolean
+  timespanEndGte?: string
 }
 
 export function useUpdates(options: UseUpdatesOptions = {}) {
@@ -43,8 +44,15 @@ export function useUpdates(options: UseUpdatesOptions = {}) {
       : 'no-bounds'
     const zoomKey = typeof options.zoom === 'number' ? options.zoom.toFixed(2) : 'no-zoom'
 
-    return `${pushToken ?? ''}|${categoriesKey}|${boundsKey}|${zoomKey}|${i18n.language}`
-  }, [pushToken, categoriesKey, i18n.language, options.bounds, options.zoom])
+    return `${pushToken ?? ''}|${categoriesKey}|${boundsKey}|${zoomKey}|${options.timespanEndGte ?? ''}|${i18n.language}`
+  }, [
+    pushToken,
+    categoriesKey,
+    i18n.language,
+    options.bounds,
+    options.zoom,
+    options.timespanEndGte,
+  ])
 
   const loadUpdates = useCallback(
     async (force: boolean = false) => {
@@ -98,6 +106,7 @@ export function useUpdates(options: UseUpdatesOptions = {}) {
             categories: categoriesKey ? categoriesKey.split('|') : undefined,
             bounds: options.bounds ?? undefined,
             zoom: options.zoom,
+            timespanEndGte: options.timespanEndGte,
           }),
           fetchUpdateSources().catch((sourcesError) => {
             console.warn('Error loading update sources metadata:', sourcesError)
@@ -130,6 +139,7 @@ export function useUpdates(options: UseUpdatesOptions = {}) {
       options.bounds,
       options.zoom,
       options.limit,
+      options.timespanEndGte,
       pushToken,
       error,
       buildRequestKey,
