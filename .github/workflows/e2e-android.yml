@@ -78,6 +78,9 @@ jobs:
       - name: Install emulator dependency
         run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
 
+      - name: Reverse localhost ports to not use patch
+        run: adb reverse tcp:8099 tcp:8099
+
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -104,6 +107,7 @@ jobs:
           # runs each line of a multi-line `script:` input as its own
           # separate invocation, so real control flow (retries, a shared
           # failure handler) can't live inline here.
+
           run: pnpm e2e:test:ios
 
       - name: Upload Detox artifacts on failure
