@@ -104,7 +104,7 @@ jobs:
           # runs each line of a multi-line `script:` input as its own
           # separate invocation, so real control flow (retries, a shared
           # failure handler) can't live inline here.
-          script: bash .github/scripts/android-e2e-run.sh
+          run: pnpm e2e:test:ios
 
       - name: Upload Detox artifacts on failure
         if: failure() || cancelled()
