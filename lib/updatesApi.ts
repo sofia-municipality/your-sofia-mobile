@@ -39,6 +39,7 @@ export async function fetchNewsUpdates(options?: {
   categories?: string[]
   bounds?: MapBounds
   zoom?: number
+  timespanEndGte?: string
 }): Promise<UpdateMessage[]> {
   const baseUrl = getUpdatesBaseUrl()
   const params = new URLSearchParams()
@@ -60,6 +61,10 @@ export async function fetchNewsUpdates(options?: {
 
   if (options?.categories && options.categories.length > 0) {
     params.set('categories', options.categories.join(','))
+  }
+
+  if (options?.timespanEndGte) {
+    params.set('timespanEndGte', options.timespanEndGte)
   }
 
   const query = params.toString()
