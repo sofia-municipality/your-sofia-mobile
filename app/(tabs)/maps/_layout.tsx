@@ -12,13 +12,7 @@ import ArView from './ar-view'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
 type MapFilter =
-  | 'wasteContainers'
-  | 'fountains'
-  | 'bgsmetView'
-  | 'transport'
-  | 'news'
-  | 'events'
-  | 'arView'
+  'wasteContainers' | 'fountains' | 'bgsmetView' | 'transport' | 'news' | 'events' | 'arView'
 
 export default function MapsLayout() {
   const {t} = useTranslation()

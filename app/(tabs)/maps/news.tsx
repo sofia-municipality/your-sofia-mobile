@@ -24,10 +24,16 @@ export default function NewsMap() {
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined)
   const regionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timespanEndGte = useMemo(() => {
+    const date = new Date()
+    date.setDate(date.getDate() - 7)
+    return date.toISOString()
+  }, [])
   const {news, loading} = useUpdates({
     categories: selectedCategories,
     bounds: mapBounds,
     zoom: mapZoom,
+    timespanEndGte,
     enabled: true,
   })
 
@@ -74,7 +80,6 @@ export default function NewsMap() {
     }
   }, [])
 
-  // Filter news items that have location data
   const newsWithLocation = news.filter((item) => item.location)
 
   if (loading) {
