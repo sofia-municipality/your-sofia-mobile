@@ -75,6 +75,14 @@
             "defaultChannel": "default"
           }
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://de.sentry.io/",
+          "organization": "<TODO_SET_ORG>",
+          "project": "your-sofia-mobile"
+        }
       ]
     ],
     "experiments": {
