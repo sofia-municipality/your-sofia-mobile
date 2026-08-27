@@ -13,7 +13,8 @@
       "bundleIdentifier": "bg.sofia.yoursofia",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "deploymentTarget": "16.4"
     },
     "android": {
       "package": "bg.sofia.yoursofia",
