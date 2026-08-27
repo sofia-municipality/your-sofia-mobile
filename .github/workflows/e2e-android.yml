@@ -108,7 +108,7 @@ jobs:
           # separate invocation, so real control flow (retries, a shared
           # failure handler) can't live inline here.
 
-          run: pnpm e2e:test:ios
+          run: pnpm e2e:test:android
 
       - name: Upload Detox artifacts on failure
         if: failure() || cancelled()
