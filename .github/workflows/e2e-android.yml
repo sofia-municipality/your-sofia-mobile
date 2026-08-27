@@ -14,17 +14,9 @@ jobs:
     name: Detox E2E (Android)
     runs-on: ubuntu-latest
     timeout-minutes: 45
+
     env:
-      # Gates a network security config (see plugins/withDetoxAndroid.js)
-      # that allows cleartext traffic to 10.0.2.2 — the emulator's own
-      # host alias. Android blocks cleartext to any non-loopback address
-      # by default; `adb reverse`'s tunneled "localhost" is exempt
-      # (loopback) but this runner's adb-reverse tunnel never actually
-      # passes traffic, so DETOX_DEVICE_SERVER_HOST (via
-      # patches/detox@20.51.4.patch) points the app at 10.0.2.2 instead,
-      # bypassing the tunnel entirely.
       DETOX_E2E_BUILD: 'true'
-      # DETOX_DEVICE_SERVER_HOST: 10.0.2.2 idk if that should be needed
       EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
@@ -54,7 +46,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Prebuild Android project
-        run: npx expo prebuild --platform android
+        run: pnpm exec expo prebuild --platform android
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -62,21 +54,29 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/**/gradle*.properties', 'android/**/build.gradle*', 'android/**/settings.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
 
       - name: Build Detox APKs
-        run: pnpm e2e:build:android
+        working-directory: android
+        run: |
+          export LINT_PRINT_STACKTRACE=true
+          ./gradlew \
+            :app:assembleRelease \
+            :app:assembleAndroidTest \
+            -DtestBuildType=release \
+            --stacktrace
 
       - name: Enable KVM access
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
+            sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
       - name: Install emulator dependency
-        run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
 
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -87,24 +87,15 @@ jobs:
           profile: pixel_7
           disable-animations: true
           avd-name: Pixel_10_Pro
-          # ubuntu-latest runners have 4 vCPUs; the default of 2 makes cold
-          # app-launch slower than it needs to be.
           cores: 4
-          # Trims boot-time work that's pure CI overhead (no snapshot to
-          # save, no window to render into, no audio/camera hardware to
-          # simulate) — the emulator has no GPU passthrough on this runner,
-          # so software rendering via swiftshader is required anyway, and
-          # the boot animation is one more thing competing for CPU while the
-          # system is still settling (see android-e2e-run.sh).
           emulator-options: >-
-            -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio
-            -no-boot-anim -camera-back none -camera-front none
-          # Reverse localhost ports to not use patch
-          # The actual boot-settle / keyguard-dismiss / test-run logic lives
-          # in android-e2e-run.sh — reactivecircus/android-emulator-runner
-          # runs each line of a multi-line `script:` input as its own
-          # separate invocation, so real control flow (retries, a shared
-          # failure handler) can't live inline here.
+            -no-snapshot-save
+            -no-window
+            -gpu swiftshader_indirect
+            -noaudio
+            -no-boot-anim
+            -camera-back none
+            -camera-front none
           run: |
             adb reverse tcp:8099 tcp:8099
             pnpm e2e:test:android
