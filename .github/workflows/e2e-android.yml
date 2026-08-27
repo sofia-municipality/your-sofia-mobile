@@ -24,7 +24,7 @@ jobs:
       # patches/detox@20.51.4.patch) points the app at 10.0.2.2 instead,
       # bypassing the tunnel entirely.
       DETOX_E2E_BUILD: 'true'
-      DETOX_DEVICE_SERVER_HOST: 10.0.2.2
+      # DETOX_DEVICE_SERVER_HOST: 10.0.2.2 idk if that should be needed
       EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
@@ -78,9 +78,6 @@ jobs:
       - name: Install emulator dependency
         run: sudo apt-get update -qq && sudo apt-get install -y libpulse0
 
-      - name: Reverse localhost ports to not use patch
-        run: adb reverse tcp:8099 tcp:8099
-
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -102,13 +99,15 @@ jobs:
           emulator-options: >-
             -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio
             -no-boot-anim -camera-back none -camera-front none
+          # Reverse localhost ports to not use patch
           # The actual boot-settle / keyguard-dismiss / test-run logic lives
           # in android-e2e-run.sh — reactivecircus/android-emulator-runner
           # runs each line of a multi-line `script:` input as its own
           # separate invocation, so real control flow (retries, a shared
           # failure handler) can't live inline here.
-
-          run: pnpm e2e:test:android
+          run: |
+            adb reverse tcp:8099 tcp:8099
+            pnpm e2e:test:android
 
       - name: Upload Detox artifacts on failure
         if: failure() || cancelled()
