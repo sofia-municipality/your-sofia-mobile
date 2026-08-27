@@ -34,7 +34,6 @@ export default function SignalDetailsScreen() {
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [resolving, setResolving] = useState(false)
-  const [canEdit, setCanEdit] = useState(false)
 
   // A fountain admin may resolve fountain signals; general infrastructure admins
   // may resolve them too. Container signals are unaffected by this screen.
@@ -63,6 +62,7 @@ export default function SignalDetailsScreen() {
   }, [id, t])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSignal()
   }, [loadSignal])
 
@@ -73,14 +73,11 @@ export default function SignalDetailsScreen() {
   }, [id])
 
   // Check if the current user is the reporter who created this signal
-  useEffect(() => {
-    if (signal && user) {
-      const reporterId = typeof signal.reporter === 'object' ? signal.reporter?.id : signal.reporter
-      setCanEdit(reporterId !== undefined && String(reporterId) === String(user.id))
-    } else {
-      setCanEdit(false)
-    }
-  }, [signal, user])
+  const reporterId =
+    signal && (typeof signal.reporter === 'object' ? signal.reporter?.id : signal.reporter)
+  const canEdit = Boolean(
+    user && reporterId !== undefined && String(reporterId) === String(user.id)
+  )
 
   const handleEdit = useCallback(() => {
     setIsEditing(true)

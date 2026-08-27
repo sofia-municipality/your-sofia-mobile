@@ -11,8 +11,7 @@ import {
   SafeAreaView,
 } from 'react-native'
 import {useState, useEffect, useCallback} from 'react'
-import {useRouter} from 'expo-router'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect, useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
 import {AlertCircle, MapPin, Plus, Trash2, ChevronRight} from 'lucide-react-native'
 
@@ -51,6 +50,7 @@ export default function NotificationsScreen() {
   // Populate drafts from loaded subscription
   useEffect(() => {
     if (subscription) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotificationsEnabled(subscription.enabled ?? true)
       const slugs = subscription.categories.map((c: SubscriptionCategory) => c.slug).filter(Boolean)
       setSelectedSlugs(new Set<string>(slugs))

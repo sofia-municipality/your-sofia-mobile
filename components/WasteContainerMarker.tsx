@@ -17,20 +17,13 @@ export function WasteContainerMarker({
   wasteType,
   state,
 }: WasteContainerMarkerProps) {
-  const getIcon = () => {
-    if (state?.includes('bulkyWaste')) return Shapes
-
-    switch (wasteType) {
-      case 'recyclables':
-        return Recycle
-      case 'trashCan':
-        return Trash2
-      default:
-        return Container
-    }
-  }
-
-  const Icon = getIcon()
+  const Icon = state?.includes('bulkyWaste')
+    ? Shapes
+    : wasteType === 'recyclables'
+      ? Recycle
+      : wasteType === 'trashCan'
+        ? Trash2
+        : Container
 
   return (
     <View style={[styles.container, {width: size, height: size}]}>

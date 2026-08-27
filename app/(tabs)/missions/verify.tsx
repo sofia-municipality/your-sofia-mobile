@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect} from 'expo-router'
 import {ThumbsUp, ThumbsDown} from 'lucide-react-native'
 import {useAuth} from '@/contexts/AuthContext'
 import {fetchVerifiableMissions, submitMissionVerification} from '@/lib/payload'

@@ -18,8 +18,7 @@ import {
 import MapView, {Marker, type Region} from 'react-native-maps'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useTranslation} from 'react-i18next'
-import {useRouter, useLocalSearchParams} from 'expo-router'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect, useRouter, useLocalSearchParams} from 'expo-router'
 import {CameraView, useCameraPermissions} from 'expo-camera'
 import {X, MapPin as MapPinIcon, Upload} from 'lucide-react-native'
 import * as Location from 'expo-location'
@@ -190,6 +189,8 @@ export default function NewSignal() {
   // Update form when params change (e.g., user selects different container)
   React.useEffect(() => {
     if (prefilledMapObject) {
+      // Sync local form state with route params passed back from the object picker.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedObject(prefilledMapObject)
       setSelectedObjectType(prefilledObjectType ?? 'waste-container')
       setNearbyObjects([prefilledMapObject])

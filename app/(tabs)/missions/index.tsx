@@ -9,8 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useRouter} from 'expo-router'
-import {useFocusEffect} from '@react-navigation/native'
+import {useFocusEffect, useRouter} from 'expo-router'
 import {ShieldCheck} from 'lucide-react-native'
 import {useAuth} from '@/contexts/AuthContext'
 import {useMissions} from '@/hooks/useMissions'

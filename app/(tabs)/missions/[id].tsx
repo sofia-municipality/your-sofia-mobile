@@ -49,18 +49,19 @@ export default function MissionDetailScreen() {
   const [submittingOverall, setSubmittingOverall] = useState(false)
   const [submittingReview, setSubmittingReview] = useState(false)
 
+  const [signalLng, signalLat] = mission?.signal.location ?? []
   const missionLocation = useMemo(() => {
-    if (!mission?.signal.location) {
+    if (signalLat === undefined || signalLng === undefined) {
       return null
     }
 
     return {
-      latitude: mission.signal.location[1],
-      longitude: mission.signal.location[0],
+      latitude: signalLat,
+      longitude: signalLng,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     }
-  }, [mission?.signal.location])
+  }, [signalLat, signalLng])
 
   if (loading && !mission) {
     return (
