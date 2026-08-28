@@ -48,23 +48,29 @@ jobs:
       - name: Prebuild Android project
         run: pnpm exec expo prebuild --platform android
 
-      - name: Configure Gradle memory
+      - name: Configure Gradle
         working-directory: android
         run: |
-          cat > gradle.properties <<'EOF'
-          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          cat >> gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
           org.gradle.workers.max=2
+          hermesEnabled=true
           EOF
+
+          echo "Generated gradle.properties:"
+          cat gradle.properties
 
       - name: Build Detox APKs
         working-directory: android
         run: |
           export LINT_PRINT_STACKTRACE=true
+
           ./gradlew \
             :app:assembleRelease \
             :app:assembleAndroidTest \
             -DtestBuildType=release \
-            --stacktrace
+            --stacktrace \
+            --max-workers=2
 
       - name: Enable KVM access
         run: |
