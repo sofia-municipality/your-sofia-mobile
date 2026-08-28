@@ -45,6 +45,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Check Node environment
+        run: |
+          node --version
+          pnpm --version
+          which node
+          which pnpm
+          pnpm exec expo --version
+
       - name: Prebuild Android project
         run: pnpm exec expo prebuild --platform android
 
@@ -60,8 +68,16 @@ jobs:
           echo "Generated gradle.properties:"
           cat gradle.properties
 
+      - name: Test Expo autolinking
+        run: |
+          pnpm exec expo-modules-autolinking resolve \
+            --platform android \
+            --json
+
       - name: Build Detox APKs
         working-directory: android
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           export LINT_PRINT_STACKTRACE=true
 
@@ -69,12 +85,13 @@ jobs:
             :app:assembleRelease \
             :app:assembleAndroidTest \
             -DtestBuildType=release \
+            --max-workers=2 \
             --stacktrace \
-            --max-workers=2
+            --info
 
       - name: Enable KVM access
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm4all.rules"' |
             sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
