@@ -60,9 +60,10 @@ jobs:
         working-directory: android
         run: |
           cat >> gradle.properties <<'EOF'
-          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
           org.gradle.workers.max=2
           hermesEnabled=true
+
           EOF
 
           echo "Generated gradle.properties:"
@@ -77,7 +78,7 @@ jobs:
       - name: Build Detox APKs
         working-directory: android
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: --max-old-space-size=2048
         run: |
           export LINT_PRINT_STACKTRACE=true
 
