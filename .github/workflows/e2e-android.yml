@@ -59,12 +59,12 @@ jobs:
       - name: Configure Gradle
         working-directory: android
         run: |
-          cat >> gradle.properties <<'EOF'
-          org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
-          org.gradle.workers.max=2
-          hermesEnabled=true
-
-          EOF
+          printf '\n' >> gradle.properties
+          printf '%s\n' \
+            'org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8' \
+            'org.gradle.workers.max=2' \
+            'hermesEnabled=true' \
+            >> gradle.properties
 
           echo "Generated gradle.properties:"
           cat gradle.properties
