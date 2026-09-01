@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -39,34 +39,33 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
+          cache: gradle
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Check Node environment
-        run: |
-          node --version
-          pnpm --version
-          which node
-          which pnpm
-          pnpm exec expo --version
-
       - name: Prebuild Android project
-        run: pnpm exec expo prebuild --platform android
+        run: |
+          pnpm exec expo prebuild \
+            --platform android \
+            --clean
 
       - name: Configure Gradle
         working-directory: android
         run: |
-          printf '\n' >> gradle.properties
-          printf '%s\n' \
-            'org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8' \
-            'org.gradle.workers.max=2' \
-            'hermesEnabled=true' \
-            >> gradle.properties
+          cat >> gradle.properties <<'EOF'
 
-          echo "Generated gradle.properties:"
+          # CI memory configuration
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          org.gradle.workers.max=2
+
+          # Hermes
+          hermesEnabled=true
+          EOF
+
+          echo "gradle.properties:"
           cat gradle.properties
 
       - name: Test Expo autolinking
@@ -75,29 +74,18 @@ jobs:
             --platform android \
             --json
 
-      - name: Build Detox APKs
-        working-directory: android
-        env:
-          NODE_OPTIONS: --max-old-space-size=2048
-        run: |
-          export LINT_PRINT_STACKTRACE=true
-
-          ./gradlew \
-            :app:assembleRelease \
-            :app:assembleAndroidTest \
-            -DtestBuildType=release \
-            --max-workers=2 \
-            --stacktrace \
-            --info
-
       - name: Enable KVM access
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm4all.rules"' |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
             sudo tee /etc/udev/rules.d/99-kvm4all.rules
+
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Install emulator dependency
+          echo "KVM:"
+          ls -la /dev/kvm || true
+
+      - name: Install emulator dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y libpulse0
@@ -109,9 +97,11 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_7
-          disable-animations: true
           avd-name: Pixel_10_Pro
           cores: 4
+          ram-size: 4096M
+          heap-size: 512M
+          disable-animations: true
           emulator-options: >-
             -no-snapshot-save
             -no-window
@@ -120,8 +110,17 @@ jobs:
             -no-boot-anim
             -camera-back none
             -camera-front none
-          run: |
+          script: |
+            adb wait-for-device
+
+            echo "Android device:"
+            adb shell getprop ro.product.model
+            adb shell getprop ro.build.version.sdk
+
+            echo "Running Detox..."
+
             adb reverse tcp:8099 tcp:8099
+
             pnpm e2e:test:android
 
       - name: Upload Detox artifacts on failure
@@ -129,5 +128,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-detox-artifacts
-          path: .artifacts
+          path: |
+            .artifacts
+            android/app/build/outputs
           if-no-files-found: ignore
+          retention-days: 7
