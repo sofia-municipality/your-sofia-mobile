@@ -64,7 +64,6 @@ jobs:
 
           # Hermes
           hermesEnabled=true
-          hermesCommand=../node_modules/hermes-engine/build/Release/hermes
           EOF
 
           echo "gradle.properties:"
