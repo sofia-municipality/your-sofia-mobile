@@ -12,7 +12,7 @@ jobs:
   e2e-ios:
     name: Detox E2E (iOS)
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
@@ -32,27 +32,32 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
       - name: Generate native iOS project
         run: pnpm exec expo prebuild --platform ios
 
       - name: Install CocoaPods dependencies
-        run: pod install --no-repo-update
+        run: pod install --no-repo-update --deployment
         working-directory: ios
 
       - name: Build Detox iOS app
         run: pnpm e2e:build:ios
 
-      - name: Install applesimutils
+      - name: Install applesimutils and setup Homebrew taps
         run: |
           brew tap wix/brew
-          # Homebrew tap trust became strict on GitHub runners.
           brew tap aws/tap
           brew trust wix/brew
           brew trust aws/tap
           brew install applesimutils
 
       - name: Build Detox framework cache
-
         run: npx detox clean-framework-cache && npx detox build-framework-cache
 
       - name: Run Detox tests on iOS simulator

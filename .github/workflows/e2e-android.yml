@@ -13,7 +13,7 @@ jobs:
   e2e-android:
     name: Detox E2E (Android)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     env:
       DETOX_E2E_BUILD: 'true'
@@ -49,8 +49,7 @@ jobs:
       - name: Prebuild Android project
         run: |
           pnpm exec expo prebuild \
-            --platform android \
-            --clean
+            --platform android
 
       - name: Configure Gradle
         working-directory: android
@@ -59,10 +58,13 @@ jobs:
 
           # CI memory configuration
           org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
-          org.gradle.workers.max=2
+          org.gradle.workers.max=4
+          org.gradle.parallel=true
+          org.gradle.configureondemand=true
 
           # Hermes
           hermesEnabled=true
+          hermesCommand=../node_modules/hermes-engine/build/Release/hermes
           EOF
 
           echo "gradle.properties:"
