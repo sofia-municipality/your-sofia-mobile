@@ -101,7 +101,31 @@ jobs:
           sudo apt-get install -y libpulse0
 
       - name: Build APK with Detox
-        run: pnpm e2e:build:android
+        run: |
+          echo "Starting Detox build..."
+          pnpm e2e:build:android 2>&1 | tee build.log
+          echo "Detox build completed"
+
+      - name: Check Gradle build errors
+        if: always()
+        run: |
+          echo "=== Checking for Gradle errors ==="
+          grep -i "error\|failed" build.log | head -20 || echo "No obvious errors in build log"
+          echo ""
+          echo "=== Last 30 lines of build log ==="
+          tail -30 build.log
+
+      - name: Debug Check build outputs
+        if: always()
+        run: |
+          echo "=== Looking for ALL APKs in android/app/build ==="
+          find android/app/build -type f -name "*.apk" 2>/dev/null | sort || echo "No APKs found"
+          echo ""
+          echo "=== android/app/build/outputs structure ==="
+          find android/app/build/outputs -type d 2>/dev/null | head -30 || echo "Directory not found"
+          echo ""
+          echo "=== Full contents of apk directory ==="
+          find android/app/build/outputs/apk -type f 2>/dev/null || echo "No apk outputs found"
 
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
