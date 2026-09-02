@@ -102,9 +102,10 @@ jobs:
 
       - name: Build APK with Detox
         run: |
-          echo "Starting Detox build..."
-          pnpm e2e:build:android 2>&1 | tee build.log
-          echo "Detox build completed"
+          echo "Starting Gradle build..."
+          cd android && ./gradlew :app:assembleRelease :app:assembleAndroidTest -DtestBuildType=release --stacktrace 2>&1 | tee ../build.log
+          cd ..
+          echo "Gradle build completed"
 
       - name: Check Gradle build errors
         if: always()
