@@ -90,6 +90,9 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y libpulse0
 
+      - name: Build APK with Detox
+        run: pnpm e2e:build:android
+
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
