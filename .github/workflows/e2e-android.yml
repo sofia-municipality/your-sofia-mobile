@@ -102,19 +102,20 @@ jobs:
 
       - name: Build APK with Detox
         run: |
-          echo "Starting Gradle build..."
-          cd android && ./gradlew :app:assembleRelease :app:assembleAndroidTest -DtestBuildType=release --stacktrace 2>&1 | tee ../build.log
-          cd ..
-          echo "Gradle build completed"
+          echo "Starting Detox build..."
+          pnpm e2e:build:android 2>&1 | tee build.log
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
+          echo "Build exit code: $BUILD_EXIT_CODE"
 
       - name: Check Gradle build errors
         if: always()
         run: |
-          echo "=== Checking for Gradle errors ==="
-          grep -i "error\|failed" build.log | head -20 || echo "No obvious errors in build log"
-          echo ""
-          echo "=== Last 30 lines of build log ==="
-          tail -30 build.log
+          if [ -f build.log ]; then
+            echo "=== Full build.log output ==="
+            cat build.log
+          else
+            echo "build.log not found - checking last 100 lines of system output"
+          fi
 
       - name: Debug Check build outputs
         if: always()
