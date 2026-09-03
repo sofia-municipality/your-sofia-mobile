@@ -44,7 +44,7 @@ jobs:
     name: Android - Build app
     runs-on: ubuntu-latest
     needs: [find-test-files]
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       DETOX_E2E_BUILD: 'true'
       EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
