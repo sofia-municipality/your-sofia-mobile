@@ -1,4 +1,4 @@
-name: E2E Android (Detox)
+name: Detox Android E2E
 
 on:
   workflow_dispatch:
@@ -9,11 +9,20 @@ on:
     branches:
       - main
 
+env:
+  ANDROID_API_LEVEL: '36'
+  ANDROID_TARGET: google_apis
+  ANDROID_ARCH: x86_64
+  AVD_NAME: Pixel_10_Pro
+  GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=2048m"'
+  ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
+  EXPO_NO_TELEMETRY: '1'
+
 jobs:
-  e2e-android:
-    name: Detox E2E (Android)
+  detox-android:
+    name: Build and run Detox E2E on Android
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
 
     env:
       DETOX_E2E_BUILD: 'true'
@@ -24,33 +33,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: pnpm
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Prebuild Android project
-        run: pnpm exec expo prebuild --platform android
+        run: pnpm exec expo prebuild --platform android --no-install
+
+      - name: Setup Gradle with caching
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: android
+          cache-read-only: false
+
+      - name: Build app and androidTest APKs
+        run: pnpm e2e:build:android
 
       - name: Enable KVM
         run: |
@@ -59,23 +73,24 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Build app and test APKs
-        run: pnpm e2e:build:android
-
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          avd-name: Pixel_10_Pro
-          force-avd-creation: true
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          target: ${{ env.ANDROID_TARGET }}
+          arch: ${{ env.ANDROID_ARCH }}
+          avd-name: ${{ env.AVD_NAME }}
+          ram-size: 4096M
+          cores: 2
+          force-avd-creation: false
           emulator-options: >-
+            -no-snapshot-save
             -no-window
             -gpu swiftshader_indirect
             -noaudio
             -no-boot-anim
             -camera-back none
+            -camera-front none
           disable-animations: true
           script: |
             adb reverse tcp:8099 tcp:8099
@@ -85,7 +100,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: android-detox-artifacts
+          name: detox-android-artifacts-${{ github.run_id }}
           path: .artifacts
-          if-no-files-found: ignore
-          retention-days: 5
+          if-no-files-found: warn
+          retention-days: 7
