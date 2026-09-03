@@ -9,196 +9,39 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  actions: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  NODE_VERSION: 22
-  JAVA_VERSION: 17
-  ANDROID_API_LEVEL: 34
-  CMAKE_VERSION: 3.22.1
-  NDK_VERSION: 26.1.10909125
-  PNPM_VERSION: 10.0.0
-
 jobs:
-  find-test-files:
-    name: Find Detox test files
+  e2e-android:
+    name: Detox E2E (Android)
     runs-on: ubuntu-latest
-    outputs:
-      test-files: ${{ steps.set-test-files.outputs.test-files }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: set-test-files
-        shell: bash
-        run: |
-          TEST_FILES=$(find e2e -name '*.e2e.js' | sed 's|^e2e/||g' | jq -R -s -c 'split("\n")[:-1]')
-          echo "test-files=$TEST_FILES" >> $GITHUB_OUTPUT
-          echo "Found test files: $TEST_FILES"
+    timeout-minutes: 45
 
-  build-android:
-    name: Android - Build app
-    runs-on: ubuntu-latest
-    needs: [find-test-files]
-    timeout-minutes: 60
     env:
       DETOX_E2E_BUILD: 'true'
       EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: false
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '22'
           cache: pnpm
 
-      - name: Install Node dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: ${{ env.JAVA_VERSION }}
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install CMake, NDK & Build Tools
-        run: |
-          sdkmanager --install "cmake;${{ env.CMAKE_VERSION }}" "ndk;${{ env.NDK_VERSION }}" "build-tools;34.0.0"
-
-      - name: Cache Gradle & CMake
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            /usr/local/lib/android/sdk/cmake
-          key: gradle-cmake-${{ runner.os }}-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties') }}-${{ env.CMAKE_VERSION }}-${{ env.NDK_VERSION }}
-          restore-keys: |
-            gradle-cmake-${{ runner.os }}-
-
-      - name: Prebuild Android project with Expo
-        run: |
-          pnpm exec expo prebuild \
-            --platform android
-
-      - name: Configure Gradle for CI
-        working-directory: android
-        run: |
-          cat >> gradle.properties <<'EOF'
-
-          # CI memory configuration
-          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
-          org.gradle.workers.max=4
-          org.gradle.caching=true
-
-          # Hermes
-          hermesEnabled=true
-          EOF
-
-          echo "gradle.properties:"
-          cat gradle.properties
-
-      - name: Warm up Gradle dependencies
-        working-directory: android
-        run: |
-          ./gradlew dependencies \
-            --no-daemon --max-workers=2 \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
-
-      - name: Build Android app APK and test APK
-        working-directory: android
-        run: |
-          echo "Building release APK and androidTest APK..."
-          ./gradlew \
-            :app:assembleRelease \
-            :app:assembleAndroidTest \
-            -DtestBuildType=release \
-            --no-daemon --max-workers=2 \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" \
-            --stacktrace
-
-      - name: Debug - Verify APK artifacts
-        if: always()
-        run: |
-          echo "=== App APK ==="
-          find android/app/build/outputs/apk/release -name "*.apk" -exec ls -lh {} \;
-          echo ""
-          echo "=== Test APK ==="
-          find android/app/build/outputs/apk/androidTest/release -name "*.apk" -exec ls -lh {} \;
-
-      - name: Upload Android app artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk-artifacts
-          path: |
-            android/app/build/outputs/apk/release
-            android/app/build/outputs/apk/androidTest/release
-          retention-days: 2
-
-  run-android-tests:
-    name: Android - Run Detox tests
-    runs-on: ubuntu-latest
-    needs: [find-test-files, build-android]
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        test-file: ${{ fromJson(needs.find-test-files.outputs.test-files) }}
-    env:
-      DETOX_E2E_BUILD: 'true'
-      EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
-
-    steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: false
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install Node dependencies
-        run: pnpm install --frozen-lockfile
-
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '17'
+          cache: gradle
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -206,62 +49,43 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
-      - name: Download Android APK artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: android-apk-artifacts
-          path: android/app/build/outputs
+      - name: Prebuild Android project
+        run: pnpm exec expo prebuild --platform android
 
       - name: Enable KVM
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
+            sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-          echo "KVM enabled:"
-          ls -la /dev/kvm || echo "KVM not available"
 
-      - name: Cache AVD
-        id: avd-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.ANDROID_API_LEVEL }}-${{ runner.os }}
+      - name: Build app and test APKs
+        run: pnpm e2e:build:android
 
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
+      - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ env.ANDROID_API_LEVEL }}
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Run Detox tests - ${{ matrix.test-file }}
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.ANDROID_API_LEVEL }}
+          api-level: 34
           target: google_apis
           arch: x86_64
           avd-name: Pixel_10_Pro
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
+          force-avd-creation: true
+          emulator-options: >-
+            -no-window
+            -gpu swiftshader_indirect
+            -noaudio
+            -no-boot-anim
+            -camera-back none
           disable-animations: true
           script: |
-            adb wait-for-device
             adb reverse tcp:8099 tcp:8099
-
-            echo "Running Detox test: ${{ matrix.test-file }}"
-            pnpm e2e:test:android -- e2e/${{ matrix.test-file }}
+            pnpm e2e:test:android
 
       - name: Upload Detox artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: detox-android-artifacts-${{ matrix.test-file }}
+          name: android-detox-artifacts
           path: .artifacts
+          if-no-files-found: ignore
           retention-days: 5
