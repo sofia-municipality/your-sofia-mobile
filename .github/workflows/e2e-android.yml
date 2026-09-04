@@ -9,11 +9,18 @@ on:
     branches:
       - main
 
+concurrency:
+  group: detox-android-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   ANDROID_API_LEVEL: '36'
   ANDROID_TARGET: google_apis
   ANDROID_ARCH: x86_64
   AVD_NAME: Pixel_10_Pro
+
+  AVD_CACHE_VERSION: v1
+
   GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=2048m"'
   ORG_GRADLE_PROJECT_reactNativeArchitectures: x86_64
   EXPO_NO_TELEMETRY: '1'
@@ -25,8 +32,6 @@ jobs:
     timeout-minutes: 90
 
     env:
-      DETOX_E2E_BUILD: 'true'
-      EXPO_PUBLIC_DETOX_E2E_BUILD: 'true'
       GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
 
     steps:
@@ -73,6 +78,36 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Cache AVD snapshot
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD_CACHE_VERSION }}-${{ env.ANDROID_API_LEVEL }}-${{ env.ANDROID_TARGET }}-${{ env.ANDROID_ARCH }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          target: ${{ env.ANDROID_TARGET }}
+          arch: ${{ env.ANDROID_ARCH }}
+          avd-name: ${{ env.AVD_NAME }}
+          ram-size: 4096M
+          cores: 2
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: false
+          script: |
+            adb root
+            adb wait-for-device
+            adb shell content insert --uri content://com.google.settings/partner --bind name:s:use_location_for_services --bind value:i:1
+            adb shell settings put secure location_providers_allowed gps,network
+            adb shell content insert --uri content://com.google.settings/partner --bind name:s:network_location_opt_in --bind value:i:1
+            adb shell cmd location set-location-enabled true
+
       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -83,24 +118,22 @@ jobs:
           ram-size: 4096M
           cores: 2
           force-avd-creation: false
-          emulator-options: >-
-            -no-snapshot-save
-            -no-window
-            -gpu swiftshader_indirect
-            -noaudio
-            -no-boot-anim
-            -camera-back none
-            -camera-front none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           disable-animations: true
           script: |
-            adb reverse tcp:8099 tcp:8099
-            pnpm e2e:test:android
+            adb root
+            adb wait-for-device
+            adb shell content insert --uri content://com.google.settings/partner --bind name:s:use_location_for_services --bind value:i:1
+            adb shell settings put secure location_providers_allowed gps,network
+            adb shell content insert --uri content://com.google.settings/partner --bind name:s:network_location_opt_in --bind value:i:1
+            adb shell cmd location set-location-enabled true
+            pnpm e2e:test:android --cleanup --record-videos failing --record-logs failing --take-screenshots failing --artifacts-location artifacts
 
-      - name: Upload Detox artifacts on failure
-        if: failure()
+      - name: Upload Detox artifacts (recordings, logs, screenshots)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: detox-android-artifacts-${{ github.run_id }}
-          path: .artifacts
+          path: artifacts/
           if-no-files-found: warn
           retention-days: 7
