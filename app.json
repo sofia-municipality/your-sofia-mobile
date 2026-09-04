@@ -40,6 +40,7 @@
       "favicon": "./assets/images/sofia-gerb.png"
     },
     "plugins": [
+      "expo-detox-config-plugin",
       "expo-router",
       "expo-font",
       "expo-web-browser",
