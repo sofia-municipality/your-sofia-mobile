@@ -41,21 +41,42 @@ describe('Login screen', () => {
 
   it('navigates from the profile tab to the login screen', async () => {
     await element(by.label('profile.title')).tap()
+
+    // The profile screen push is a native navigation transition that Detox
+    // doesn't wait for automatically. Tapping the login button before the
+    // transition settles hits it mid-slide, which Espresso rejects with
+    // "does not match ... covers at least 75 percent of the view's area".
+    await waitFor(element(by.label('Вход')).atIndex(0))
+      .toBeVisible()
+      .withTimeout(10000)
     await element(by.label('Вход')).atIndex(0).tap()
 
+    await waitFor(element(by.label('Имейл')).atIndex(0))
+      .toBeVisible()
+      .withTimeout(10000)
     await expect(element(by.label('Имейл')).atIndex(0)).toBeVisible()
     await expect(element(by.label('Парола')).atIndex(0)).toBeVisible()
   })
 
   it('shows a validation alert when submitting the form empty', async () => {
     await element(by.label('profile.title')).tap()
+
+    await waitFor(element(by.label('Вход')).atIndex(0))
+      .toBeVisible()
+      .withTimeout(10000)
     await element(by.label('Вход')).atIndex(0).tap()
 
     // On the login screen itself, "Вход" also matches the screen's own
     // heading text (atIndex(0)) before the actual submit button
     // (atIndex(1)) — verified via `detox test --loglevel verbose`.
+    await waitFor(element(by.label('Вход')).atIndex(1))
+      .toBeVisible()
+      .withTimeout(10000)
     await element(by.label('Вход')).atIndex(1).tap()
 
+    await waitFor(element(by.text('Грешка')))
+      .toBeVisible()
+      .withTimeout(10000)
     await expect(element(by.text('Грешка'))).toBeVisible()
     await expect(element(by.text('Моля, попълнете всички полета'))).toBeVisible()
 
