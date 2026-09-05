@@ -8,7 +8,11 @@
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start --dev-client",
     "dev:staging": "cross-env EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_DEFAULT_ENV=staging expo start --dev-client",
-    "build:web": "expo export --platform web",
+    "generate:api": "openapi-generator-cli generate -i api.yaml -g typescript-axios -o src/api --additional-properties=supportsES6=true,withInterfaces=true",
+    "generate:mock": "openapi-generator-cli generate -i api.yaml -g nodejs-express-server -o mock-server",
+    "install:mock": "pnpm --dir mock-server install",
+    "test": "pnpm generate:mock && pnpm install:mock && jest --config package.json",
+    "build:web": "openapi-generator-cli generate -i api.yaml -g typescript-axios -o src/api --additional-properties=supportsES6=true,withInterfaces=true && expo export --platform web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix && prettier --write .",
     "format": "prettier --write .",
@@ -18,7 +22,12 @@
     "android:staging": "EXPO_PUBLIC_DEFAULT_ENV=staging expo run:android",
     "ios": "REACT_NATIVE_PACKAGER_HOSTNAME=localhost expo run:ios",
     "ios:staging": "EXPO_PUBLIC_DEFAULT_ENV=staging REACT_NATIVE_PACKAGER_HOSTNAME=localhost expo run:ios",
-    "test": "jest",
+    "e2e:build:ios": "detox build --configuration ios.sim.release",
+    "e2e:test:ios": "detox test --configuration ios.sim.release --config e2e/jest.config.js --cleanup",
+    "e2e:test:android": "detox test --configuration android.emulator.release --config e2e/jest.config.js --loglevel verbose",
+    "e2e:debug_test:ios": "detox test --inspect-brk --configuration ios.sim.release",
+    "e2e:build:android": "detox build --configuration android.emulator.release",
+    "e2e:debug_test:android": "detox test --inspect-brk --configuration android.emulator.release",
     "update:development": "eas update --channel development",
     "update:preview": "eas update --channel preview",
     "update:production": "eas update --channel production"
@@ -34,6 +43,7 @@
     "@lucide/lab": "^0.2.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@shopify/react-native-skia": "2.6.2",
+    "axios": "^1.19.0",
     "expo": "^57.0.11",
     "expo-application": "~57.0.2",
     "expo-blur": "~57.0.2",
@@ -41,6 +51,7 @@
     "expo-camera": "~57.0.3",
     "expo-constants": "~57.0.9",
     "expo-crypto": "~57.0.1",
+    "expo-detox-config-plugin": "^13.0.0",
     "expo-dev-client": "~57.0.10",
     "expo-device": "^57.0.1",
     "expo-font": "~57.0.1",
@@ -83,19 +94,25 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@openapitools/openapi-generator-cli": "^2.40.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",
+    "@types/node": "^24.5.2",
     "@types/react": "~19.2.4",
+    "cors": "^2.8.6",
     "baseline-browser-mapping": "^2.11.12",
     "cross-env": "^10.1.0",
+    "detox": "20.51.4",
     "eslint": "^9.37.0",
     "eslint-config-expo": "~57.0.1",
     "eslint-config-prettier": "^10.1.8",
+    "express": "^5.2.1",
     "eslint-plugin-prettier": "^5.5.6",
     "glob": "^12.0.0",
     "husky": "^9.1.7",
     "inflight": "^1.0.6",
     "jest": "~29.7.0",
+    "swagger-ui-express": "^5.0.1",
     "jest-expo": "~57.0.3",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
@@ -103,13 +120,21 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/\\.claude/worktrees/"
+    ],
     "moduleNameMapper": {
       "^@react-native-async-storage/async-storage$": "@react-native-async-storage/async-storage/jest/async-storage-mock"
-    }
+    },
+    "modulePathIgnorePatterns": [
+      "helpers"
+    ]
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@shopify/react-native-skia"
+      "@shopify/react-native-skia",
+      "detox"
     ],
     "overrides": {
       "fast-uri": "^3.1.1",

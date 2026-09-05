@@ -13,7 +13,8 @@
       "bundleIdentifier": "bg.sofia.yoursofia",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "deploymentTarget": "16.4"
     },
     "android": {
       "package": "bg.sofia.yoursofia",
@@ -39,6 +40,7 @@
       "favicon": "./assets/images/sofia-gerb.png"
     },
     "plugins": [
+      "expo-detox-config-plugin",
       "expo-router",
       "expo-font",
       "expo-web-browser",

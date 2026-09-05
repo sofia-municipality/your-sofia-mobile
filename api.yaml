@@ -1,0 +1,2583 @@
+openapi: 3.0.3
+
+info:
+  title: Your Sofia API
+  version: 1.0.0
+  description: >
+    Reverse-engineered OpenAPI definition of the Payload CMS backend consumed by the
+    "Your Sofia" mobile app. This file is the single source of truth for generating
+    the typed API client (`npx @openapitools/openapi-generator-cli generate -i api.yaml
+    -g typescript-axios -o src/api`) and a mock server for tests
+    (`... -g nodejs-express-server -o mock-server`).
+
+    Endpoints were extracted from actual client usage in `lib/payload.ts`,
+    `lib/updatesApi.ts`, `lib/bulkPhotoUtils.ts`, `contexts/AuthContext.tsx` and
+    `contexts/NotificationsContext.tsx` — not from backend source — so treat this as a
+    contract snapshot, not the backend's own spec.
+
+servers:
+  - url: '{baseUrl}'
+    description: Resolved at runtime from EXPO_PUBLIC_API_URL / EXPO_PUBLIC_STAGING_API_URL / EXPO_PUBLIC_PRODUCTION_API_URL
+    variables:
+      baseUrl:
+        default: http://localhost:3000
+
+tags:
+  - name: Auth
+  - name: PushTokens
+  - name: Signals
+  - name: WasteContainers
+  - name: BulkyWasteZones
+  - name: DrinkingFountains
+  - name: Lookups
+  - name: CityDistricts
+  - name: Subscriptions
+  - name: Assignments
+  - name: Missions
+  - name: Media
+  - name: News
+  - name: Updates
+
+security: []
+
+paths:
+  # ─── Auth ──────────────────────────────────────────────────────────────────
+  /api/users/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Log in with email + password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/users:
+    post:
+      tags: [Auth]
+      operationId: register
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/Error'
+
+  /api/users/me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      summary: Fetch the authenticated user
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/users/delete-account:
+    delete:
+      tags: [Auth]
+      operationId: deleteAccount
+      summary: Permanently delete the authenticated user's account
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: Account deleted
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/users/resend-verification-email:
+    post:
+      tags: [Auth]
+      operationId: resendVerificationEmail
+      summary: Resend the account-verification email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendVerificationRequest'
+      responses:
+        '200':
+          description: Email queued
+        '400':
+          $ref: '#/components/responses/Error'
+
+  /api/users/forgot-password:
+    post:
+      tags: [Auth]
+      operationId: forgotPassword
+      summary: Request a password-reset email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Reset email queued
+        '400':
+          $ref: '#/components/responses/Error'
+
+  # ─── Push Tokens ───────────────────────────────────────────────────────────
+  /api/push-tokens:
+    get:
+      tags: [PushTokens]
+      operationId: findPushTokens
+      summary: Look up a push-token document by its Expo token value
+      parameters:
+        - name: 'where[token][equals]'
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Matching push-token docs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PayloadListMeta'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PushToken'
+    post:
+      tags: [PushTokens]
+      operationId: registerPushToken
+      summary: Register (or upsert) an Expo push token for this device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushTokenCreateRequest'
+      responses:
+        '201':
+          description: Push token stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushToken'
+
+  # ─── Signals ───────────────────────────────────────────────────────────────
+  /api/signals:
+    get:
+      tags: [Signals]
+      operationId: listSignals
+      summary: List signals (citizen reports)
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 20}
+        - name: page
+          in: query
+          schema: {type: integer, default: 1}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+        - name: sort
+          in: query
+          schema: {type: string, default: '-createdAt'}
+        - name: 'where[status][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/SignalStatus'}
+        - name: 'where[category][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/SignalCategory'}
+        - name: 'where[reporterUniqueId][equals]'
+          in: query
+          schema: {type: string}
+        - name: 'where[reporter][equals]'
+          in: query
+          schema: {type: integer}
+        - name: 'where[cityObject.referenceId][equals]'
+          in: query
+          schema: {type: string}
+      responses:
+        '200':
+          description: Paged signal list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalList'
+    post:
+      tags: [Signals]
+      operationId: createSignal
+      summary: Create a signal (optionally with an already-uploaded `Authorization` header for logged-in reporters)
+      security:
+        - jwtAuth: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalCreateRequest'
+      responses:
+        '201':
+          description: Signal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+        '400':
+          $ref: '#/components/responses/Error'
+
+  /api/signals/{id}:
+    get:
+      tags: [Signals]
+      operationId: getSignal
+      summary: Fetch a single signal
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+      responses:
+        '200':
+          description: Signal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags: [Signals]
+      operationId: updateSignal
+      summary: Update a signal (status transitions, admin notes, added photos, ...)
+      security:
+        - jwtAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalUpdateRequest'
+      responses:
+        '200':
+          description: Updated signal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  # ─── Waste Containers ──────────────────────────────────────────────────────
+  /api/waste-containers:
+    get:
+      tags: [WasteContainers]
+      operationId: listWasteContainers
+      summary: List waste containers
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 3000}
+        - name: page
+          in: query
+          schema: {type: integer, default: 1}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 2}
+        - name: 'where[status][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/ContainerStatus'}
+        - name: 'where[wasteType][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/WasteType'}
+      responses:
+        '200':
+          description: Paged waste-container list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteContainerList'
+    post:
+      tags: [WasteContainers]
+      operationId: createWasteContainer
+      summary: Create a waste container (containerAdmin/admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WasteContainerCreateRequest'
+      responses:
+        '201':
+          description: Container created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteContainer'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/waste-containers/nearby:
+    get:
+      tags: [WasteContainers]
+      operationId: listNearbyWasteContainers
+      summary: List waste containers near a point (PostGIS radius query)
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema: {type: number}
+        - name: longitude
+          in: query
+          required: true
+          schema: {type: number}
+        - name: radius
+          in: query
+          description: Radius in meters
+          schema: {type: number, default: 500}
+        - name: limit
+          in: query
+          schema: {type: integer, default: 500}
+        - name: status
+          in: query
+          schema: {$ref: '#/components/schemas/ContainerStatus'}
+        - name: wasteType
+          in: query
+          schema: {$ref: '#/components/schemas/WasteType'}
+      responses:
+        '200':
+          description: Paged list of containers annotated with `distance`
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PayloadListMeta'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/WasteContainer'
+                            - type: object
+                              properties:
+                                distance:
+                                  type: number
+                                  description: Distance from the query point, in meters
+
+  /api/waste-containers/containers-with-signal-count:
+    get:
+      tags: [WasteContainers]
+      operationId: listContainersWithSignalCount
+      summary: >
+        List/cluster waste containers annotated with signal counts. Returns clustered
+        points when `zoom` < 16 and individual markers when `zoom` >= 16.
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 1000}
+        - name: page
+          in: query
+          schema: {type: integer, default: 1}
+        - name: zoom
+          in: query
+          schema: {type: integer, default: 16}
+        - name: districtId
+          in: query
+          description: Comma-separated district ids
+          schema: {type: string}
+        - name: minLat
+          in: query
+          schema: {type: number}
+        - name: maxLat
+          in: query
+          schema: {type: number}
+        - name: minLng
+          in: query
+          schema: {type: number}
+        - name: maxLng
+          in: query
+          schema: {type: number}
+        - name: status
+          in: query
+          schema: {$ref: '#/components/schemas/ContainerStatus'}
+        - name: volumeOptions
+          in: query
+          description: Comma-separated capacity-volume values
+          schema: {type: string}
+      responses:
+        '200':
+          description: Clustered or per-marker container data
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ContainerClusterResponse'
+                  - $ref: '#/components/schemas/ContainerMarkerResponse'
+
+  /api/waste-containers/collection-metrics:
+    get:
+      tags: [WasteContainers]
+      operationId: getCollectionMetrics
+      summary: Fleet-wide collection metrics for a date range
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: {type: string, format: date}
+        - name: to
+          in: query
+          required: true
+          schema: {type: string, format: date}
+      responses:
+        '200':
+          description: Collection metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionMetrics'
+
+  /api/waste-containers/{id}:
+    get:
+      tags: [WasteContainers]
+      operationId: getWasteContainer
+      summary: Fetch a single waste container
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+      responses:
+        '200':
+          description: Waste container
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteContainer'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags: [WasteContainers]
+      operationId: updateWasteContainer
+      summary: Update a waste container (containerAdmin/admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WasteContainerUpdateRequest'
+      responses:
+        '200':
+          description: Updated container
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WasteContainer'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/waste-containers/{containerId}/clean:
+    post:
+      tags: [WasteContainers]
+      operationId: cleanWasteContainer
+      summary: Log a cleaning pass for a container (resolves open signals, sets status to active)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: containerId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                notes:
+                  type: string
+                _empty:
+                  type: string
+                  description: Placeholder field sent when no photo is attached, so the multipart body is non-empty.
+      responses:
+        '200':
+          description: Cleaning recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanContainerResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/waste-container-observations:
+    get:
+      tags: [WasteContainers]
+      operationId: listWasteContainerObservations
+      summary: List cleaning observations for a container
+      parameters:
+        - name: 'where[container][equals]'
+          in: query
+          required: true
+          schema: {type: string}
+        - name: sort
+          in: query
+          schema: {type: string, default: '-cleanedAt'}
+        - name: limit
+          in: query
+          schema: {type: integer, default: 1}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+      responses:
+        '200':
+          description: Paged observation list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PayloadListMeta'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WasteContainerObservation'
+
+  # ─── Bulky Waste Zones ─────────────────────────────────────────────────────
+  /api/bulky-waste-zones:
+    get:
+      tags: [BulkyWasteZones]
+      operationId: listBulkyWasteZones
+      summary: List bulky-waste collection zones, as GeoJSON
+      responses:
+        '200':
+          description: Bulky-waste zone polygons
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkyWasteZonesFeatureCollection'
+
+  # ─── Drinking Fountains ────────────────────────────────────────────────────
+  /api/drinking-fountains:
+    get:
+      tags: [DrinkingFountains]
+      operationId: listDrinkingFountains
+      summary: List drinking fountains
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 2000}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+      responses:
+        '200':
+          description: Fountain list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PayloadListMeta'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DrinkingFountainDoc'
+    post:
+      tags: [DrinkingFountains]
+      operationId: createDrinkingFountain
+      summary: Create a drinking fountain (fountainAdmin/infrastructureAdmin/admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DrinkingFountainCreateRequest'
+      responses:
+        '201':
+          description: Fountain created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    $ref: '#/components/schemas/DrinkingFountainDoc'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/fountain-status:
+    get:
+      tags: [Lookups]
+      operationId: listFountainStatuses
+      summary: List possible fountain-condition lookup values
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 100}
+        - name: sort
+          in: query
+          schema: {type: string, default: name}
+      responses:
+        '200':
+          description: Lookup list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FountainLookup'
+
+  /api/drinking-fountain-source:
+    get:
+      tags: [Lookups]
+      operationId: listDrinkingFountainSources
+      summary: List possible fountain water-source lookup values
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 100}
+        - name: sort
+          in: query
+          schema: {type: string, default: name}
+      responses:
+        '200':
+          description: Lookup list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FountainLookup'
+
+  # ─── City Districts ────────────────────────────────────────────────────────
+  /api/city-districts:
+    get:
+      tags: [CityDistricts]
+      operationId: listCityDistricts
+      summary: List Sofia city districts
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, default: 24}
+        - name: sort
+          in: query
+          schema: {type: string, default: districtId}
+      responses:
+        '200':
+          description: District list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CityDistrict'
+
+  # ─── Subscriptions ─────────────────────────────────────────────────────────
+  /api/subscriptions:
+    post:
+      tags: [Subscriptions]
+      operationId: createSubscription
+      summary: Create a notification subscription for a push token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionInput'
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    $ref: '#/components/schemas/Subscription'
+
+  /api/subscriptions/mine:
+    get:
+      tags: [Subscriptions]
+      operationId: getMySubscription
+      summary: Fetch the subscription tied to a push token
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Subscription, or null if none exists yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription:
+                    nullable: true
+                    allOf:
+                      - $ref: '#/components/schemas/Subscription'
+    patch:
+      tags: [Subscriptions]
+      operationId: updateMySubscription
+      summary: Upsert the subscription tied to a push token (validates device ownership)
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionInput'
+      responses:
+        '200':
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    $ref: '#/components/schemas/Subscription'
+
+  /api/subscriptions/{id}:
+    patch:
+      tags: [Subscriptions]
+      operationId: updateSubscription
+      summary: Update a subscription by id (authenticated users, e.g. linking to their account)
+      security:
+        - jwtAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionInput'
+      responses:
+        '200':
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    $ref: '#/components/schemas/Subscription'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  # ─── Assignments ───────────────────────────────────────────────────────────
+  /api/assignments:
+    get:
+      tags: [Assignments]
+      operationId: listAssignments
+      summary: List waste-collection assignments
+      parameters:
+        - name: 'where[status][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/AssignmentStatus'}
+        - name: 'where[assignedTo][equals]'
+          in: query
+          schema: {type: integer}
+        - name: limit
+          in: query
+          schema: {type: integer}
+        - name: page
+          in: query
+          schema: {type: integer}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 2}
+        - name: sort
+          in: query
+          schema: {type: string, default: '-createdAt'}
+      responses:
+        '200':
+          description: Paged assignment list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentList'
+    post:
+      tags: [Assignments]
+      operationId: createAssignment
+      summary: Create an assignment (admin/containerAdmin)
+      security:
+        - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssignmentInput'
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/assignments/{id}:
+    get:
+      tags: [Assignments]
+      operationId: getAssignment
+      summary: Fetch a single assignment
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - name: depth
+          in: query
+          schema: {type: integer, default: 2}
+      responses:
+        '200':
+          description: Assignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags: [Assignments]
+      operationId: updateAssignment
+      summary: Update an assignment
+      security:
+        - jwtAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentUpdateRequest'
+      responses:
+        '200':
+          description: Updated assignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  # ─── Missions ──────────────────────────────────────────────────────────────
+  /api/mission-profiles/me:
+    get:
+      tags: [Missions]
+      operationId: getMyMissionProfile
+      summary: Fetch the authenticated citizen's DAR-points balance and contributor level
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: Mission profile summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionProfileSummary'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions:
+    get:
+      tags: [Missions]
+      operationId: listVerifiableMissions
+      summary: List other citizens' missions awaiting community verification
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: 'where[status][equals]'
+          in: query
+          schema: {type: string, default: ready_for_review}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, default: 50}
+      responses:
+        '200':
+          description: Missions ready for review
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Mission'
+    post:
+      tags: [Missions]
+      operationId: createMission
+      summary: Create a mission (admin-only)
+      security:
+        - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMissionInput'
+      responses:
+        '201':
+          description: Mission created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mission'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/feed:
+    get:
+      tags: [Missions]
+      operationId: getMissionsFeed
+      summary: Quest board — open missions plus the citizen's own, with lock state
+      security:
+        - jwtAuth: []
+      responses:
+        '200':
+          description: Missions feed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissionsFeedResponse'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/{id}:
+    get:
+      tags: [Missions]
+      operationId: getMission
+      summary: Fetch a single mission
+      security:
+        - jwtAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - name: depth
+          in: query
+          schema: {type: integer, default: 2}
+      responses:
+        '200':
+          description: Mission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mission'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/{id}/claim:
+    post:
+      tags: [Missions]
+      operationId: claimMission
+      summary: Claim an open mission
+      security:
+        - jwtAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: Mission claimed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mission:
+                    $ref: '#/components/schemas/Mission'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/{missionId}/submit-task:
+    post:
+      tags: [Missions]
+      operationId: submitMissionTask
+      summary: Submit progress (and optional before/after photo ids) for one mission task
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: missionId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitMissionTaskRequest'
+      responses:
+        '200':
+          description: Updated mission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mission:
+                    $ref: '#/components/schemas/Mission'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/{missionId}/photos:
+    post:
+      tags: [Missions]
+      operationId: submitMissionOverallPhotos
+      summary: Attach mission-level before/after photo ids
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: missionId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitMissionPhotosRequest'
+      responses:
+        '200':
+          description: Updated mission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mission:
+                    $ref: '#/components/schemas/Mission'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/missions/{id}/submit-for-review:
+    post:
+      tags: [Missions]
+      operationId: submitMissionForReview
+      summary: Move a mission from in_progress to ready_for_review
+      security:
+        - jwtAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: Updated mission
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mission:
+                    $ref: '#/components/schemas/Mission'
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /api/mission-verifications:
+    post:
+      tags: [Missions]
+      operationId: createMissionVerification
+      summary: Submit a community approve/reject verification for another citizen's mission
+      security:
+        - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMissionVerificationRequest'
+      responses:
+        '201':
+          description: Verification recorded
+        '401':
+          $ref: '#/components/responses/Error'
+
+  # ─── Media ─────────────────────────────────────────────────────────────────
+  /api/media:
+    post:
+      tags: [Media]
+      operationId: uploadMedia
+      summary: Upload a photo (used by signals, waste containers, fountains, and missions)
+      security:
+        - jwtAuth: []
+        - bearerAuth: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                _payload:
+                  type: string
+                  description: >-
+                    JSON-encoded metadata, e.g. `{"reporterUniqueId": "..."}`,
+                    used by the unauthenticated signal-photo upload flow.
+              required: [file]
+      responses:
+        '201':
+          description: Uploaded media document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    $ref: '#/components/schemas/MediaRef'
+        '400':
+          $ref: '#/components/responses/Error'
+
+  # ─── News ──────────────────────────────────────────────────────────────────
+  /api/news:
+    get:
+      tags: [News]
+      operationId: listNews
+      summary: List published news items
+      parameters:
+        - name: locale
+          in: query
+          schema: {type: string, enum: [bg, en], default: bg}
+        - name: limit
+          in: query
+          schema: {type: integer, default: 10}
+        - name: page
+          in: query
+          schema: {type: integer, default: 1}
+        - name: depth
+          in: query
+          schema: {type: integer, default: 1}
+        - name: sort
+          in: query
+          schema: {type: string, default: '-publishedAt'}
+        - name: 'where[status][equals]'
+          in: query
+          schema: {type: string, default: published}
+        - name: 'where[topic][equals]'
+          in: query
+          schema: {$ref: '#/components/schemas/NewsTopic'}
+      responses:
+        '200':
+          description: Paged news list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsList'
+
+  /api/news/{id}:
+    get:
+      tags: [News]
+      operationId: getNewsItem
+      summary: Fetch a single news item
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - name: locale
+          in: query
+          schema: {type: string, enum: [bg, en], default: bg}
+      responses:
+        '200':
+          description: News item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayloadNewsItem'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  # ─── Updates (city feed, separate from Payload news) ──────────────────────
+  /api/updates:
+    get:
+      tags: [Updates]
+      operationId: listUpdates
+      summary: List city-feed update messages, optionally filtered by viewport/categories
+      parameters:
+        - name: pushToken
+          in: query
+          schema: {type: string}
+        - name: north
+          in: query
+          schema: {type: number}
+        - name: south
+          in: query
+          schema: {type: number}
+        - name: east
+          in: query
+          schema: {type: number}
+        - name: west
+          in: query
+          schema: {type: number}
+        - name: zoom
+          in: query
+          schema: {type: number}
+        - name: categories
+          in: query
+          description: Comma-separated category slugs
+          schema: {type: string}
+      responses:
+        '200':
+          description: Update messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesResponse'
+
+  /api/updates/by-id:
+    get:
+      tags: [Updates]
+      operationId: getUpdateById
+      summary: Fetch a single update message by id
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Update message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateByIdResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+
+  /api/updates/sources:
+    get:
+      tags: [Updates]
+      operationId: listUpdateSources
+      summary: List the sources feeding the city update feed
+      responses:
+        '200':
+          description: Sources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesSourcesResponse'
+
+components:
+  securitySchemes:
+    jwtAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Payload CMS auth collections. Send as `Authorization: JWT <token>`.'
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        A handful of admin write endpoints (container/fountain create-update, container clean,
+        bulk photo import) send `Authorization: Bearer <token>` instead of the `JWT` scheme
+        used everywhere else — this is an inconsistency in the current backend, not a
+        deliberate second auth mechanism.
+
+  parameters:
+    IdPathParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+    # ── Shared ────────────────────────────────────────────────────────────
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+
+    PayloadListMeta:
+      type: object
+      properties:
+        totalDocs: {type: integer}
+        limit: {type: integer}
+        totalPages: {type: integer}
+        page: {type: integer}
+        pagingCounter: {type: integer}
+        hasPrevPage: {type: boolean}
+        hasNextPage: {type: boolean}
+        prevPage: {type: integer, nullable: true}
+        nextPage: {type: integer, nullable: true}
+
+    MediaRef:
+      type: object
+      properties:
+        id: {type: integer}
+        url: {type: string}
+        alt: {type: string, nullable: true}
+        filename: {type: string}
+        mimeType: {type: string}
+        filesize: {type: integer}
+        width: {type: integer}
+        height: {type: integer}
+
+    # ── Auth ─────────────────────────────────────────────────────────────
+    UserRole:
+      type: string
+      enum:
+        - user
+        - admin
+        - containerAdmin
+        - fountainAdmin
+        - inspector
+        - wasteCollector
+        - infrastructureAdmin
+
+    User:
+      type: object
+      required: [id, email, role]
+      properties:
+        id: {type: integer}
+        email: {type: string, format: email}
+        name: {type: string}
+        role: {$ref: '#/components/schemas/UserRole'}
+        darPoints:
+          type: integer
+          description: Client-side merged field, populated from GET /api/mission-profiles/me.
+        contributorLevel:
+          type: string
+          enum: [beginner, contributor, guardian]
+          description: Client-side merged field, populated from GET /api/mission-profiles/me.
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+
+    LoginResponse:
+      type: object
+      properties:
+        token: {type: string}
+        user: {$ref: '#/components/schemas/User'}
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: {type: string}
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+        role:
+          type: string
+          enum: [user]
+          default: user
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email: {type: string, format: email}
+
+    ResendVerificationRequest:
+      type: object
+      required: [email]
+      properties:
+        email: {type: string, format: email}
+
+    # ── Push Tokens ──────────────────────────────────────────────────────
+    PushTokenCreateRequest:
+      type: object
+      required: [token, device, active]
+      properties:
+        token: {type: string}
+        device: {type: string, enum: [ios, android]}
+        active: {type: boolean}
+        reporterUniqueId: {type: string, nullable: true}
+
+    PushToken:
+      type: object
+      properties:
+        id: {type: integer}
+        token: {type: string}
+        device: {type: string, enum: [ios, android]}
+        active: {type: boolean}
+        reporterUniqueId: {type: string, nullable: true}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    # ── Signals ──────────────────────────────────────────────────────────
+    SignalCategory:
+      type: string
+      enum:
+        - waste-container
+        - drinking-fountain
+        - street-damage
+        - lighting
+        - green-spaces
+        - parking
+        - public-transport
+        - other
+
+    SignalStatus:
+      type: string
+      enum: [pending, in-progress, resolved, rejected]
+
+    CityObjectType:
+      type: string
+      enum: [waste-container, drinking-fountain, street, park, building, other]
+
+    ContainerState:
+      type: string
+      enum: [full, dirty, damaged, leaves, maintenance, bagged, fallen, bulkyWaste]
+
+    FountainState:
+      type: string
+      enum: [notWorking, damaged, dirty, leaking, other]
+
+    CityObjectRef:
+      type: object
+      properties:
+        type: {$ref: '#/components/schemas/CityObjectType'}
+        referenceId: {type: string}
+        name: {type: string}
+
+    SignalLocation:
+      type: object
+      properties:
+        latitude: {type: number}
+        longitude: {type: number}
+        address: {type: string}
+
+    SignalReporterRef:
+      type: object
+      properties:
+        id: {type: integer}
+        email: {type: string}
+        name: {type: string}
+
+    Signal:
+      type: object
+      required: [id, title, description, category, status, createdAt, updatedAt]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        description: {type: string}
+        category: {$ref: '#/components/schemas/SignalCategory'}
+        cityObject: {$ref: '#/components/schemas/CityObjectRef'}
+        containerState:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        fountainState:
+          type: array
+          items: {$ref: '#/components/schemas/FountainState'}
+        location: {$ref: '#/components/schemas/SignalLocation'}
+        images:
+          type: array
+          items: {$ref: '#/components/schemas/MediaRef'}
+        status: {$ref: '#/components/schemas/SignalStatus'}
+        adminNotes: {type: string}
+        reporterUniqueId: {type: string}
+        reporter:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/SignalReporterRef'
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    SignalCreateRequest:
+      description: Wire-format request body — `location` is serialized to a Payload `[longitude, latitude]` point tuple.
+      type: object
+      required: [title, category]
+      properties:
+        title: {type: string}
+        description: {type: string}
+        category: {$ref: '#/components/schemas/SignalCategory'}
+        cityObject: {$ref: '#/components/schemas/CityObjectRef'}
+        containerState:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        fountainState:
+          type: array
+          items: {$ref: '#/components/schemas/FountainState'}
+        location:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+          description: '[longitude, latitude]'
+        reporterUniqueId: {type: string}
+        images:
+          type: array
+          items: {type: integer}
+          description: Media ids uploaded via POST /api/media beforehand.
+
+    SignalUpdateRequest:
+      description: Partial update; same wire format as SignalCreateRequest.
+      type: object
+      properties:
+        title: {type: string}
+        description: {type: string}
+        category: {$ref: '#/components/schemas/SignalCategory'}
+        cityObject: {$ref: '#/components/schemas/CityObjectRef'}
+        containerState:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        fountainState:
+          type: array
+          items: {$ref: '#/components/schemas/FountainState'}
+        location:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+          description: '[longitude, latitude]'
+        status: {$ref: '#/components/schemas/SignalStatus'}
+        adminNotes: {type: string}
+        images:
+          type: array
+          items: {type: integer}
+          description: Full replacement list of media ids (existing kept + newly uploaded).
+
+    SignalList:
+      allOf:
+        - $ref: '#/components/schemas/PayloadListMeta'
+        - type: object
+          properties:
+            docs:
+              type: array
+              items: {$ref: '#/components/schemas/Signal'}
+
+    # ── Waste Containers ─────────────────────────────────────────────────
+    WasteType:
+      type: string
+      enum:
+        - general
+        - recyclables
+        - organic
+        - glass
+        - paper
+        - plastic
+        - metal
+        - trashCan
+        - bulky-waste-zones
+
+    CapacitySize:
+      type: string
+      enum: [tiny, small, standard, big, industrial]
+
+    ContainerStatus:
+      type: string
+      enum: [active, full, maintenance, inactive, pending]
+
+    WasteContainer:
+      type: object
+      required:
+        [
+          id,
+          publicNumber,
+          location,
+          latitude,
+          longitude,
+          capacityVolume,
+          capacitySize,
+          wasteType,
+          status,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: {type: string}
+        publicNumber: {type: string}
+        image:
+          type: object
+          nullable: true
+          properties:
+            url: {type: string}
+            alt: {type: string}
+        location:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+          description: Payload point field, stored as [longitude, latitude].
+        latitude:
+          type: number
+          description: Derived client-side from location[1].
+        longitude:
+          type: number
+          description: Derived client-side from location[0].
+        address: {type: string}
+        capacityVolume: {type: number}
+        capacitySize: {$ref: '#/components/schemas/CapacitySize'}
+        binCount: {type: integer}
+        servicedBy: {type: string}
+        wasteType: {$ref: '#/components/schemas/WasteType'}
+        status: {$ref: '#/components/schemas/ContainerStatus'}
+        state:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        notes: {type: string}
+        lastCleaned: {type: string, format: date-time, nullable: true}
+        lastCleanedPhoto:
+          type: object
+          nullable: true
+          properties:
+            url: {type: string}
+            alt: {type: string}
+        collectionDaysOfWeek:
+          type: array
+          items: {type: string}
+        collectionTimesPerDay: {type: integer}
+        scheduleSource: {type: string, nullable: true}
+        signalCount:
+          type: integer
+          description: Populated by GET /api/waste-containers/containers-with-signal-count.
+        activeSignalCount:
+          type: integer
+          description: Populated by GET /api/waste-containers/containers-with-signal-count.
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    WasteContainerList:
+      allOf:
+        - $ref: '#/components/schemas/PayloadListMeta'
+        - type: object
+          properties:
+            docs:
+              type: array
+              items: {$ref: '#/components/schemas/WasteContainer'}
+
+    WasteContainerCreateRequest:
+      type: object
+      required: [publicNumber, wasteType, capacityVolume, capacitySize, location]
+      properties:
+        publicNumber: {type: string}
+        wasteType: {$ref: '#/components/schemas/WasteType'}
+        capacityVolume: {type: number}
+        capacitySize: {$ref: '#/components/schemas/CapacitySize'}
+        binCount: {type: integer}
+        location:
+          type: object
+          required: [latitude, longitude]
+          properties:
+            latitude: {type: number}
+            longitude: {type: number}
+            address: {type: string}
+        notes: {type: string}
+        image:
+          type: integer
+          description: Media id uploaded via POST /api/media beforehand.
+        status:
+          $ref: '#/components/schemas/ContainerStatus'
+
+    WasteContainerUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/WasteContainerCreateRequest'
+
+    ContainerCluster:
+      type: object
+      properties:
+        type: {type: string, enum: [cluster]}
+        lat: {type: number}
+        lng: {type: number}
+        count: {type: integer}
+        dominantStatus: {type: string}
+        activeSignalCount: {type: integer}
+
+    ContainerClusterResponse:
+      type: object
+      properties:
+        type: {type: string, enum: [clusters]}
+        zoom: {type: integer}
+        docs:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerCluster'}
+
+    ContainerMarkerResponse:
+      type: object
+      properties:
+        type: {type: string, enum: [markers]}
+        zoom: {type: integer}
+        docs:
+          type: array
+          items: {$ref: '#/components/schemas/WasteContainer'}
+
+    CleanContainerResponse:
+      type: object
+      properties:
+        success: {type: boolean}
+        container: {$ref: '#/components/schemas/WasteContainer'}
+        resolvedSignals: {type: integer}
+        observationId: {type: string}
+
+    WasteContainerObservation:
+      type: object
+      required: [id, cleanedAt]
+      properties:
+        id: {type: string}
+        container:
+          oneOf:
+            - type: string
+            - $ref: '#/components/schemas/WasteContainer'
+        cleanedAt: {type: string, format: date-time}
+        notes: {type: string}
+        photo: {$ref: '#/components/schemas/MediaRef'}
+
+    CollectionMetricsDistrictStat:
+      type: object
+      properties:
+        districtId: {type: integer}
+        districtName: {type: string}
+        totalContainers: {type: integer}
+        collectedContainers: {type: integer}
+
+    CollectionMetricsZoneStat:
+      type: object
+      properties:
+        zoneNumber: {type: integer}
+        zoneName: {type: string}
+        serviceCompanyId: {type: integer, nullable: true}
+        totalContainers: {type: integer}
+        collectedContainers: {type: integer}
+
+    CollectionMetricsTimeBucket:
+      type: object
+      properties:
+        bucket: {type: string}
+        bucketOrder: {type: integer}
+        containerCount: {type: integer}
+
+    CollectionMetricsDailyTrend:
+      type: object
+      properties:
+        date: {type: string, format: date}
+        totalContainers: {type: integer}
+        collectedContainers: {type: integer}
+
+    CollectionMetrics:
+      type: object
+      properties:
+        from: {type: string, format: date}
+        to: {type: string, format: date}
+        byDistrict:
+          type: array
+          items: {$ref: '#/components/schemas/CollectionMetricsDistrictStat'}
+        byZone:
+          type: array
+          items: {$ref: '#/components/schemas/CollectionMetricsZoneStat'}
+        byDay:
+          type: array
+          items: {$ref: '#/components/schemas/CollectionMetricsDailyTrend'}
+        byTimeSinceCollection:
+          type: array
+          items: {$ref: '#/components/schemas/CollectionMetricsTimeBucket'}
+        scheduleCompliance:
+          type: object
+          properties:
+            scheduledToday: {type: integer}
+            delayed: {type: integer}
+            missed: {type: integer}
+
+    # ── Bulky Waste Zones ────────────────────────────────────────────────
+    BulkyWasteZoneGeometry:
+      oneOf:
+        - type: object
+          properties:
+            type: {type: string, enum: [Polygon]}
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items: {type: number}
+                  minItems: 2
+                  maxItems: 2
+        - type: object
+          properties:
+            type: {type: string, enum: [MultiPolygon]}
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items: {type: number}
+                  minItems: 2
+                  maxItems: 2
+
+    BulkyWasteZoneProperties:
+      type: object
+      properties:
+        id: {type: string}
+        name: {type: string}
+        info: {type: string, nullable: true}
+        collectionDaysOfWeek:
+          type: array
+          items: {type: string}
+
+    BulkyWasteZoneFeature:
+      type: object
+      properties:
+        type: {type: string, enum: [Feature]}
+        properties: {$ref: '#/components/schemas/BulkyWasteZoneProperties'}
+        geometry: {$ref: '#/components/schemas/BulkyWasteZoneGeometry'}
+
+    BulkyWasteZonesFeatureCollection:
+      type: object
+      properties:
+        type: {type: string, enum: [FeatureCollection]}
+        features:
+          type: array
+          items: {$ref: '#/components/schemas/BulkyWasteZoneFeature'}
+
+    # ── Drinking Fountains ───────────────────────────────────────────────
+    DrinkingFountainDoc:
+      description: Raw document as returned by Payload (before client-side flattening).
+      type: object
+      properties:
+        id: {type: integer}
+        publicNumber: {type: string, nullable: true}
+        address: {type: string}
+        location:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+          description: '[longitude, latitude]'
+        isActive: {type: boolean, nullable: true}
+        protectionStatus: {type: string, nullable: true}
+        externalLink: {type: string, nullable: true}
+        district:
+          oneOf:
+            - type: integer
+            - type: string
+            - $ref: '#/components/schemas/FountainLookup'
+        source:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/FountainLookup'
+        status:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/FountainLookup'
+        owner:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/FountainLookup'
+        activationType:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/FountainLookup'
+        createdAt: {type: string, format: date-time, nullable: true}
+        updatedAt: {type: string, format: date-time, nullable: true}
+
+    DrinkingFountainCreateRequest:
+      type: object
+      required: [address, location, isActive]
+      properties:
+        address: {type: string}
+        location:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+          description: '[longitude, latitude]'
+        isActive: {type: boolean}
+        district:
+          oneOf:
+            - type: integer
+            - type: string
+        source: {type: integer}
+        status: {type: integer}
+
+    FountainLookup:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string}
+
+    # ── City Districts / Subscriptions ───────────────────────────────────
+    CityDistrict:
+      type: object
+      properties:
+        id:
+          oneOf: [{type: integer}, {type: string}]
+        districtId: {type: integer}
+        name: {type: string}
+        code: {type: string}
+
+    SubscriptionCategory:
+      type: object
+      properties:
+        id:
+          oneOf: [{type: integer}, {type: string}]
+        title: {type: string}
+        slug: {type: string}
+
+    LocationFilterAll:
+      type: object
+      properties:
+        id: {type: string}
+        filterType: {type: string, enum: [all]}
+
+    LocationFilterDistrict:
+      type: object
+      properties:
+        id: {type: string}
+        filterType: {type: string, enum: [district]}
+        district:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: object
+              properties:
+                id: {oneOf: [{type: integer}, {type: string}]}
+                name: {type: string}
+                districtId: {type: integer}
+
+    LocationFilterPoint:
+      type: object
+      properties:
+        id: {type: string}
+        filterType: {type: string, enum: [point]}
+        latitude: {type: number}
+        longitude: {type: number}
+        radius:
+          type: number
+          description: Radius in meters.
+
+    LocationFilterArea:
+      type: object
+      properties:
+        id: {type: string}
+        filterType: {type: string, enum: [area]}
+        polygon:
+          type: object
+          properties:
+            type: {type: string, enum: [Polygon]}
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  type: array
+                  items: {type: number}
+                  minItems: 2
+                  maxItems: 2
+
+    LocationFilter:
+      oneOf:
+        - $ref: '#/components/schemas/LocationFilterAll'
+        - $ref: '#/components/schemas/LocationFilterDistrict'
+        - $ref: '#/components/schemas/LocationFilterPoint'
+        - $ref: '#/components/schemas/LocationFilterArea'
+      discriminator:
+        propertyName: filterType
+        mapping:
+          all: '#/components/schemas/LocationFilterAll'
+          district: '#/components/schemas/LocationFilterDistrict'
+          point: '#/components/schemas/LocationFilterPoint'
+          area: '#/components/schemas/LocationFilterArea'
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          oneOf: [{type: integer}, {type: string}]
+        enabled: {type: boolean}
+        pushToken:
+          oneOf:
+            - type: integer
+            - type: string
+            - type: object
+              properties:
+                id: {oneOf: [{type: integer}, {type: string}]}
+                token: {type: string}
+        user:
+          nullable: true
+          oneOf: [{type: integer}, {type: string}]
+        categories:
+          type: array
+          items: {$ref: '#/components/schemas/SubscriptionCategory'}
+        locationFilters:
+          type: array
+          items: {$ref: '#/components/schemas/LocationFilter'}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    CreateSubscriptionInput:
+      type: object
+      required: [pushToken]
+      properties:
+        pushToken:
+          oneOf: [{type: integer}, {type: string}]
+        user:
+          nullable: true
+          oneOf: [{type: integer}, {type: string}]
+        categories:
+          type: array
+          items:
+            oneOf: [{type: integer}, {type: string}]
+        locationFilters:
+          type: array
+          items: {$ref: '#/components/schemas/LocationFilter'}
+
+    UpdateSubscriptionInput:
+      type: object
+      properties:
+        user:
+          nullable: true
+          oneOf: [{type: integer}, {type: string}]
+        enabled: {type: boolean}
+        categories:
+          type: array
+          items:
+            oneOf: [{type: integer}, {type: string}]
+        locationFilters:
+          type: array
+          items: {$ref: '#/components/schemas/LocationFilter'}
+
+    # ── Assignments ──────────────────────────────────────────────────────
+    AssignmentStatus:
+      type: string
+      enum: [pending, in-progress, completed, cancelled]
+
+    AssignmentAssigneeRef:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        email: {type: string}
+
+    Assignment:
+      type: object
+      required: [id, title, activities, status, createdAt, updatedAt]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        description: {type: string}
+        containers:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/WasteContainer'
+        assignedTo:
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/AssignmentAssigneeRef'
+        activities:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        status: {$ref: '#/components/schemas/AssignmentStatus'}
+        dueDate: {type: string, format: date-time}
+        completedAt: {type: string, format: date-time}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    AssignmentList:
+      allOf:
+        - $ref: '#/components/schemas/PayloadListMeta'
+        - type: object
+          properties:
+            docs:
+              type: array
+              items: {$ref: '#/components/schemas/Assignment'}
+
+    CreateAssignmentInput:
+      type: object
+      required: [title, containers, assignedTo, activities]
+      properties:
+        title: {type: string}
+        description: {type: string}
+        containers:
+          type: array
+          items: {type: string}
+        assignedTo: {type: integer}
+        activities:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        status: {$ref: '#/components/schemas/AssignmentStatus'}
+        dueDate: {type: string, format: date-time}
+
+    AssignmentUpdateRequest:
+      type: object
+      properties:
+        title: {type: string}
+        description: {type: string}
+        containers:
+          type: array
+          items: {type: string}
+        assignedTo: {type: integer}
+        activities:
+          type: array
+          items: {$ref: '#/components/schemas/ContainerState'}
+        status: {$ref: '#/components/schemas/AssignmentStatus'}
+        dueDate: {type: string, format: date-time}
+        completedAt: {type: string, format: date-time}
+
+    # ── Missions ─────────────────────────────────────────────────────────
+    MissionLevel:
+      type: string
+      enum: [good-first-mission, verified-contributor, verified-guardian]
+
+    MissionStatus:
+      type: string
+      enum:
+        - draft
+        - open
+        - in_progress
+        - ready_for_review
+        - returned_for_improvement
+        - completed
+        - cancelled
+
+    MissionMediaRef:
+      type: object
+      properties:
+        id: {type: integer}
+        url: {type: string}
+        alt: {type: string}
+
+    MissionTask:
+      type: object
+      required: [id, title, instructions, acceptanceCriteria]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        instructions: {type: string}
+        acceptanceCriteria: {type: string}
+        requiresBeforePhoto: {type: boolean}
+        requiresAfterPhoto: {type: boolean}
+        beforePhoto:
+          nullable: true
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/MissionMediaRef'
+        afterPhoto:
+          nullable: true
+          oneOf:
+            - type: integer
+            - $ref: '#/components/schemas/MissionMediaRef'
+        completedByCitizenAt: {type: string, format: date-time, nullable: true}
+
+    MissionSignalRef:
+      type: object
+      properties:
+        id: {type: integer}
+        title: {type: string}
+        location:
+          type: array
+          items: {type: number}
+        cityObject:
+          type: object
+          properties:
+            type: {type: string}
+            referenceId: {type: string}
+
+    MissionInspectorRef:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        email: {type: string}
+
+    Mission:
+      type: object
+      required:
+        [
+          id,
+          signal,
+          title,
+          level,
+          status,
+          pointsReward,
+          generalInstructions,
+          tasks,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: {type: string}
+        signal: {$ref: '#/components/schemas/MissionSignalRef'}
+        title: {type: string}
+        description: {type: string}
+        level: {$ref: '#/components/schemas/MissionLevel'}
+        status: {$ref: '#/components/schemas/MissionStatus'}
+        pointsReward: {type: integer}
+        pointsAwarded: {type: integer, nullable: true}
+        generalInstructions: {type: string}
+        tasks:
+          type: array
+          items: {$ref: '#/components/schemas/MissionTask'}
+        missionBeforePhotos:
+          type: array
+          items: {$ref: '#/components/schemas/MissionMediaRef'}
+        missionAfterPhotos:
+          type: array
+          items: {$ref: '#/components/schemas/MissionMediaRef'}
+        inspector: {$ref: '#/components/schemas/MissionInspectorRef'}
+        citizen:
+          nullable: true
+          oneOf:
+            - type: integer
+            - type: object
+              properties:
+                id: {type: integer}
+                name: {type: string}
+        claimedAt: {type: string, format: date-time, nullable: true}
+        submittedForReviewAt: {type: string, format: date-time, nullable: true}
+        reviewedAt: {type: string, format: date-time, nullable: true}
+        completedAt: {type: string, format: date-time, nullable: true}
+        inspectorReviewNotes: {type: string}
+        communityConsensus:
+          type: string
+          enum: [none, trusted_verified, peer_verified, disputed]
+        locked:
+          type: boolean
+          description: Server-computed; only present on /api/missions/feed responses.
+        unlockRequirement: {type: string}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    MissionsFeedResponse:
+      type: object
+      properties:
+        missions:
+          type: array
+          items: {$ref: '#/components/schemas/Mission'}
+        completedMissionsCount: {type: integer}
+        contributorLevel:
+          type: string
+          enum: [beginner, contributor, guardian]
+
+    MissionProfileSummary:
+      type: object
+      properties:
+        darPoints: {type: integer}
+        contributorLevel:
+          type: string
+          enum: [beginner, contributor, guardian]
+
+    CreateMissionInput:
+      type: object
+      required: [signal, title, level, status, pointsReward, generalInstructions, tasks]
+      properties:
+        signal: {type: string}
+        title: {type: string}
+        description: {type: string}
+        level: {$ref: '#/components/schemas/MissionLevel'}
+        status: {type: string, enum: [draft, open]}
+        pointsReward: {type: integer}
+        generalInstructions: {type: string}
+        tasks:
+          type: array
+          items:
+            type: object
+            required: [title, instructions, acceptanceCriteria]
+            properties:
+              title: {type: string}
+              instructions: {type: string}
+              acceptanceCriteria: {type: string}
+              requiresBeforePhoto: {type: boolean}
+              requiresAfterPhoto: {type: boolean}
+
+    SubmitMissionTaskRequest:
+      type: object
+      required: [taskId]
+      properties:
+        taskId: {type: string}
+        beforePhotoId: {type: integer, nullable: true}
+        afterPhotoId: {type: integer, nullable: true}
+
+    SubmitMissionPhotosRequest:
+      type: object
+      properties:
+        beforePhotoIds:
+          type: array
+          items: {type: integer}
+        afterPhotoIds:
+          type: array
+          items: {type: integer}
+
+    CreateMissionVerificationRequest:
+      type: object
+      required: [mission, decision]
+      properties:
+        mission: {type: string}
+        decision: {type: string, enum: [approve, reject]}
+        comment: {type: string}
+
+    # ── News ─────────────────────────────────────────────────────────────
+    NewsTopic:
+      type: string
+      enum: [festivals, street-closure, city-events, alerts]
+
+    PayloadNewsItem:
+      type: object
+      required: [id, title, description, topic, status, publishedAt, createdAt, updatedAt]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        description: {type: string}
+        content:
+          description: Lexical rich-text document; shape is editor-defined.
+        topic: {$ref: '#/components/schemas/NewsTopic'}
+        image:
+          oneOf:
+            - type: string
+            - $ref: '#/components/schemas/MediaRef'
+        location:
+          type: object
+          nullable: true
+          properties:
+            latitude: {type: number}
+            longitude: {type: number}
+        status: {type: string, enum: [draft, published]}
+        publishedAt: {type: string, format: date-time}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+
+    NewsList:
+      allOf:
+        - $ref: '#/components/schemas/PayloadListMeta'
+        - type: object
+          properties:
+            docs:
+              type: array
+              items: {$ref: '#/components/schemas/PayloadNewsItem'}
+
+    # ── Updates (city feed) ──────────────────────────────────────────────
+    UpdateCoordinates:
+      type: object
+      properties:
+        lat: {type: number}
+        lng: {type: number}
+
+    UpdateGeoJsonPoint:
+      type: object
+      properties:
+        type: {type: string, enum: [Point]}
+        coordinates:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+
+    UpdateAddress:
+      type: object
+      properties:
+        originalText: {type: string}
+        formattedAddress: {type: string}
+        coordinates: {$ref: '#/components/schemas/UpdateCoordinates'}
+        geoJson: {$ref: '#/components/schemas/UpdateGeoJsonPoint'}
+
+    UpdateFeatureGeometry:
+      type: object
+      properties:
+        type: {type: string, enum: [Point, LineString, Polygon]}
+        coordinates: {}
+
+    UpdateGeoJsonFeatureCollection:
+      type: object
+      properties:
+        type: {type: string, enum: [FeatureCollection]}
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              type: {type: string, enum: [Feature]}
+              geometry: {$ref: '#/components/schemas/UpdateFeatureGeometry'}
+              properties:
+                type: object
+                additionalProperties: {}
+
+    UpdateTimespan:
+      type: object
+      properties:
+        start: {type: string, format: date-time, nullable: true}
+        end: {type: string, format: date-time, nullable: true}
+
+    UpdatePin:
+      type: object
+      properties:
+        address: {type: string}
+        coordinates: {$ref: '#/components/schemas/UpdateCoordinates'}
+        timespans:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateTimespan'}
+
+    UpdateStreet:
+      type: object
+      properties:
+        street: {type: string}
+        from: {type: string}
+        fromCoordinates: {$ref: '#/components/schemas/UpdateCoordinates'}
+        to: {type: string}
+        toCoordinates: {$ref: '#/components/schemas/UpdateCoordinates'}
+        timespans:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateTimespan'}
+
+    UpdateCadastralProperty:
+      type: object
+      properties:
+        identifier: {type: string}
+        timespans:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateTimespan'}
+
+    UpdateMessage:
+      type: object
+      required: [text, createdAt]
+      properties:
+        id: {type: string}
+        text: {type: string}
+        plainText: {type: string}
+        markdownText: {type: string}
+        addresses:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateAddress'}
+        geoJson: {$ref: '#/components/schemas/UpdateGeoJsonFeatureCollection'}
+        createdAt: {type: string, format: date-time}
+        crawledAt: {type: string, format: date-time}
+        finalizedAt: {type: string, format: date-time}
+        source: {type: string}
+        sourceUrl: {type: string}
+        categories:
+          type: array
+          items: {type: string}
+        timespanStart: {type: string, format: date-time}
+        timespanEnd: {type: string, format: date-time}
+        cityWide: {type: boolean}
+        responsibleEntity: {type: string}
+        pins:
+          type: array
+          items: {$ref: '#/components/schemas/UpdatePin'}
+        streets:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateStreet'}
+        cadastralProperties:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateCadastralProperty'}
+        busStops:
+          type: array
+          items: {type: string}
+        locality: {type: string}
+
+    UpdateSource:
+      type: object
+      required: [id]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        url: {type: string}
+        logoUrl: {type: string}
+
+    UpdatesResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateMessage'}
+
+    UpdateByIdResponse:
+      type: object
+      properties:
+        message: {$ref: '#/components/schemas/UpdateMessage'}
+
+    UpdatesSourcesResponse:
+      type: object
+      properties:
+        sources:
+          type: array
+          items: {$ref: '#/components/schemas/UpdateSource'}
