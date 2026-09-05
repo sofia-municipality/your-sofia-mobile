@@ -42,13 +42,14 @@ describe('Login screen', () => {
   it('navigates from the profile tab to the login screen', async () => {
     await element(by.label('profile.title')).tap()
 
-    // The profile screen push is a native navigation transition that Detox
-    // doesn't wait for automatically. Tapping the login button before the
-    // transition settles hits it mid-slide, which Espresso rejects with
+    // The login button sits in the unauthenticated auth section, below the
+    // profile card — it's off-screen until the profile ScrollView is
+    // scrolled down, which is why Espresso rejects a bare tap() here with
     // "does not match ... covers at least 75 percent of the view's area".
     await waitFor(element(by.label('Вход')).atIndex(0))
       .toBeVisible()
-      .withTimeout(10000)
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
     await element(by.label('Вход')).atIndex(0).tap()
 
     await waitFor(element(by.label('Имейл')).atIndex(0))
@@ -63,7 +64,8 @@ describe('Login screen', () => {
 
     await waitFor(element(by.label('Вход')).atIndex(0))
       .toBeVisible()
-      .withTimeout(10000)
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
     await element(by.label('Вход')).atIndex(0).tap()
 
     // On the login screen itself, "Вход" also matches the screen's own

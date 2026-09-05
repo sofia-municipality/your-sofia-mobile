@@ -194,7 +194,11 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        testID="profileScrollView"
+      >
         {/* Notification Bar */}
 
         <TouchableOpacity style={styles.notificationBar}>
