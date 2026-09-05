@@ -283,6 +283,7 @@ export default function ProfileScreen() {
                 onPress={() => router.push('/auth/login' as any)}
                 accessibilityRole="button"
                 accessibilityLabel={t('auth.login')}
+                testID="profileLoginButton"
               >
                 <LogInIcon size={20} color={colors.surface} />
                 <Text style={styles.loginButtonText}>{t('auth.login')}</Text>

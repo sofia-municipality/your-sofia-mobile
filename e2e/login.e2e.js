@@ -42,15 +42,20 @@ describe('Login screen', () => {
   it('navigates from the profile tab to the login screen', async () => {
     await element(by.label('profile.title')).tap()
 
-    // The login button sits in the unauthenticated auth section, below the
-    // profile card — it's off-screen until the profile ScrollView is
-    // scrolled down, which is why Espresso rejects a bare tap() here with
-    // "does not match ... covers at least 75 percent of the view's area".
-    await waitFor(element(by.label('Вход')).atIndex(0))
+    // by.label('Вход') is ambiguous: the (tabs) group mounts all tabs
+    // eagerly (lazy: false in app/(tabs)/_layout.tsx), so the missions
+    // tab's own unauthenticated "Вход" text is present in the tree at the
+    // same time as the profile screen's login button, regardless of tab
+    // focus. atIndex() ordering across screens isn't stable, so target the
+    // button by its unique testID instead.
+    //
+    // It also sits in the unauthenticated auth section below the profile
+    // card — off-screen until the profile ScrollView is scrolled down.
+    await waitFor(element(by.id('profileLoginButton')))
       .toBeVisible()
       .whileElement(by.id('profileScrollView'))
       .scroll(200, 'down')
-    await element(by.label('Вход')).atIndex(0).tap()
+    await element(by.id('profileLoginButton')).tap()
 
     await waitFor(element(by.label('Имейл')).atIndex(0))
       .toBeVisible()
@@ -62,19 +67,19 @@ describe('Login screen', () => {
   it('shows a validation alert when submitting the form empty', async () => {
     await element(by.label('profile.title')).tap()
 
-    await waitFor(element(by.label('Вход')).atIndex(0))
+    await waitFor(element(by.id('profileLoginButton')))
       .toBeVisible()
       .whileElement(by.id('profileScrollView'))
       .scroll(200, 'down')
-    await element(by.label('Вход')).atIndex(0).tap()
+    await element(by.id('profileLoginButton')).tap()
 
     // On the login screen itself, "Вход" also matches the screen's own
-    // heading text (atIndex(0)) before the actual submit button
-    // (atIndex(1)) — verified via `detox test --loglevel verbose`.
-    await waitFor(element(by.label('Вход')).atIndex(1))
+    // heading text as well as the submit button — target the submit
+    // button by its unique testID instead of guessing label order.
+    await waitFor(element(by.id('loginSubmitButton')))
       .toBeVisible()
       .withTimeout(10000)
-    await element(by.label('Вход')).atIndex(1).tap()
+    await element(by.id('loginSubmitButton')).tap()
 
     await waitFor(element(by.text('Грешка')))
       .toBeVisible()

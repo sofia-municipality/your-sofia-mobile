@@ -126,6 +126,7 @@ export default function LoginScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('auth.login')}
             accessibilityState={{disabled: isLoading}}
+            testID="loginSubmitButton"
           >
             {isLoading ? (
               <ActivityIndicator color={colors.surface} />
