@@ -1,0 +1,87 @@
+name: Detox iOS E2E
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: detox-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Bump to invalidate the CocoaPods cache.
+  PODS_CACHE_VERSION: v1
+  EXPO_NO_TELEMETRY: '1'
+  # brew auto-update alone can cost several minutes on a cold runner.
+  HOMEBREW_NO_AUTO_UPDATE: '1'
+  HOMEBREW_NO_INSTALL_CLEANUP: '1'
+
+jobs:
+  detox-ios:
+    name: Build & run Detox E2E on iOS
+    runs-on: macos-26
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install applesimutils
+        run: |
+          brew tap wix/brew
+          brew trust --formula wix/brew/applesimutils
+          brew install applesimutils
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prebuild iOS project
+        run: pnpm exec expo prebuild --platform ios --no-install
+        env:
+          GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods/repos
+          key: pods-${{ env.PODS_CACHE_VERSION }}-${{ hashFiles('ios/Podfile', 'ios/Podfile.properties.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            pods-${{ env.PODS_CACHE_VERSION }}-
+
+      - name: Install CocoaPods dependencies
+        run: pod install --project-directory=ios
+
+      - name: Build app for simulator
+        run: pnpm detox:ios:build
+
+      - name: Build Detox framework cache
+        run: pnpx detox clean-framework-cache && pnpx detox build-framework-cache
+
+      - name: Run Detox tests
+        run: pnpm detox:ios:test --cleanup --record-videos failing --record-logs failing --take-screenshots failing --artifacts-location artifacts
+
+      - name: Upload Detox artifacts (recordings, logs, screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detox-ios-artifacts-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 7
