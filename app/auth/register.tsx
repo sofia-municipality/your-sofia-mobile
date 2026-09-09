@@ -108,6 +108,7 @@ export default function RegisterScreen() {
                 autoCorrect={false}
                 editable={!isLoading}
                 accessibilityLabel={t('auth.name')}
+                testID="registerNameInput"
               />
             </View>
 
@@ -126,6 +127,7 @@ export default function RegisterScreen() {
                 importantForAutofill="yes"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.email')}
+                testID="registerEmailInput"
               />
             </View>
 
@@ -144,6 +146,7 @@ export default function RegisterScreen() {
                 importantForAutofill="no"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.password')}
+                testID="registerPasswordInput"
               />
             </View>
 
@@ -164,6 +167,7 @@ export default function RegisterScreen() {
                 returnKeyLabel="OK"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.confirmPassword')}
+                testID="registerConfirmPasswordInput"
               />
             </View>
           </View>
@@ -178,6 +182,7 @@ export default function RegisterScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('auth.register')}
           accessibilityState={{disabled: isLoading}}
+          testID="registerSubmitButton"
         >
           {isLoading ? (
             <ActivityIndicator color={colors.surface} />
