@@ -10,24 +10,23 @@ describe('Register screen', () => {
 
     // First launch shows a one-time "what's new" screen; dismiss it if present.
     try {
-      await waitFor(element(by.label('Напред')).atIndex(0))
+      await waitFor(element(by.id('whatsNewContinueButton')))
         .toBeVisible()
         .withTimeout(15000)
-      await element(by.label('Напред')).atIndex(0).tap()
+      await element(by.id('whatsNewContinueButton')).tap()
     } catch {
       // already dismissed in a prior test, nothing to do
     }
 
     // "profile" has no bottom tab — it's reached via the person icon in the
-    // home header, whose accessibilityLabel is the raw (untranslated)
-    // "profile.title" key.
-    await waitFor(element(by.label('profile.title')))
+    // home header.
+    await waitFor(element(by.id('headerProfileButton')))
       .toBeVisible()
       .withTimeout(10000)
   })
 
   it('shows a validation alert when submitting an empty form', async () => {
-    await element(by.label('profile.title')).tap()
+    await element(by.id('headerProfileButton')).tap()
 
     // The login button sits below the profile card, off-screen until the
     // ScrollView is scrolled down.
@@ -42,14 +41,13 @@ describe('Register screen', () => {
       .withTimeout(10000)
     await element(by.id('loginRegisterLink')).tap()
 
-    // The register screen's heading and its submit button share the label
-    // "Регистрация" (auth.register), same ambiguity as "Вход" on the login
-    // screen — targeting by testID avoids relying on label match order.
     await waitFor(element(by.id('registerSubmitButton')))
       .toBeVisible()
       .withTimeout(10000)
     await element(by.id('registerSubmitButton')).tap()
 
+    // Alert.alert renders a native dialog, not an RN view, so it has no
+    // testID to target — text matching is the only option here.
     await waitFor(element(by.text('Грешка')))
       .toBeVisible()
       .withTimeout(10000)
