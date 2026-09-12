@@ -15,16 +15,27 @@ describe('New signal redirect when logged out', () => {
     // On a cold launch, this deep link can race with app/index.tsx's own
     // "what's new" redirect (which only checks the root route "/") — and on
     // iOS that redirect has won, showing the modal instead of landing on
-    // /new. Dismiss it if present, then re-issue the deep link so the test
-    // still starts from the intended screen either way.
+    // /new. Detect it with a short wait; a timeout here just means the deep
+    // link already landed correctly, so there's nothing to dismiss.
+    let whatsNewShown = true
     try {
       await waitFor(element(by.id('whatsNewContinueButton')))
         .toBeVisible()
-        .withTimeout(10000)
-      await element(by.id('whatsNewContinueButton')).tap()
-      await device.openURL({url: 'myapp://new'})
+        .withTimeout(8000)
     } catch {
-      // what's new wasn't shown — the deep link already landed correctly
+      whatsNewShown = false
+    }
+
+    if (whatsNewShown) {
+      await element(by.id('whatsNewContinueButton')).tap()
+      // Wait for the app to land on a real screen (its own dismiss handler
+      // does its own router.replace('/(tabs)/home')) before re-issuing the
+      // deep link — firing it immediately raced that in-flight navigation
+      // and lost, leaving the modal up for the rest of the test.
+      await waitFor(element(by.id('headerProfileButton')))
+        .toBeVisible()
+        .withTimeout(10000)
+      await device.openURL({url: 'myapp://new'})
     }
   })
 
