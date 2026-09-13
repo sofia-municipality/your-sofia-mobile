@@ -99,6 +99,10 @@ describe('Register screen password validation', () => {
       // could hold up the wait for the full timeout even though replaceText
       // itself would have gone through fine.
       await element(by.id('registerPasswordInput')).replaceText(password)
+      // On iOS this leaves the keyboard up, covering the confirm-password
+      // field below.
+      await dismissKeyboardIfShown('registerPasswordInput')
+
       await element(by.id('registerConfirmPasswordInput')).replaceText(confirmPassword)
       // On iOS this leaves the keyboard up, which would otherwise cover the
       // submit button sitting in a footer outside the scroll area.
