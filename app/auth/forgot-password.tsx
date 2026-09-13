@@ -96,6 +96,7 @@ export default function ForgotPasswordScreen() {
                   importantForAutofill="yes"
                   editable={!isLoading}
                   accessibilityLabel={t('auth.email')}
+                  testID="forgotPasswordEmailInput"
                 />
               </View>
 
@@ -106,6 +107,7 @@ export default function ForgotPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={t('auth.forgotPassword')}
                 accessibilityState={{disabled: isLoading}}
+                testID="forgotPasswordSubmitButton"
               >
                 {isLoading ? (
                   <ActivityIndicator color={colors.surface} />
