@@ -140,7 +140,14 @@ export default function RegisterScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete="off"
-                textContentType="none"
+                // textContentType="none" doesn't reliably stop iOS's
+                // password-manager heuristics: with a confirm-password field
+                // right below, iOS still detects a "create password" form
+                // and pops its native "Use Strong Password?" suggestion
+                // sheet, which then visually covers that field. "oneTimeCode"
+                // is Apple's documented way to fully opt a field out of
+                // AutoFill/Strong-Password handling.
+                textContentType="oneTimeCode"
                 autoCorrect={false}
                 spellCheck={false}
                 importantForAutofill="no"
@@ -159,7 +166,7 @@ export default function RegisterScreen() {
                 onChangeText={setConfirmPassword}
                 secureTextEntry
                 autoComplete="off"
-                textContentType="none"
+                textContentType="oneTimeCode"
                 autoCorrect={false}
                 spellCheck={false}
                 importantForAutofill="no"
