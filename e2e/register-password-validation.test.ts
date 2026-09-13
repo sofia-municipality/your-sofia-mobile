@@ -2,13 +2,19 @@ import {expect, by, device, element, waitFor} from 'detox'
 
 // replaceText focuses the field and raises the keyboard on iOS, but sets the
 // value directly without focus (no keyboard) on Android — so the keyboard
-// covering the next field below is an iOS-only problem, and a bare
-// tapReturnKey() would fail on Android since there's no return key shown.
+// covering the next field below is an iOS-only problem. Skip on Android
+// entirely rather than relying on tapReturnKey() to safely no-op there: with
+// no field actually focused, its return-key press has no scoped IME target
+// and can escape to a global "Enter" action — reproduced once triggering the
+// submit button prematurely, well before confirmPassword was even filled.
 async function dismissKeyboardIfShown(testID: string) {
+  if (device.getPlatform() !== 'ios') {
+    return
+  }
   try {
     await element(by.id(testID)).tapReturnKey()
   } catch {
-    // no keyboard was raised (Android), nothing to dismiss
+    // no keyboard was raised, nothing to dismiss
   }
 }
 
