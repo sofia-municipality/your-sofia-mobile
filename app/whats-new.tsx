@@ -84,6 +84,7 @@ export default function WhatsNewScreen() {
             activeOpacity={0.85}
             accessibilityRole="button"
             accessibilityLabel={t('whatsNew.continue')}
+            testID="whatsNewContinueButton"
           >
             <Text style={styles.continueText}>{t('whatsNew.continue')}</Text>
           </TouchableOpacity>
