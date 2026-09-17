@@ -52,6 +52,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
+        with:
+          packages: 'cmdline-tools platform-tools'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
