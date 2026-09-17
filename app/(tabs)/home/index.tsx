@@ -148,6 +148,7 @@ export default function HomeScreen() {
               onPress={() => setIsMapView(!isMapView)}
               accessibilityRole="button"
               accessibilityLabel={isMapView ? t('common.seeList') : t('common.seeMap')}
+              testID="homeMapToggleButton"
             >
               <Text style={styles.viewToggleText}>
                 {isMapView ? t('common.seeList') : t('common.seeMap')}
@@ -156,7 +157,7 @@ export default function HomeScreen() {
           </View>
 
           {isMapView ? (
-            <>
+            <View testID="homeMapView">
               <NewsMap
                 news={news}
                 onMarkerPress={(item) => {
@@ -183,31 +184,37 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 </View>
               ) : null}
-            </>
-          ) : loading ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
-            </View>
-          ) : error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={refresh}
-                accessibilityRole="button"
-                accessibilityLabel={t('common.retry')}
-              >
-                <Text style={styles.retryButtonText}>{t('common.retry') || 'Retry'}</Text>
-              </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.newsContainer}>
-              {news.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>{t('common.noNews') || 'No news available'}</Text>
+            <View testID="homeListView">
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={styles.loadingText}>{t('common.loading') || 'Loading...'}</Text>
+                </View>
+              ) : error ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{error}</Text>
+                  <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={refresh}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('common.retry')}
+                  >
+                    <Text style={styles.retryButtonText}>{t('common.retry') || 'Retry'}</Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
-                news.map((item) => <NewsCard key={item.id} item={item} />)
+                <View style={styles.newsContainer}>
+                  {news.length === 0 ? (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>
+                        {t('common.noNews') || 'No news available'}
+                      </Text>
+                    </View>
+                  ) : (
+                    news.map((item) => <NewsCard key={item.id} item={item} />)
+                  )}
+                </View>
               )}
             </View>
           )}
