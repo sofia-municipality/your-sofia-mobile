@@ -178,6 +178,7 @@ export default function RegisterScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('auth.register')}
           accessibilityState={{disabled: isLoading}}
+          testID="registerSubmitButton"
         >
           {isLoading ? (
             <ActivityIndicator color={colors.surface} />

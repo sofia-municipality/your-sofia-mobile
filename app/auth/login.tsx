@@ -171,6 +171,7 @@ export default function LoginScreen() {
             disabled={isLoading}
             accessibilityRole="button"
             accessibilityLabel={t('auth.register')}
+            testID="loginRegisterLink"
           >
             <Text style={styles.registerLinkText}>
               {t('auth.dontHaveAccount')}{' '}
