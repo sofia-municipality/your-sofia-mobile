@@ -498,6 +498,8 @@ export default {
     fillAllFields: 'Моля, попълнете всички полета',
     passwordsDoNotMatch: 'Паролите не съвпадат',
     passwordTooShort: 'Паролата трябва да бъде поне 6 символа',
+    passwordNeedsLowercase: 'Паролата трябва да съдържа малка буква',
+    passwordNeedsUppercase: 'Паролата трябва да съдържа главна буква',
     loginFailed: 'Неуспешен вход',
     registerSuccess: 'Успешна регистрация',
     verifyEmailTitle: 'Потвърдете имейла си',
