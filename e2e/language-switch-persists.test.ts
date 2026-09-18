@@ -1,4 +1,4 @@
-import {expect, by, device, element, waitFor} from 'detox'
+import {by, device, element, waitFor} from 'detox'
 
 describe('Language switch persistence', () => {
   beforeAll(async () => {
@@ -22,13 +22,21 @@ describe('Language switch persistence', () => {
     await element(by.id('headerProfileButton')).tap()
 
     // Bulgarian is the default language, so this label should read in
-    // Bulgarian before the switch is touched.
+    // Bulgarian before the switch is touched. The menu item sits below the
+    // fold, so scroll the profile screen down to reach it.
     await waitFor(element(by.text('Настройки за известия')))
       .toBeVisible()
-      .withTimeout(10000)
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
 
+    // The language switch itself lives near the top of the same screen.
+    await element(by.id('profileScrollView')).scrollTo('top')
     await element(by.id('languageSwitchButton')).tap()
-    await expect(element(by.text('Notification Settings'))).toBeVisible()
+
+    await waitFor(element(by.text('Notification Settings')))
+      .toBeVisible()
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
 
     // A real relaunch (not just a JS reload), matching the issue's ask —
     // the language preference is read from AsyncStorage on native app boot
@@ -55,12 +63,17 @@ describe('Language switch persistence', () => {
 
     await waitFor(element(by.text('Notification Settings')))
       .toBeVisible()
-      .withTimeout(10000)
-    await expect(element(by.text('Notification Settings'))).toBeVisible()
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
 
     // Restore the default so later test files in the same run (sharing this
     // app install) aren't affected by this test's language change.
+    await element(by.id('profileScrollView')).scrollTo('top')
     await element(by.id('languageSwitchButton')).tap()
-    await expect(element(by.text('Настройки за известия'))).toBeVisible()
+
+    await waitFor(element(by.text('Настройки за известия')))
+      .toBeVisible()
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'down')
   })
 })
