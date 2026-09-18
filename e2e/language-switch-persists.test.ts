@@ -30,7 +30,13 @@ describe('Language switch persistence', () => {
       .scroll(200, 'down')
 
     // The language switch itself lives near the top of the same screen.
-    await element(by.id('profileScrollView')).scrollTo('top')
+    // scrollTo('top') has been observed to hang on iOS when there's nothing
+    // left to scroll, so scroll up incrementally instead — same pattern as
+    // the scroll-down waits above.
+    await waitFor(element(by.id('languageSwitchButton')))
+      .toBeVisible()
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'up')
     await element(by.id('languageSwitchButton')).tap()
 
     await waitFor(element(by.text('Notification Settings')))
@@ -68,7 +74,10 @@ describe('Language switch persistence', () => {
 
     // Restore the default so later test files in the same run (sharing this
     // app install) aren't affected by this test's language change.
-    await element(by.id('profileScrollView')).scrollTo('top')
+    await waitFor(element(by.id('languageSwitchButton')))
+      .toBeVisible()
+      .whileElement(by.id('profileScrollView'))
+      .scroll(200, 'up')
     await element(by.id('languageSwitchButton')).tap()
 
     await waitFor(element(by.text('Настройки за известия')))
