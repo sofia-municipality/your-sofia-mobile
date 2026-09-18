@@ -84,5 +84,7 @@ describe('Language switch persistence', () => {
       .toBeVisible()
       .whileElement(by.id('profileScrollView'))
       .scroll(200, 'down')
-  })
+    // A real app relaunch plus four separate scroll-and-wait steps adds up
+    // to more than Jest's default 120s test timeout on a loaded CI runner.
+  }, 240000)
 })
