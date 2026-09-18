@@ -1,37 +1,55 @@
 import {expect, by, device, element, waitFor} from 'detox'
 
+async function isVisible(testId: string): Promise<boolean> {
+  try {
+    await expect(element(by.id(testId))).toBeVisible()
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function tapToggleAndWaitFor(targetTestId: string, fallbackTestId: string) {
   await element(by.id('homeMapToggleButton')).tap()
 
   try {
     await waitFor(element(by.id(targetTestId)))
       .toBeVisible()
-      .withTimeout(8000)
+      .withTimeout(10000)
+    return
   } catch {
-    // The home screen keeps fetching news from the real API in the
-    // background, and on a busy CI runner the very first tap right after
-    // that content settles can occasionally be swallowed. Only retry if the
-    // toggle demonstrably didn't register (still showing the previous view)
-    // — otherwise the target view is just slow to reach full visibility and
-    // retapping would toggle it right back off.
-    await expect(element(by.id(fallbackTestId))).toBeVisible()
-    await element(by.id('homeMapToggleButton')).tap()
-    await waitFor(element(by.id(targetTestId)))
-      .toBeVisible()
-      .withTimeout(15000)
+    // fall through — diagnose below rather than fail immediately
   }
+
+  // The home screen keeps fetching news from the real API in the
+  // background, and on a busy CI runner the very first tap right after
+  // that content settles can occasionally be swallowed. Only retry the tap
+  // if it demonstrably didn't register (still showing the previous view) —
+  // if the previous view is already gone, the target view is just slow to
+  // reach full visibility (e.g. the native map still initializing) and
+  // retapping would toggle it right back off.
+  if (await isVisible(fallbackTestId)) {
+    await element(by.id('homeMapToggleButton')).tap()
+  }
+
+  await waitFor(element(by.id(targetTestId)))
+    .toBeVisible()
+    .withTimeout(20000)
 }
 
 describe('Home news list/map toggle', () => {
   beforeAll(async () => {
     await device.launchApp({permissions: {notifications: 'YES', location: 'always'}})
     // The home screen's news fetch hits the real production API, which can
-    // be slow or briefly unreachable from CI. Detox's default synchronization
-    // blocks all matcher/action calls until the app reports itself idle
-    // (no pending network activity), so a slow fetch there would otherwise
-    // stall this test's waits indefinitely rather than letting our own
-    // explicit withTimeout()s do their job.
-    await device.disableSynchronization()
+    // be slow from CI. Detox's default synchronization blocks matcher/action
+    // calls until the app reports itself idle (no pending network activity),
+    // which would otherwise stall this test's waits on that unrelated fetch
+    // instead of letting our own explicit withTimeout()s do their job.
+    // setURLBlacklist (rather than disableSynchronization) excludes just
+    // that endpoint from idle-tracking without disabling synchronization
+    // for taps/animations, which can deadlock if the app is already busy
+    // with that same pending request when synchronization is toggled.
+    await device.setURLBlacklist(['.*your\\.sofia\\.bg.*'])
   })
 
   beforeEach(async () => {
