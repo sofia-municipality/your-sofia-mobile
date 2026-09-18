@@ -1,42 +1,5 @@
 import {expect, by, device, element, waitFor} from 'detox'
 
-async function isVisible(testId: string): Promise<boolean> {
-  try {
-    await expect(element(by.id(testId))).toBeVisible()
-    return true
-  } catch {
-    return false
-  }
-}
-
-async function tapToggleAndWaitFor(targetTestId: string, fallbackTestId: string) {
-  await element(by.id('homeMapToggleButton')).tap()
-
-  try {
-    await waitFor(element(by.id(targetTestId)))
-      .toBeVisible()
-      .withTimeout(10000)
-    return
-  } catch {
-    // fall through — diagnose below rather than fail immediately
-  }
-
-  // The home screen keeps fetching news from the real API in the
-  // background, and on a busy CI runner the very first tap right after
-  // that content settles can occasionally be swallowed. Only retry the tap
-  // if it demonstrably didn't register (still showing the previous view) —
-  // if the previous view is already gone, the target view is just slow to
-  // reach full visibility (e.g. the native map still initializing) and
-  // retapping would toggle it right back off.
-  if (await isVisible(fallbackTestId)) {
-    await element(by.id('homeMapToggleButton')).tap()
-  }
-
-  await waitFor(element(by.id(targetTestId)))
-    .toBeVisible()
-    .withTimeout(20000)
-}
-
 describe('Home news list/map toggle', () => {
   beforeAll(async () => {
     await device.launchApp({permissions: {notifications: 'YES', location: 'always'}})
@@ -45,10 +8,6 @@ describe('Home news list/map toggle', () => {
     // calls until the app reports itself idle (no pending network activity),
     // which would otherwise stall this test's waits on that unrelated fetch
     // instead of letting our own explicit withTimeout()s do their job.
-    // setURLBlacklist (rather than disableSynchronization) excludes just
-    // that endpoint from idle-tracking without disabling synchronization
-    // for taps/animations, which can deadlock if the app is already busy
-    // with that same pending request when synchronization is toggled.
     await device.setURLBlacklist(['.*your\\.sofia\\.bg.*'])
   })
 
@@ -73,10 +32,23 @@ describe('Home news list/map toggle', () => {
       .toBeVisible()
       .withTimeout(15000)
 
-    await tapToggleAndWaitFor('homeMapView', 'homeListView')
+    // A single tap reliably flips the underlying isMapView state — verified
+    // on video from a prior failing run. What varies a lot under CI load is
+    // how long the native map view (Google Maps on Android) takes to
+    // actually finish laying out and satisfy Detox's visibility check, up to
+    // 20+ seconds in observed runs — so this only needs patience, not a
+    // retry. Retrying the tap risks toggling the state right back before the
+    // slow-to-render view ever gets a chance to be detected.
+    await element(by.id('homeMapToggleButton')).tap()
+    await waitFor(element(by.id('homeMapView')))
+      .toBeVisible()
+      .withTimeout(30000)
     await expect(element(by.id('homeMapView'))).toBeVisible()
 
-    await tapToggleAndWaitFor('homeListView', 'homeMapView')
+    await element(by.id('homeMapToggleButton')).tap()
+    await waitFor(element(by.id('homeListView')))
+      .toBeVisible()
+      .withTimeout(30000)
     await expect(element(by.id('homeListView'))).toBeVisible()
-  })
+  }, 150000)
 })
