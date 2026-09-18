@@ -140,6 +140,7 @@ export default function LoginScreen() {
             disabled={isLoading}
             accessibilityRole="button"
             accessibilityLabel={t('auth.forgotPassword')}
+            testID="loginForgotPasswordLink"
           >
             <Text style={styles.forgotPasswordText}>{t('auth.forgotPassword')}</Text>
           </TouchableOpacity>
