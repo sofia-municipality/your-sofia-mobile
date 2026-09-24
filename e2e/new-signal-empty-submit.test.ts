@@ -64,10 +64,15 @@ async function loginAsMockAdmin() {
 
   await element(by.id('loginSubmitButton')).tap()
 
-  // Login navigates back to the profile screen on success.
+  // Login navigates back to the profile screen on success, and the New tab
+  // only appears once the auth state update reaches the tab bar. CI device
+  // logs show sustained GC churn for several seconds right after this —
+  // the New tab mounts a screen with a live camera preview, and camera
+  // initialization on emulator hardware is slow — so this needs real
+  // patience, not just a short poll.
   await waitFor(element(by.id('newTabButton')))
     .toBeVisible()
-    .withTimeout(10000)
+    .withTimeout(30000)
 }
 
 async function openNewSignalForm() {
