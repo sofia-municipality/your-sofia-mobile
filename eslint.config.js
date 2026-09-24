@@ -10,7 +10,7 @@ module.exports = defineConfig([
     ignores: ['dist/*', '/.expo', 'node_modules'],
   },
   {
-    files: ['e2e/apply-mock-overrides.js'],
+    files: ['e2e/apply-mock-overrides.js', 'e2e/mock-server-overrides/expressServer.js'],
     languageOptions: {
       globals: {
         __dirname: 'readonly',
