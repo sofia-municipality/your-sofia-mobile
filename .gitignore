@@ -45,7 +45,11 @@ ios/build/
 /.idea/
 /.vscode/
 
-# openapi-generator output — regenerated from api.yaml, see package.json
+# openapi-generator output — regenerated from api.yaml via `pnpm generate:mock`
+# / `pnpm generate:api` (see package.json). The E2E fixture logic that would
+# otherwise be lost on regeneration lives in e2e/mock-server-overrides/
+# (committed) and is reapplied automatically as part of generate:mock — see
+# e2e/apply-mock-overrides.js.
 src/api/
 mock-server/
 
