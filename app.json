@@ -3,11 +3,11 @@
     "name": "YourSofia",
     "slug": "your-sofia",
     "version": "0.6.3",
-    "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "orientation": "portrait",
       "supportsTablet": true,
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "bg.sofia.yoursofia",
