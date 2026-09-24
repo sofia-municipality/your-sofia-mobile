@@ -37,11 +37,52 @@ async function dismissKeyboardIfShown(testID: string) {
   }
 }
 
+// iOS occasionally reports a freshly-visible element as "not hittable at
+// its visible point" — the hit-test resolves to a transition/overlay view
+// instead, meaning a screen/tab-switch animation was still settling when
+// the tap landed. Retrying after a short pause is the standard workaround;
+// by the time the retry's own visibility wait re-confirms the element,
+// the transition has had time to finish.
+async function tapWhenHittable(testID: string, attempts = 3) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await element(by.id(testID)).tap()
+      return
+    } catch (error) {
+      if (i === attempts - 1) throw error
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      await waitFor(element(by.id(testID)))
+        .toBeVisible()
+        .withTimeout(5000)
+    }
+  }
+}
+
+async function isAlreadyLoggedIn(): Promise<boolean> {
+  // reloadReactNative() (in beforeEach) resets JS state but not the
+  // underlying AsyncStorage-persisted auth token, so a real login in an
+  // earlier test in this file leaves every later test already
+  // authenticated on mount — the login screen never appears, and
+  // profileLoginButton doesn't exist to scroll to/tap.
+  try {
+    await waitFor(element(by.id('newTabButton')))
+      .toExist()
+      .withTimeout(2000)
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function loginAsMockAdmin() {
+  if (await isAlreadyLoggedIn()) {
+    return
+  }
+
   await waitFor(element(by.id('headerProfileButton')))
     .toBeVisible()
     .withTimeout(10000)
-  await element(by.id('headerProfileButton')).tap()
+  await tapWhenHittable('headerProfileButton')
 
   await waitFor(element(by.id('profileLoginButton')))
     .toBeVisible()
@@ -76,12 +117,12 @@ async function loginAsMockAdmin() {
 }
 
 async function openNewSignalForm() {
-  await element(by.id('newTabButton')).tap()
+  await tapWhenHittable('newTabButton')
 
   await waitFor(element(by.id('newSignalButton')))
     .toBeVisible()
     .withTimeout(10000)
-  await element(by.id('newSignalButton')).tap()
+  await tapWhenHittable('newSignalButton')
 
   // The submit button sits at the bottom of a single scrollable form well
   // below the fold (camera preview alone is 40% of screen height) — confirm
