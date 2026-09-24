@@ -136,6 +136,7 @@ export default function SignalsScreen() {
         accessibilityRole="button"
         accessibilityLabel={`${item.title}, ${t(`signals.status.${item.status}`)}${hasUpdate ? ', актуализиран' : ''}`}
         accessibilityHint="Отваря детайли на сигнала"
+        testID={`signalListItem-${item.id}`}
       >
         {hasUpdate && <View style={styles.updateDot} />}
         <View style={styles.signalHeader}>
@@ -208,6 +209,7 @@ export default function SignalsScreen() {
               accessibilityRole="button"
               accessibilityLabel={t('signals.allSignals')}
               accessibilityState={{selected: filter === 'all'}}
+              testID="signalsFilterAllChip"
             >
               <Text
                 style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}
@@ -221,6 +223,7 @@ export default function SignalsScreen() {
               accessibilityRole="button"
               accessibilityLabel={t('signals.mySignals')}
               accessibilityState={{selected: filter === 'mine'}}
+              testID="signalsFilterMineChip"
             >
               <Text
                 style={[styles.filterChipText, filter === 'mine' && styles.filterChipTextActive]}
