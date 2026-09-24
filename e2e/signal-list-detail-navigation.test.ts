@@ -39,19 +39,25 @@ describe('Signal list -> detail -> back', () => {
       .withTimeout(10000)
     await element(by.id('signalListItem-1')).tap()
 
+    // toExist() rather than toBeVisible(): the detail screen is a scrollable
+    // form (title, status badges, lifecycle banner, container state, ...
+    // above the description), and on a smaller emulator viewport this text
+    // can fail the default 75%-of-own-area visibility check even though it
+    // genuinely rendered — confirmed via the CI screenshot, same class of
+    // issue as the home list/map toggle test.
     await waitFor(element(by.text('E2E Fixture Signal')))
-      .toBeVisible()
+      .toExist()
       .withTimeout(10000)
-    await expect(element(by.text('E2E Fixture Signal'))).toBeVisible()
+    await expect(element(by.text('E2E Fixture Signal'))).toExist()
     await expect(
       element(by.text('Seeded fixture signal for Detox E2E tests — do not delete.'))
-    ).toBeVisible()
+    ).toExist()
 
     await element(by.id('signalDetailBackButton')).tap()
 
     await waitFor(element(by.id('signalListItem-1')))
-      .toBeVisible()
+      .toExist()
       .withTimeout(10000)
-    await expect(element(by.id('signalListItem-1'))).toBeVisible()
+    await expect(element(by.id('signalListItem-1'))).toExist()
   })
 })
