@@ -9,4 +9,15 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*', '/.expo', 'node_modules'],
   },
+  {
+    files: ['e2e/apply-mock-overrides.js'],
+    languageOptions: {
+      globals: {
+        __dirname: 'readonly',
+        require: 'readonly',
+        module: 'writable',
+        process: 'readonly',
+      },
+    },
+  },
 ])
