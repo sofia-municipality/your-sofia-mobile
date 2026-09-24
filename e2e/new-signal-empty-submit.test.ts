@@ -43,17 +43,17 @@ async function dismissKeyboardIfShown(testID: string) {
 // the tap landed. Retrying after a short pause is the standard workaround;
 // by the time the retry's own visibility wait re-confirms the element,
 // the transition has had time to finish.
-async function tapWhenHittable(testID: string, attempts = 3) {
+async function tapWhenHittable(testID: string, attempts = 6) {
   for (let i = 0; i < attempts; i++) {
     try {
       await element(by.id(testID)).tap()
       return
     } catch (error) {
       if (i === attempts - 1) throw error
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 1500))
       await waitFor(element(by.id(testID)))
         .toBeVisible()
-        .withTimeout(5000)
+        .withTimeout(8000)
     }
   }
 }
@@ -105,15 +105,16 @@ async function loginAsMockAdmin() {
 
   await element(by.id('loginSubmitButton')).tap()
 
-  // Login navigates back to the profile screen on success, and the New tab
-  // only appears once the auth state update reaches the tab bar. CI device
-  // logs show sustained GC churn for several seconds right after this —
-  // the New tab mounts a screen with a live camera preview, and camera
-  // initialization on emulator hardware is slow — so this needs real
-  // patience, not just a short poll.
+  // Login navigates back to the profile screen on success. Our test user is
+  // admin, which unlocks three tabs at once (New, Missions, Assignments) —
+  // each mounts a real screen (the New tab's has a live camera preview) and
+  // fires its own data fetches the moment the tab bar updates, so this can
+  // be a genuinely heavy burst of work under CI load (observed: the app
+  // reporting itself "busy" for 40+ seconds on a loaded iOS runner). Needs
+  // real patience, not just a short poll.
   await waitFor(element(by.id('newTabButton')))
     .toBeVisible()
-    .withTimeout(30000)
+    .withTimeout(60000)
 }
 
 async function openNewSignalForm() {
@@ -130,7 +131,7 @@ async function openNewSignalForm() {
   // require it to already be scrolled into view.
   await waitFor(element(by.id('newSignalSubmitButton')))
     .toExist()
-    .withTimeout(15000)
+    .withTimeout(25000)
 
   // Wait for the nearby-objects lookup to settle so the submit button's
   // location-based disabled state has already resolved before we interact
@@ -148,6 +149,28 @@ async function scrollToAndTapSubmit() {
   await element(by.id('newSignalSubmitButton')).tap()
 }
 
+// A submit tap right after scrolling can silently miss on Android — the
+// visibility check and the tap's coordinates are resolved a beat apart, and
+// if the layout is still settling (no exception, unlike iOS's "not
+// hittable") the tap can land just off-target. Retry once if the expected
+// result text hasn't shown up quickly: re-tapping submit while still on the
+// form is harmless (validation just re-runs; a genuine double-submit isn't
+// possible since the form doesn't clear until this alert is dismissed).
+async function submitAndWaitForResultText(expectedText: string) {
+  await scrollToAndTapSubmit()
+
+  try {
+    await waitFor(element(by.text(expectedText)))
+      .toBeVisible()
+      .withTimeout(8000)
+  } catch {
+    await scrollToAndTapSubmit()
+    await waitFor(element(by.text(expectedText)))
+      .toBeVisible()
+      .withTimeout(15000)
+  }
+}
+
 describe('New signal empty submit validation', () => {
   beforeAll(async () => {
     await device.launchApp({permissions: {notifications: 'YES', location: 'always'}})
@@ -159,21 +182,20 @@ describe('New signal empty submit validation', () => {
     await device.setLocation(SOFIA_LATITUDE, SOFIA_LONGITUDE)
     await dismissWhatsNewIfPresent()
     await loginAsMockAdmin()
-  })
+  }, 150000)
 
+  // Generous per-test timeouts: openNewSignalForm() alone can retry two
+  // separate tapWhenHittable() calls to their full budget under CI load.
   it('shows a validation alert when submitting with no container state selected', async () => {
     await openNewSignalForm()
-    await scrollToAndTapSubmit()
+    await submitAndWaitForResultText('Грешка')
 
-    await waitFor(element(by.text('Грешка')))
-      .toBeVisible()
-      .withTimeout(10000)
     await expect(element(by.text('Грешка'))).toBeVisible()
     await element(by.text('OK')).tap()
 
     // Still on the form — nothing was submitted.
     await expect(element(by.id('newSignalSubmitButton'))).toExist()
-  })
+  }, 200000)
 
   it('submits successfully once a container state is selected', async () => {
     await openNewSignalForm()
@@ -193,11 +215,7 @@ describe('New signal empty submit validation', () => {
     // submit button below.
     await dismissKeyboardIfShown('newSignalDescriptionInput')
 
-    await scrollToAndTapSubmit()
-
-    await waitFor(element(by.text('Сигналът е изпратен успешно!')))
-      .toBeVisible()
-      .withTimeout(10000)
+    await submitAndWaitForResultText('Сигналът е изпратен успешно!')
     await element(by.text('OK')).tap()
-  })
+  }, 200000)
 })
