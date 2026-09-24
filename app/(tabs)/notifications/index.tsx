@@ -159,7 +159,7 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} testID="notificationsScrollView">
         {/* Enable notifications toggle */}
         <View style={styles.enableToggleSection}>
           <Text style={styles.enableToggleLabel}>{t('notifications.enableNotifications')}</Text>
@@ -168,6 +168,7 @@ export default function NotificationsScreen() {
             onValueChange={setNotificationsEnabled}
             trackColor={{false: colors.border, true: '#93C5FD'}}
             thumbColor={notificationsEnabled ? colors.primary : colors.textMuted}
+            testID="notificationsEnableSwitch"
           />
         </View>
 
@@ -252,6 +253,7 @@ export default function NotificationsScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={t('notifications.removeFilter')}
                   accessibilityState={{disabled: !notificationsEnabled}}
+                  testID={`notificationRemoveFilterButton-${index}`}
                 >
                   <Trash2 size={16} color={colors.error} />
                 </TouchableOpacity>
@@ -266,6 +268,7 @@ export default function NotificationsScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('notifications.addLocation')}
             accessibilityState={{disabled: !notificationsEnabled}}
+            testID="notificationsAddLocationButton"
           >
             <Plus size={18} color={colors.primary} />
             <Text style={styles.addFilterText}>{t('notifications.addLocation')}</Text>
@@ -283,6 +286,7 @@ export default function NotificationsScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('notifications.save')}
           accessibilityState={{disabled: isSaving || !pushTokenString}}
+          testID="notificationsSaveButton"
         >
           {isSaving ? (
             <ActivityIndicator color={colors.surface} size="small" />

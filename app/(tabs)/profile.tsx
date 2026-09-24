@@ -428,6 +428,7 @@ export default function ProfileScreen() {
                     onPress={onPress}
                     accessibilityRole="button"
                     accessibilityLabel={item.title}
+                    testID={item.id === 12 ? 'profileNotificationSettingsItem' : undefined}
                   >
                     <View style={styles.menuItemContent}>
                       <View style={styles.menuItemIcon}>

@@ -465,6 +465,7 @@ export default function NewSignal() {
         keyboardShouldPersistTaps="handled"
         enableOnAndroid={false}
         extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
+        testID="newSignalScrollView"
       >
         {/* Camera Section */}
         <View style={styles.cameraContainer}>
@@ -580,7 +581,7 @@ export default function NewSignal() {
 
           {/* Nearby Objects List */}
           {loadingNearbyObjects ? (
-            <View style={styles.loadingContainer}>
+            <View style={styles.loadingContainer} testID="newSignalNearbyLoading">
               <ActivityIndicator size="small" color={colors.primary} />
               <Text style={styles.loadingText}>{t('newSignal.loadingNearbyObjects')}</Text>
             </View>
@@ -664,6 +665,7 @@ export default function NewSignal() {
                   ]}
                   onPress={() => toggleState(state)}
                   disabled={loading}
+                  testID={`newSignalStateTag-${state}`}
                 >
                   <Text style={[styles.stateTagText, isActive && styles.stateTagTextActive]}>
                     {t(`signals.containerStates.${state}`)}
@@ -686,6 +688,7 @@ export default function NewSignal() {
             multiline
             numberOfLines={4}
             textAlignVertical="top"
+            testID="newSignalDescriptionInput"
           />
         </View>
 
@@ -719,6 +722,7 @@ export default function NewSignal() {
             style={styles.secondaryButton}
             onPress={handleCancel}
             disabled={loading}
+            testID="newSignalCancelButton"
           >
             <Text style={styles.secondaryButtonText}>{t('newSignal.cancel')}</Text>
           </TouchableOpacity>
@@ -726,6 +730,7 @@ export default function NewSignal() {
             style={[styles.primaryButton, (loading || !currentLocation) && styles.buttonDisabled]}
             onPress={handleSubmit}
             disabled={loading || !currentLocation}
+            testID="newSignalSubmitButton"
           >
             <Text style={styles.primaryButtonText}>
               {loading ? t('newSignal.submitting') : t('newSignal.submit')}
