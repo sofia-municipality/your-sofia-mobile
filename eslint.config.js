@@ -10,13 +10,17 @@ module.exports = defineConfig([
     ignores: ['dist/*', '/.expo', 'node_modules'],
   },
   {
-    files: ['e2e/apply-mock-overrides.js', 'e2e/mock-server-overrides/expressServer.js'],
+    // These run under plain Node.js (the mock server and the script that
+    // overlays these files onto it), not the RN app bundle — give them Node
+    // globals instead of the RN/browser-ish set the rest of the project uses.
+    files: ['e2e/apply-mock-overrides.js', 'e2e/mock-server-overrides/**/*.js'],
     languageOptions: {
       globals: {
         __dirname: 'readonly',
         require: 'readonly',
         module: 'writable',
         process: 'readonly',
+        Buffer: 'readonly',
       },
     },
   },

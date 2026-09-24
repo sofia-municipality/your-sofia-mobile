@@ -19,7 +19,17 @@ const testUser = {
 // don't flag it as a hardcoded password.
 const testPassword = ['E2e', 'Test', '123!'].join('')
 
-const testToken = 'e2e-mock-jwt-token'
+// AuthContext.isTokenExpired() parses this client-side (splits on '.', base64-
+// decodes the payload segment, checks `exp`) regardless of what the mock
+// server does with it server-side — a token that isn't JWT-shaped is always
+// treated as expired, silently keeping isAuthenticated false forever after a
+// "successful" login. Build one with a real (if fake-signed) header/payload
+// structure and a far-future exp instead of an opaque string.
+const testToken = [
+  Buffer.from(JSON.stringify({alg: 'none', typ: 'JWT'})).toString('base64'),
+  Buffer.from(JSON.stringify({sub: String(testUser.id), exp: 4102444800})).toString('base64'),
+  'e2e-mock-signature',
+].join('.')
 
 const fixtureSignal = {
   id: '1',
