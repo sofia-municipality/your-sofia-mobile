@@ -19,6 +19,24 @@ async function dismissWhatsNewIfPresent() {
   }
 }
 
+// replaceText focuses the field and raises the keyboard on iOS, but sets the
+// value directly without focus (no keyboard) on Android — so the keyboard
+// covering the next field/button below is an iOS-only problem. Skip on
+// Android entirely rather than relying on tapReturnKey() to safely no-op
+// there: with no field actually focused, its return-key press has no scoped
+// IME target and can escape to a global "Enter" action (see the same
+// pattern in e2e/register-password-validation.test.ts).
+async function dismissKeyboardIfShown(testID: string) {
+  if (device.getPlatform() !== 'ios') {
+    return
+  }
+  try {
+    await element(by.id(testID)).tapReturnKey()
+  } catch {
+    // no keyboard was raised, nothing to dismiss
+  }
+}
+
 async function loginAsMockAdmin() {
   await waitFor(element(by.id('headerProfileButton')))
     .toBeVisible()
@@ -34,8 +52,16 @@ async function loginAsMockAdmin() {
   await waitFor(element(by.id('loginEmailInput')))
     .toBeVisible()
     .withTimeout(10000)
-  await element(by.id('loginEmailInput')).typeText(MOCK_USER_EMAIL)
-  await element(by.id('loginPasswordInput')).typeText(MOCK_USER_PASSWORD)
+  // replaceText instead of typeText: back-to-back typeText() calls on
+  // Android can race with focus shifting between fields (observed: both
+  // strings landing in the email field, corrupting it) — see the same
+  // pattern in e2e/register-password-validation.test.ts.
+  await element(by.id('loginEmailInput')).replaceText(MOCK_USER_EMAIL)
+  await dismissKeyboardIfShown('loginEmailInput')
+
+  await element(by.id('loginPasswordInput')).replaceText(MOCK_USER_PASSWORD)
+  await dismissKeyboardIfShown('loginPasswordInput')
+
   await element(by.id('loginSubmitButton')).tap()
 
   // Login navigates back to the profile screen on success.
@@ -116,7 +142,10 @@ describe('New signal empty submit validation', () => {
       .toBeVisible()
       .whileElement(by.id('newSignalScrollView'))
       .scroll(200, 'down')
-    await element(by.id('newSignalDescriptionInput')).typeText('Препълнен контейнер до входа')
+    await element(by.id('newSignalDescriptionInput')).replaceText('Препълнен контейнер до входа')
+    // On iOS this leaves the keyboard up, which would otherwise cover the
+    // submit button below.
+    await dismissKeyboardIfShown('newSignalDescriptionInput')
 
     await scrollToAndTapSubmit()
 
