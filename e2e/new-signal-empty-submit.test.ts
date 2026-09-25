@@ -37,6 +37,28 @@ async function dismissKeyboardIfShown(testID: string) {
   }
 }
 
+// iOS's own iCloud Keychain "Save Password?" system dialog can appear right
+// after a login form submits — it's a native alert outside the app, not
+// tracked by Detox's synchronization at all, and it covers the full screen
+// including the tab bar underneath. This turned out to be the actual cause
+// of the intermittent "not hittable" newTabButton failures seen in CI: the
+// dialog (not a settling screen transition) was what was blocking the tap.
+// It doesn't show up every run — iOS only offers to save credentials it
+// doesn't already have stored — so this is a no-op most of the time.
+async function dismissSavePasswordPromptIfPresent(timeoutMs = 5000) {
+  if (device.getPlatform() !== 'ios') {
+    return
+  }
+  try {
+    await waitFor(element(by.label('Not Now')))
+      .toBeVisible()
+      .withTimeout(timeoutMs)
+    await element(by.label('Not Now')).tap()
+  } catch {
+    // dialog didn't appear, nothing to dismiss
+  }
+}
+
 // iOS occasionally reports a freshly-visible element as "not hittable at
 // its visible point" — the hit-test resolves to a transition/overlay view
 // instead, meaning a screen/tab-switch animation was still settling when
@@ -55,6 +77,13 @@ async function tapWhenHittable(testID: string, attempts = 10) {
       return
     } catch (error) {
       if (i === attempts - 1) throw error
+      // The iOS "Save Password?" system dialog (see
+      // dismissSavePasswordPromptIfPresent) can appear with unpredictable
+      // delay after login and was, in practice, the actual cause of most
+      // "not hittable" failures here — not a settling animation. Check for
+      // it on every retry (short timeout: the main catch is right after
+      // login; this just covers a late-appearing dialog).
+      await dismissSavePasswordPromptIfPresent(1000)
       await new Promise((resolve) => setTimeout(resolve, 2000))
       await waitFor(element(by.id(testID)))
         .toBeVisible()
@@ -109,6 +138,7 @@ async function loginAsMockAdmin() {
   await dismissKeyboardIfShown('loginPasswordInput')
 
   await element(by.id('loginSubmitButton')).tap()
+  await dismissSavePasswordPromptIfPresent()
 
   // Login navigates back to the profile screen on success. Our test user is
   // admin, which unlocks three tabs at once (New, Missions, Assignments) —
@@ -140,8 +170,15 @@ async function openNewSignalForm() {
   // "settled" (observed in CI: stuck for 4+ minutes past the test's own
   // timeout). Turn synchronization off before that tap fires; every
   // remaining wait in this file already polls explicitly via
-  // waitFor(...).withTimeout(...), which works fine without it.
-  await device.disableSynchronization()
+  // waitFor(...).withTimeout(...), which works fine without it. Android
+  // never showed this hang (its idling-resource tracking isn't tripped by
+  // the camera preview the same way), and disabling sync there caused a
+  // regression: a native Alert's "OK" tap could return before the dialog
+  // finished dismissing, leaving it covering the next test's screen. So
+  // this is iOS-only.
+  if (device.getPlatform() === 'ios') {
+    await device.disableSynchronization()
+  }
   await tapWhenHittable('newSignalButton')
 
   // The submit button sits at the bottom of a single scrollable form well
@@ -219,9 +256,11 @@ describe('New signal empty submit validation', () => {
 
   beforeEach(async () => {
     // Restore default synchronization in case the previous test left it off
-    // (see the comment in openNewSignalForm) — reloadReactNative() doesn't
-    // reset this on its own.
-    await device.enableSynchronization()
+    // (see the comment in openNewSignalForm, iOS-only) — reloadReactNative()
+    // doesn't reset this on its own.
+    if (device.getPlatform() === 'ios') {
+      await device.enableSynchronization()
+    }
     await device.reloadReactNative()
     await device.setLocation(SOFIA_LATITUDE, SOFIA_LONGITUDE)
     await dismissWhatsNewIfPresent()
@@ -265,7 +304,9 @@ describe('New signal empty submit validation', () => {
 
   afterAll(async () => {
     // Leave synchronization in its default state for whichever spec file
-    // runs next in this worker.
-    await device.enableSynchronization()
+    // runs next in this worker (iOS-only — see openNewSignalForm).
+    if (device.getPlatform() === 'ios') {
+      await device.enableSynchronization()
+    }
   })
 })
