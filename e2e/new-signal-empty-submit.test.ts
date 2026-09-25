@@ -125,9 +125,12 @@ async function loginAsMockAdmin() {
 async function openNewSignalForm() {
   await tapWhenHittable('newTabButton')
 
+  // Same post-login burst as above (three admin tabs mounting and fetching
+  // at once) can also delay the New tab's own landing screen from finishing
+  // its first render — CI showed this timing out at the previous 10s.
   await waitFor(element(by.id('newSignalButton')))
     .toBeVisible()
-    .withTimeout(10000)
+    .withTimeout(30000)
 
   // The New Signal screen mounts a live camera preview the instant it
   // renders, and on iOS that preview continuously emits native frame/render
