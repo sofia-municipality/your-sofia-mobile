@@ -123,6 +123,17 @@ async function openNewSignalForm() {
   await waitFor(element(by.id('newSignalButton')))
     .toBeVisible()
     .withTimeout(10000)
+
+  // The New Signal screen mounts a live camera preview the instant it
+  // renders, and on iOS that preview continuously emits native frame/render
+  // events. Detox's default synchronization waits for the app to go fully
+  // idle after every action, which it now never does — so the very tap that
+  // navigates onto this screen hangs forever waiting to be considered
+  // "settled" (observed in CI: stuck for 4+ minutes past the test's own
+  // timeout). Turn synchronization off before that tap fires; every
+  // remaining wait in this file already polls explicitly via
+  // waitFor(...).withTimeout(...), which works fine without it.
+  await device.disableSynchronization()
   await tapWhenHittable('newSignalButton')
 
   // The submit button sits at the bottom of a single scrollable form well
@@ -186,6 +197,10 @@ describe('New signal empty submit validation', () => {
   })
 
   beforeEach(async () => {
+    // Restore default synchronization in case the previous test left it off
+    // (see the comment in openNewSignalForm) — reloadReactNative() doesn't
+    // reset this on its own.
+    await device.enableSynchronization()
     await device.reloadReactNative()
     await device.setLocation(SOFIA_LATITUDE, SOFIA_LONGITUDE)
     await dismissWhatsNewIfPresent()
@@ -226,4 +241,10 @@ describe('New signal empty submit validation', () => {
     await submitAndWaitForResultText('Сигналът е изпратен успешно!')
     await element(by.text('OK')).tap()
   }, 200000)
+
+  afterAll(async () => {
+    // Leave synchronization in its default state for whichever spec file
+    // runs next in this worker.
+    await device.enableSynchronization()
+  })
 })
