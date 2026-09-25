@@ -43,17 +43,22 @@ async function dismissKeyboardIfShown(testID: string) {
 // the tap landed. Retrying after a short pause is the standard workaround;
 // by the time the retry's own visibility wait re-confirms the element,
 // the transition has had time to finish.
-async function tapWhenHittable(testID: string, attempts = 6) {
+// Budget widened after CI showed the post-login tab-switch transition can
+// still be settling a full 80+ seconds in — admin login mounts three tabs
+// at once (New, Missions, Assignments), each firing its own data fetches
+// simultaneously, and on a loaded iOS runner that JS-thread burst delays
+// the native transition well past the previous ~57s retry budget.
+async function tapWhenHittable(testID: string, attempts = 10) {
   for (let i = 0; i < attempts; i++) {
     try {
       await element(by.id(testID)).tap()
       return
     } catch (error) {
       if (i === attempts - 1) throw error
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
       await waitFor(element(by.id(testID)))
         .toBeVisible()
-        .withTimeout(8000)
+        .withTimeout(10000)
     }
   }
 }
