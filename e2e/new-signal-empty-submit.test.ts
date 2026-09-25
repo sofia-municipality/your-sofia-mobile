@@ -160,12 +160,25 @@ async function openNewSignalForm() {
     .withTimeout(15000)
 }
 
-async function scrollToAndTapSubmit() {
-  await waitFor(element(by.id('newSignalSubmitButton')))
-    .toBeVisible()
-    .whileElement(by.id('newSignalScrollView'))
-    .scroll(300, 'down')
-  await element(by.id('newSignalSubmitButton')).tap()
+// With synchronization disabled for the camera screen (see openNewSignalForm),
+// Detox no longer waits for in-flight native animations before acting, so a
+// scroll gesture can land on a still-animating transition overlay instead of
+// the scroll view itself ("View is not scrollable at the given start point").
+// Same class of issue as tapWhenHittable above — retry after a short pause.
+async function scrollToAndTapSubmit(attempts = 5) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await waitFor(element(by.id('newSignalSubmitButton')))
+        .toBeVisible()
+        .whileElement(by.id('newSignalScrollView'))
+        .scroll(300, 'down')
+      await element(by.id('newSignalSubmitButton')).tap()
+      return
+    } catch (error) {
+      if (i === attempts - 1) throw error
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+    }
+  }
 }
 
 // A submit tap right after scrolling can silently miss on Android — the
