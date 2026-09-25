@@ -173,7 +173,15 @@ async function submitAndWaitForResultText(expectedText: string) {
 
 describe('New signal empty submit validation', () => {
   beforeAll(async () => {
-    await device.launchApp({permissions: {notifications: 'YES', location: 'always'}})
+    // This is the only e2e spec that reaches the New Signal form, which
+    // renders nothing (including newSignalSubmitButton) until expo-camera's
+    // permission state resolves to granted. Without pre-granting `camera`
+    // here, iOS leaves the app on the "camera access required" screen
+    // indefinitely — Android masks the same gap because its instrumented
+    // test builds auto-grant runtime permissions declared in the manifest.
+    await device.launchApp({
+      permissions: {notifications: 'YES', location: 'always', camera: 'YES'},
+    })
     await device.setLocation(SOFIA_LATITUDE, SOFIA_LONGITUDE)
   })
 
