@@ -225,13 +225,20 @@ describe('New signal empty submit validation', () => {
   })
 
   beforeEach(async () => {
-    // Restore default synchronization in case the previous test left it off
-    // (see the comment in openNewSignalForm, iOS-only) — reloadReactNative()
-    // doesn't reset this on its own.
+    // Reload FIRST, then re-enable synchronization — not the other way
+    // around. The previous test can leave the New Signal screen (and its
+    // live camera preview) mounted with synchronization disabled (see
+    // openNewSignalForm); re-enabling sync while that view is still up
+    // hangs forever; CI showed it stuck for the full hook timeout on
+    // `setSyncSettings: {"enabled":true}`, because the camera's continuous
+    // animation updates mean the app never reaches the idle checkpoint that
+    // enabling sync waits for. reloadReactNative() tears the old screen
+    // (and camera) down first, regardless of the current sync state, so by
+    // the time we re-enable it there's nothing left keeping the app busy.
+    await device.reloadReactNative()
     if (device.getPlatform() === 'ios') {
       await device.enableSynchronization()
     }
-    await device.reloadReactNative()
     await device.setLocation(SOFIA_LATITUDE, SOFIA_LONGITUDE)
     await dismissWhatsNewIfPresent()
     await loginAsMockAdmin()
