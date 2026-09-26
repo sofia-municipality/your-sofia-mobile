@@ -16,6 +16,7 @@ import {useAuth, AuthApiError} from '../../contexts/AuthContext'
 import {useTranslation} from 'react-i18next'
 import {LogIn, MailWarning} from 'lucide-react-native'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
+import {isE2EMockMode} from '@/lib/e2eMock'
 
 export default function LoginScreen() {
   const {t} = useTranslation()
@@ -95,11 +96,17 @@ export default function LoginScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              autoComplete="username"
-              textContentType="username"
-              importantForAutofill="yes"
+              // In E2E mock mode, iOS's "Save Password?" system dialog (triggered
+              // by a recognized username/password field pair) has no stable way
+              // to be dismissed from a Detox test — Detox's system-level element
+              // API is experimental and crashed the XCUITest runner in CI when
+              // used to try. Simplest fix: don't give iOS a reason to offer it.
+              autoComplete={isE2EMockMode ? 'off' : 'username'}
+              textContentType={isE2EMockMode ? 'none' : 'username'}
+              importantForAutofill={isE2EMockMode ? 'no' : 'yes'}
               editable={!isLoading}
               accessibilityLabel={t('auth.email')}
+              testID="loginEmailInput"
             />
           </View>
 
@@ -110,12 +117,22 @@ export default function LoginScreen() {
               placeholder={t('auth.passwordPlaceholder')}
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              textContentType="password"
-              importantForAutofill="yes"
+              // iOS's "Save Password?" prompt turned out to still trigger with
+              // textContentType="none" alone — its heuristic for detecting a
+              // password field leans heavily on isSecureTextEntry itself, not
+              // just the content-type hint (confirmed via a CI screenshot
+              // showing the dialog still appearing on the Save button, on a
+              // build with the textContentType override already in place). A
+              // plain, unmasked field in E2E mock mode sidesteps the heuristic
+              // entirely — the value hides nothing sensitive there anyway (see
+              // the login credential comment in the e2e test).
+              secureTextEntry={!isE2EMockMode}
+              autoComplete={isE2EMockMode ? 'off' : 'password'}
+              textContentType={isE2EMockMode ? 'none' : 'password'}
+              importantForAutofill={isE2EMockMode ? 'no' : 'yes'}
               editable={!isLoading}
               accessibilityLabel={t('auth.password')}
+              testID="loginPasswordInput"
             />
           </View>
 
@@ -126,6 +143,7 @@ export default function LoginScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('auth.login')}
             accessibilityState={{disabled: isLoading}}
+            testID="loginSubmitButton"
           >
             {isLoading ? (
               <ActivityIndicator color={colors.surface} />
