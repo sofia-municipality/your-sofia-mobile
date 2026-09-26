@@ -117,7 +117,16 @@ export default function LoginScreen() {
               placeholder={t('auth.passwordPlaceholder')}
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              // iOS's "Save Password?" prompt turned out to still trigger with
+              // textContentType="none" alone — its heuristic for detecting a
+              // password field leans heavily on isSecureTextEntry itself, not
+              // just the content-type hint (confirmed via a CI screenshot
+              // showing the dialog still appearing on the Save button, on a
+              // build with the textContentType override already in place). A
+              // plain, unmasked field in E2E mock mode sidesteps the heuristic
+              // entirely — the value hides nothing sensitive there anyway (see
+              // the login credential comment in the e2e test).
+              secureTextEntry={!isE2EMockMode}
               autoComplete={isE2EMockMode ? 'off' : 'password'}
               textContentType={isE2EMockMode ? 'none' : 'password'}
               importantForAutofill={isE2EMockMode ? 'no' : 'yes'}
