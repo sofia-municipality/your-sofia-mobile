@@ -1,4 +1,4 @@
-import {by, device, element, expect, system, waitFor} from 'detox'
+import {by, device, element, expect, waitFor} from 'detox'
 
 const MOCK_USER_EMAIL = 'e2e-test@yoursofia.local'
 // Not a real credential — matches the mock server's fixture password (see
@@ -37,38 +37,6 @@ async function dismissKeyboardIfShown(testID: string) {
   }
 }
 
-// iOS's own iCloud Keychain "Save Password?" system dialog can appear right
-// after a login form submits — it's a native alert outside the app, not
-// tracked by Detox's synchronization at all, and it covers the full screen
-// including the tab bar underneath. This turned out to be the actual cause
-// of the intermittent "not hittable" newTabButton failures seen in CI: the
-// dialog (not a settling screen transition) was what was blocking the tap.
-// It doesn't show up every run — iOS only offers to save credentials it
-// doesn't already have stored — so this is a no-op most of the time.
-//
-// A first attempt at this used `element(by.label('Not Now'))`, which never
-// works for a dialog like this: the regular `element()`/`waitFor()` APIs only
-// search the app's own accessibility tree, and this alert is presented by a
-// separate system process outside it, so the matcher silently found nothing
-// every time and the dialog was never actually dismissed. System-level UI
-// needs Detox's dedicated `system.element(by.system...)` facade instead —
-// which also has no `waitFor`/polling support, hence the manual retry loop.
-async function dismissSavePasswordPromptIfPresent(attempts = 5, delayMs = 1000) {
-  if (device.getPlatform() !== 'ios') {
-    return
-  }
-  for (let i = 0; i < attempts; i++) {
-    try {
-      await system.element(by.system.label('Not Now')).tap()
-      return
-    } catch {
-      if (i < attempts - 1) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs))
-      }
-    }
-  }
-}
-
 // iOS occasionally reports a freshly-visible element as "not hittable at
 // its visible point" — the hit-test resolves to a transition/overlay view
 // instead, meaning a screen/tab-switch animation was still settling when
@@ -87,13 +55,6 @@ async function tapWhenHittable(testID: string, attempts = 10) {
       return
     } catch (error) {
       if (i === attempts - 1) throw error
-      // The iOS "Save Password?" system dialog (see
-      // dismissSavePasswordPromptIfPresent) can appear with unpredictable
-      // delay after login and was, in practice, the actual cause of most
-      // "not hittable" failures here — not a settling animation. Check for
-      // it on every retry (single quick attempt: the main catch is right
-      // after login; this just covers a late-appearing dialog).
-      await dismissSavePasswordPromptIfPresent(1, 0)
       await new Promise((resolve) => setTimeout(resolve, 2000))
       await waitFor(element(by.id(testID)))
         .toBeVisible()
@@ -148,7 +109,6 @@ async function loginAsMockAdmin() {
   await dismissKeyboardIfShown('loginPasswordInput')
 
   await element(by.id('loginSubmitButton')).tap()
-  await dismissSavePasswordPromptIfPresent()
 
   // Login navigates back to the profile screen on success. Our test user is
   // admin, which unlocks three tabs at once (New, Missions, Assignments) —
