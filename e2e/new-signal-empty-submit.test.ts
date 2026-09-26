@@ -1,4 +1,4 @@
-import {by, device, element, expect, waitFor} from 'detox'
+import {by, device, element, expect, system, waitFor} from 'detox'
 
 const MOCK_USER_EMAIL = 'e2e-test@yoursofia.local'
 // Not a real credential — matches the mock server's fixture password (see
@@ -45,17 +45,27 @@ async function dismissKeyboardIfShown(testID: string) {
 // dialog (not a settling screen transition) was what was blocking the tap.
 // It doesn't show up every run — iOS only offers to save credentials it
 // doesn't already have stored — so this is a no-op most of the time.
-async function dismissSavePasswordPromptIfPresent(timeoutMs = 5000) {
+//
+// A first attempt at this used `element(by.label('Not Now'))`, which never
+// works for a dialog like this: the regular `element()`/`waitFor()` APIs only
+// search the app's own accessibility tree, and this alert is presented by a
+// separate system process outside it, so the matcher silently found nothing
+// every time and the dialog was never actually dismissed. System-level UI
+// needs Detox's dedicated `system.element(by.system...)` facade instead —
+// which also has no `waitFor`/polling support, hence the manual retry loop.
+async function dismissSavePasswordPromptIfPresent(attempts = 5, delayMs = 1000) {
   if (device.getPlatform() !== 'ios') {
     return
   }
-  try {
-    await waitFor(element(by.label('Not Now')))
-      .toBeVisible()
-      .withTimeout(timeoutMs)
-    await element(by.label('Not Now')).tap()
-  } catch {
-    // dialog didn't appear, nothing to dismiss
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await system.element(by.system.label('Not Now')).tap()
+      return
+    } catch {
+      if (i < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs))
+      }
+    }
   }
 }
 
@@ -81,9 +91,9 @@ async function tapWhenHittable(testID: string, attempts = 10) {
       // dismissSavePasswordPromptIfPresent) can appear with unpredictable
       // delay after login and was, in practice, the actual cause of most
       // "not hittable" failures here — not a settling animation. Check for
-      // it on every retry (short timeout: the main catch is right after
-      // login; this just covers a late-appearing dialog).
-      await dismissSavePasswordPromptIfPresent(1000)
+      // it on every retry (single quick attempt: the main catch is right
+      // after login; this just covers a late-appearing dialog).
+      await dismissSavePasswordPromptIfPresent(1, 0)
       await new Promise((resolve) => setTimeout(resolve, 2000))
       await waitFor(element(by.id(testID)))
         .toBeVisible()
