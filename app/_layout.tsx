@@ -1,5 +1,7 @@
 import {useEffect} from 'react'
+import {isRunningInExpoGo} from 'expo'
 import {Stack, useRouter} from 'expo-router'
+import * as Sentry from '@sentry/react-native'
 import {StatusBar} from 'expo-status-bar'
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {User} from 'lucide-react-native'
@@ -25,8 +27,37 @@ import {
 } from '@expo-google-fonts/jetbrains-mono'
 import {colors, fonts, fontSizes, radius} from '@/styles/tokens'
 import '../i18n'
+import {environmentManager} from '@/lib/environment'
 
-export default function RootLayout() {
+const env = environmentManager.getCurrentEnvironment()
+const isDevOrStaging = env === 'development' || env === 'staging'
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  environment: env,
+  sendDefaultPii: true,
+  enableLogs: true,
+  tracePropagationTargets: ['localhost', /^https:\/\/(staging-)?your\.sofia\.bg/],
+  tracesSampleRate: isDevOrStaging ? 1.0 : 0.2,
+  profilesSampleRate: isDevOrStaging ? 1.0 : 0.5,
+  replaysOnErrorSampleRate: isDevOrStaging ? 1.0 : 0,
+  replaysSessionSampleRate: isDevOrStaging ? 1.0 : 0,
+  integrations: [
+    Sentry.consoleLoggingIntegration({levels: ['warn', 'error']}),
+    ...(isDevOrStaging
+      ? [
+          Sentry.mobileReplayIntegration({
+            maskAllText: false,
+            maskAllImages: false,
+            maskAllVectors: false,
+          }),
+        ]
+      : []),
+  ],
+  enableNativeFramesTracking: !isRunningInExpoGo(),
+})
+
+function RootLayout() {
   useFrameworkReady()
 
   const [fontsLoaded] = useFonts({
@@ -157,3 +188,5 @@ const headerStyles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 })
+
+export default Sentry.wrap(RootLayout)

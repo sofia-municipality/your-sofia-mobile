@@ -1,5 +1,6 @@
 import React, {Component, ErrorInfo, ReactNode} from 'react'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import * as Sentry from '@sentry/react-native'
 import i18n from '../i18n'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
@@ -23,6 +24,9 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('[AppErrorBoundary] Unhandled error:', error)
     console.error('[AppErrorBoundary] Error info:', errorInfo)
+    Sentry.captureException(error, {
+      contexts: {react: {componentStack: errorInfo.componentStack}},
+    })
   }
 
   handleRetry = () => {
