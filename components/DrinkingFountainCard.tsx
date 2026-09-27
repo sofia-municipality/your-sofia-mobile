@@ -225,7 +225,7 @@ export function DrinkingFountainCard({fountain, onClose}: DrinkingFountainCardPr
         <View style={{flex: 1}}>
           <View style={styles.titleRow}>
             <Droplet size={18} color={colors.info} />
-            <Text style={styles.title} numberOfLines={2}>
+            <Text style={styles.title} numberOfLines={showFullInfo ? undefined : 2}>
               {fountain.address || t('fountains.name')}
             </Text>
           </View>
