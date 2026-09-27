@@ -39,6 +39,7 @@
       "favicon": "./assets/images/sofia-gerb.png"
     },
     "plugins": [
+      "expo-detox-config-plugin",
       "expo-router",
       "expo-font",
       "expo-web-browser",
@@ -60,6 +61,10 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          },
           "ios": {
             "deploymentTarget": "16.4"
           }
