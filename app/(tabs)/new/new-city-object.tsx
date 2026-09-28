@@ -59,7 +59,7 @@ export default function NewCityObjectScreen() {
 
   const [permission, requestPermission] = useCameraPermissions()
   // Fountain-only admins start on the fountain form (they can't submit containers).
-  const [objectType, setObjectType] = useState<CityObjectType>(
+  const [selectedObjectType, setObjectType] = useState<CityObjectType>(
     isFountainAdmin && !isContainerAdmin ? 'drinking-fountain' : 'waste-container'
   )
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
@@ -88,13 +88,13 @@ export default function NewCityObjectScreen() {
     }
   }, [isContainerAdmin, isEditing, t, router])
 
-  React.useEffect(() => {
-    if (!canManageFountains && objectType === 'drinking-fountain') {
-      // Correct a permission change made after this screen mounted (e.g. role revoked mid-session).
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setObjectType('waste-container')
-    }
-  }, [canManageFountains, objectType])
+  // Correct a permission change made after this screen mounted (e.g. role revoked
+  // mid-session): derive the effective type at render time instead of syncing state
+  // in an effect, since objectType is only ever read for rendering, never submitted.
+  const objectType: CityObjectType =
+    !canManageFountains && selectedObjectType === 'drinking-fountain'
+      ? 'waste-container'
+      : selectedObjectType
 
   const loadContainer = useCallback(
     async (id: string) => {
