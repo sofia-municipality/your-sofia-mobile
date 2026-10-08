@@ -194,7 +194,11 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        testID="profileScrollView"
+      >
         {/* Notification Bar */}
 
         <TouchableOpacity style={styles.notificationBar}>
@@ -279,6 +283,7 @@ export default function ProfileScreen() {
                 onPress={() => router.push('/auth/login' as any)}
                 accessibilityRole="button"
                 accessibilityLabel={t('auth.login')}
+                testID="profileLoginButton"
               >
                 <LogInIcon size={20} color={colors.surface} />
                 <Text style={styles.loginButtonText}>{t('auth.login')}</Text>
