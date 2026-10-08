@@ -6,6 +6,7 @@ import {User} from 'lucide-react-native'
 import {useFrameworkReady} from '@/hooks/useFrameworkReady'
 import {useTranslation} from 'react-i18next'
 import {initializeReporterId} from '@/lib/deviceId'
+import {seedE2EMockStateIfEnabled} from '@/lib/e2eMock'
 import {EnvironmentProvider} from '@/contexts/EnvironmentContext'
 import {AuthProvider} from '@/contexts/AuthContext'
 import {NotificationsProvider} from '@/contexts/NotificationsContext'
@@ -59,6 +60,7 @@ function AppShell() {
       .catch((error) => {
         console.error('Failed to initialize reporter ID:', error)
       })
+    seedE2EMockStateIfEnabled()
   }, [])
 
   return (
@@ -93,6 +95,7 @@ function AppShell() {
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/profile')}
                     accessibilityLabel={t('profile.title')}
+                    testID="headerProfileButton"
                   >
                     <User size={24} style={{marginLeft: 6}} color={colors.primary} />
                   </TouchableOpacity>

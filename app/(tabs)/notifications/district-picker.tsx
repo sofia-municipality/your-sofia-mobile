@@ -64,6 +64,7 @@ export default function DistrictPickerScreen() {
               accessibilityRole="button"
               accessibilityLabel={`${item.districtId} ${item.name}`}
               accessibilityState={{selected: isSelected}}
+              testID={`districtPickerRow-${item.id}`}
             >
               <View style={styles.rowLeft}>
                 <Text style={styles.districtId}>{item.districtId}</Text>
@@ -83,6 +84,7 @@ export default function DistrictPickerScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('notifications.confirmLocation')}
           accessibilityState={{disabled: !selected}}
+          testID="districtPickerConfirmButton"
         >
           <Text style={styles.confirmBtnText}>{t('notifications.confirmLocation')}</Text>
         </TouchableOpacity>

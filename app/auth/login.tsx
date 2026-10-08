@@ -100,6 +100,7 @@ export default function LoginScreen() {
               importantForAutofill="yes"
               editable={!isLoading}
               accessibilityLabel={t('auth.email')}
+              testID="loginEmailInput"
             />
           </View>
 
@@ -116,6 +117,7 @@ export default function LoginScreen() {
               importantForAutofill="yes"
               editable={!isLoading}
               accessibilityLabel={t('auth.password')}
+              testID="loginPasswordInput"
             />
           </View>
 
@@ -126,6 +128,7 @@ export default function LoginScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('auth.login')}
             accessibilityState={{disabled: isLoading}}
+            testID="loginSubmitButton"
           >
             {isLoading ? (
               <ActivityIndicator color={colors.surface} />
