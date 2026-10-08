@@ -495,6 +495,8 @@ export default {
     fillAllFields: 'Please fill all fields',
     passwordsDoNotMatch: 'Passwords do not match',
     passwordTooShort: 'Password must be at least 6 characters',
+    passwordNeedsLowercase: 'Password must contain a lowercase letter',
+    passwordNeedsUppercase: 'Password must contain an uppercase letter',
     loginFailed: 'Login failed',
     registerSuccess: 'Registered successfully',
     verifyEmailTitle: 'Verify your email',

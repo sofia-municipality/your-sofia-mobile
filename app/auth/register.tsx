@@ -108,6 +108,7 @@ export default function RegisterScreen() {
                 autoCorrect={false}
                 editable={!isLoading}
                 accessibilityLabel={t('auth.name')}
+                testID="registerNameInput"
               />
             </View>
 
@@ -126,6 +127,7 @@ export default function RegisterScreen() {
                 importantForAutofill="yes"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.email')}
+                testID="registerEmailInput"
               />
             </View>
 
@@ -138,12 +140,20 @@ export default function RegisterScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete="off"
-                textContentType="none"
+                // textContentType="none" doesn't reliably stop iOS's
+                // password-manager heuristics: with a confirm-password field
+                // right below, iOS still detects a "create password" form
+                // and pops its native "Use Strong Password?" suggestion
+                // sheet, which then visually covers that field. "oneTimeCode"
+                // is Apple's documented way to fully opt a field out of
+                // AutoFill/Strong-Password handling.
+                textContentType="oneTimeCode"
                 autoCorrect={false}
                 spellCheck={false}
                 importantForAutofill="no"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.password')}
+                testID="registerPasswordInput"
               />
             </View>
 
@@ -156,7 +166,7 @@ export default function RegisterScreen() {
                 onChangeText={setConfirmPassword}
                 secureTextEntry
                 autoComplete="off"
-                textContentType="none"
+                textContentType="oneTimeCode"
                 autoCorrect={false}
                 spellCheck={false}
                 importantForAutofill="no"
@@ -164,6 +174,7 @@ export default function RegisterScreen() {
                 returnKeyLabel="OK"
                 editable={!isLoading}
                 accessibilityLabel={t('auth.confirmPassword')}
+                testID="registerConfirmPasswordInput"
               />
             </View>
           </View>
@@ -178,6 +189,7 @@ export default function RegisterScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('auth.register')}
           accessibilityState={{disabled: isLoading}}
+          testID="registerSubmitButton"
         >
           {isLoading ? (
             <ActivityIndicator color={colors.surface} />
