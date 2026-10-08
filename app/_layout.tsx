@@ -93,6 +93,7 @@ function AppShell() {
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/profile')}
                     accessibilityLabel={t('profile.title')}
+                    testID="headerProfileButton"
                   >
                     <User size={24} style={{marginLeft: 6}} color={colors.primary} />
                   </TouchableOpacity>
