@@ -31,6 +31,7 @@ export default function NewScreen() {
               }}
               accessibilityRole="button"
               accessibilityLabel={t('new.newSignal')}
+              testID="newSignalButton"
             >
               <View style={styles.iconContainer}>
                 <AlertTriangle size={36} color={colors.primary} />

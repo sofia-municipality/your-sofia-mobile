@@ -21,6 +21,15 @@ env:
   HOMEBREW_NO_AUTO_UPDATE: '1'
   HOMEBREW_NO_INSTALL_CLEANUP: '1'
 
+  # Point the app at the frontend-only OpenAPI mock server (mock-server/,
+  # generated from api.yaml and started by e2e/globalSetup.ts) instead of the
+  # real production API — see e2e/mock-server-overrides/fixtures.js for the
+  # seeded test user/signal/districts. The iOS Simulator shares the host's
+  # network stack, so localhost works as-is.
+  EXPO_PUBLIC_DEFAULT_ENV: development
+  EXPO_PUBLIC_API_URL: http://127.0.0.1:3000
+  EXPO_PUBLIC_E2E_MOCK: 'true'
+
 jobs:
   detox-ios:
     name: Build & run Detox E2E on iOS
@@ -48,6 +57,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate mock server from api.yaml
+        run: pnpm run generate:mock
+
+      - name: Install mock server dependencies
+        run: pnpm run install:mock
 
       - name: Prebuild iOS project
         run: pnpm exec expo prebuild --platform ios --no-install
