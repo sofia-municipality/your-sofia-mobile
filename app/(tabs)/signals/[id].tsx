@@ -9,9 +9,9 @@ import {
   StyleSheet,
 } from 'react-native'
 import {useTranslation} from 'react-i18next'
-import {useLocalSearchParams, useNavigation} from 'expo-router'
+import {useLocalSearchParams, useNavigation, useRouter} from 'expo-router'
 import {SafeAreaView} from 'react-native-safe-area-context'
-import {Edit3, Save, X, CheckCircle} from 'lucide-react-native'
+import {ChevronLeft, Edit3, Save, X, CheckCircle} from 'lucide-react-native'
 import {fetchSignalById, updateSignal} from '../../../lib/payload'
 import type {Signal} from '../../../types/signal'
 import {type ContainerState} from '../../../types/wasteContainer'
@@ -23,6 +23,7 @@ import {useAuth} from '@/contexts/AuthContext'
 export default function SignalDetailsScreen() {
   const {t} = useTranslation()
   const navigation = useNavigation()
+  const router = useRouter()
   const {id} = useLocalSearchParams<{id: string}>()
   const formRef = useRef<any>(null)
   const {removeUpdatedSignalId} = useNotifications()
@@ -168,6 +169,17 @@ export default function SignalDetailsScreen() {
   // Update header buttons based on editing state
   useEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{padding: 8}}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+          testID="signalDetailBackButton"
+        >
+          <ChevronLeft size={24} color={colors.textPrimary} />
+        </TouchableOpacity>
+      ),
       headerRight: () => (
         <View style={{flexDirection: 'row', alignItems: 'center', gap: 8, marginRight: 8}}>
           {isEditing ? (
@@ -195,7 +207,7 @@ export default function SignalDetailsScreen() {
         </View>
       ),
     })
-  }, [isEditing, saving, canEdit, navigation, handleCancelEdit, handleEdit, handleSave])
+  }, [isEditing, saving, canEdit, navigation, router, t, handleCancelEdit, handleEdit, handleSave])
 
   if (loading) {
     return (
