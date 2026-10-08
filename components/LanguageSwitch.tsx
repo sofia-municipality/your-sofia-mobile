@@ -19,6 +19,7 @@ export function LanguageSwitch() {
       style={styles.container}
       accessibilityRole="button"
       accessibilityLabel={currentLanguage === 'bg' ? 'Switch to English' : 'Превключи на Български'}
+      testID="languageSwitchButton"
     >
       <Text style={styles.language}>{currentLanguage === 'bg' ? 'EN' : 'БГ'}</Text>
     </TouchableOpacity>
