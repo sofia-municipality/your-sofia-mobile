@@ -92,6 +92,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           title: t('common.new'),
           tabBarLabel: t('common.new'),
           tabBarIcon: ({color}) => <MapPlus size={24} color={color} />,
+          tabBarButtonTestID: 'newTabButton',
           headerShown: false,
         }}
       />
@@ -102,6 +103,7 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
           tabBarLabel: t('common.signals'),
           tabBarIcon: ({color}) => <AlertTriangle size={24} color={color} />,
           tabBarBadge: closedSignalsCount > 0 ? closedSignalsCount : undefined,
+          tabBarButtonTestID: 'signalsTabButton',
           headerTitle: () => (
             <TabHeader title={t('signals.title')} showActionIcon={false} ActionIcon={Plus} />
           ),
