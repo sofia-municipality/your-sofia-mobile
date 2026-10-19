@@ -1,4 +1,4 @@
-import {StyleSheet, View, Dimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import type {NewsItem} from '../types/news'
 import type {MapBounds} from '@/lib/mapBounds'
@@ -11,8 +11,6 @@ interface NewsMapProps {
   onMarkerPress?: (item: NewsItem) => void
   onBoundsChange?: (bounds: MapBounds, zoom: number) => void
 }
-
-const {width} = Dimensions.get('window')
 
 export function NewsMap({news, onMarkerPress, onBoundsChange}: NewsMapProps) {
   const handleRegionChangeComplete = (region: Region) => {

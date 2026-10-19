@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
-  Dimensions,
+  useWindowDimensions,
   ActivityIndicator,
   Image,
   Platform,
@@ -32,8 +32,6 @@ import * as ImagePicker from 'expo-image-picker'
 import type {WasteContainer} from '../../../types/wasteContainer'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
-const {height} = Dimensions.get('window')
-
 interface Photo {
   id: string
   uri: string
@@ -45,6 +43,7 @@ export default function NewCityObjectScreen() {
   const {t} = useTranslation()
   const router = useRouter()
   const params = useLocalSearchParams()
+  const {height: windowHeight} = useWindowDimensions()
   const cameraRef = useRef<CameraView>(null)
   const formRef = useRef<any>(null)
   const {isContainerAdmin, isInfrastructureAdmin, isFountainAdmin, token} = useAuth()
@@ -409,7 +408,7 @@ export default function NewCityObjectScreen() {
 
         {/* Camera Section */}
         {objectType === 'waste-container' && (
-          <View style={styles.cameraContainer}>
+          <View style={[styles.cameraContainer, {height: windowHeight * 0.4}]}>
             {showCamera && !isEditing ? (
               <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
             ) : (
@@ -567,7 +566,6 @@ const styles = StyleSheet.create({
     color: colors.surface,
   },
   cameraContainer: {
-    height: height * 0.4,
     backgroundColor: '#000',
     position: 'relative',
   },
