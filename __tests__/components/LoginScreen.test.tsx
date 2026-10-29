@@ -50,19 +50,19 @@ beforeEach(() => {
 
 describe('LoginScreen', () => {
   describe('normal login flow', () => {
-    it('renders email and password inputs', () => {
-      const {getByLabelText} = renderLogin()
+    it('renders email and password inputs', async () => {
+      const {getByLabelText} = await renderLogin()
       expect(getByLabelText('auth.email')).toBeTruthy()
       expect(getByLabelText('auth.password')).toBeTruthy()
     })
 
     it('calls login with entered credentials on button press', async () => {
       mockLogin.mockResolvedValueOnce(undefined)
-      const {getByLabelText, getByRole} = renderLogin()
+      const {getByLabelText, getByRole} = await renderLogin()
 
-      fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'secret123')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'secret123')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(mockLogin).toHaveBeenCalledWith('user@example.com', 'secret123')
@@ -71,11 +71,11 @@ describe('LoginScreen', () => {
 
     it('navigates back after successful login', async () => {
       mockLogin.mockResolvedValueOnce(undefined)
-      const {getByLabelText, getByRole} = renderLogin()
+      const {getByLabelText, getByRole} = await renderLogin()
 
-      fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'secret')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'secret')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(mockBack).toHaveBeenCalled()
@@ -86,11 +86,11 @@ describe('LoginScreen', () => {
   describe('unverified account (403)', () => {
     it('shows unverified panel when login returns AuthApiError with status 403', async () => {
       mockLogin.mockRejectedValueOnce(new AuthApiError('Unverified email', 403))
-      const {getByLabelText, getByRole, queryByRole} = renderLogin()
+      const {getByLabelText, getByRole, queryByRole} = await renderLogin()
 
-      fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'secret')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'secret')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(queryByRole('button', {name: 'auth.resendVerificationEmail'})).toBeTruthy()
@@ -102,19 +102,19 @@ describe('LoginScreen', () => {
         .mockRejectedValueOnce(new AuthApiError('Unverified email', 403))
         .mockResolvedValueOnce(undefined)
 
-      const {getByLabelText, getByRole, queryByRole} = renderLogin()
+      const {getByLabelText, getByRole, queryByRole} = await renderLogin()
 
       // First attempt → show panel
-      fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'secret')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'secret')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(queryByRole('button', {name: 'auth.resendVerificationEmail'})).toBeTruthy()
       })
 
       // Second attempt → panel disappears
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
       await waitFor(() => {
         expect(queryByRole('button', {name: 'auth.resendVerificationEmail'})).toBeNull()
       })
@@ -124,18 +124,18 @@ describe('LoginScreen', () => {
       mockLogin.mockRejectedValueOnce(new AuthApiError('Unverified email', 403))
       mockResendVerificationEmail.mockResolvedValueOnce(undefined)
 
-      const {getByLabelText, getByRole} = renderLogin()
+      const {getByLabelText, getByRole} = await renderLogin()
 
-      fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'secret')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'unverified@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'secret')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(getByRole('button', {name: 'auth.resendVerificationEmail'})).toBeTruthy()
       })
 
       await act(async () => {
-        fireEvent.press(getByRole('button', {name: 'auth.resendVerificationEmail'}))
+        await fireEvent.press(getByRole('button', {name: 'auth.resendVerificationEmail'}))
       })
 
       expect(mockResendVerificationEmail).toHaveBeenCalledWith('unverified@example.com')
@@ -143,11 +143,11 @@ describe('LoginScreen', () => {
 
     it('does not show unverified panel for non-403 errors', async () => {
       mockLogin.mockRejectedValueOnce(new AuthApiError('Wrong password', 401))
-      const {getByLabelText, getByRole, queryByRole} = renderLogin()
+      const {getByLabelText, getByRole, queryByRole} = await renderLogin()
 
-      fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
-      fireEvent.changeText(getByLabelText('auth.password'), 'wrong')
-      fireEvent.press(getByRole('button', {name: 'auth.login'}))
+      await fireEvent.changeText(getByLabelText('auth.email'), 'user@example.com')
+      await fireEvent.changeText(getByLabelText('auth.password'), 'wrong')
+      await fireEvent.press(getByRole('button', {name: 'auth.login'}))
 
       await waitFor(() => {
         expect(queryByRole('button', {name: 'auth.resendVerificationEmail'})).toBeNull()

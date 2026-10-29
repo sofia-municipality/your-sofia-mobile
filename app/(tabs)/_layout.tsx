@@ -22,6 +22,10 @@ import {useAuth} from '../../contexts/AuthContext'
 import {useNotifications} from '../../hooks/useNotifications'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
+export const unstable_settings = {
+  anchor: 'home',
+}
+
 export default function TabLayout() {
   const {t} = useTranslation()
 
@@ -45,7 +49,6 @@ function TabLayoutContent({t}: {t: (key: string) => string}) {
 
   return (
     <Tabs
-      initialRouteName="home"
       backBehavior="history"
       screenOptions={{
         headerShown: true,
