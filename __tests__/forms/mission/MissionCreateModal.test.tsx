@@ -26,8 +26,8 @@ jest.mock('react-i18next', () => ({
 }))
 
 describe('MissionCreateModal', () => {
-  it('renders the mission creation title and subtitle', () => {
-    const {getByText} = render(
+  it('renders the mission creation title and subtitle', async () => {
+    const {getByText} = await render(
       <MissionCreateModal
         visible
         onClose={() => undefined}
@@ -40,8 +40,8 @@ describe('MissionCreateModal', () => {
     expect(getByText('missions.form.createMissionSubtitle')).toBeTruthy()
   })
 
-  it('renders city object and location details in the mission form', () => {
-    const {getByText} = render(
+  it('renders city object and location details in the mission form', async () => {
+    const {getByText} = await render(
       <MissionForm
         onSubmit={() => Promise.resolve()}
         onCancel={() => undefined}

@@ -14,6 +14,7 @@ import {
   Platform,
   Modal,
   Linking,
+  type ScrollViewInstance,
 } from 'react-native'
 import MapView, {Marker, type Region} from 'react-native-maps'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
@@ -55,7 +56,7 @@ export default function NewSignal() {
   const params = useLocalSearchParams()
   const {isContainerAdmin, token} = useAuth()
   const cameraRef = useRef<CameraView>(null)
-  const scrollViewRef = useRef<ScrollView>(null)
+  const scrollViewRef = useRef<ScrollViewInstance>(null)
 
   // Prepopulated data from container create a mapObject from params if available
   const prefilledMapObject: MapObject | null = React.useMemo(
