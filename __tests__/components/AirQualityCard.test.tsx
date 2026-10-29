@@ -31,48 +31,48 @@ describe('AirQualityCard', () => {
     jest.clearAllMocks()
   })
 
-  it('renders air quality data correctly', () => {
-    const {getByText} = render(<AirQualityCard data={mockData} />)
+  it('renders air quality data correctly', async () => {
+    const {getByText} = await render(<AirQualityCard data={mockData} />)
 
     expect(getByText('45 - airQuality.status.good')).toBeTruthy()
   })
 
-  it('renders different status text for moderate air quality', () => {
-    const {getByText} = render(<AirQualityCard data={mockDataModerate} />)
+  it('renders different status text for moderate air quality', async () => {
+    const {getByText} = await render(<AirQualityCard data={mockDataModerate} />)
 
     expect(getByText('75 - airQuality.status.moderate')).toBeTruthy()
   })
 
-  it('displays the air quality title', () => {
-    const {getByText} = render(<AirQualityCard data={mockData} />)
+  it('displays the air quality title', async () => {
+    const {getByText} = await render(<AirQualityCard data={mockData} />)
 
     expect(getByText('airQuality.title')).toBeTruthy()
   })
 
-  it('applies correct background color for good air quality', () => {
-    const {getByTestId} = render(<AirQualityCard data={mockData} />)
+  it('applies correct background color for good air quality', async () => {
+    const {getByTestId} = await render(<AirQualityCard data={mockData} />)
 
     const container = getByTestId('air-quality-card-container')
     //log the style prop to see its structure
     expect(container.props.style[1].backgroundColor).toBe('#DCFCE7') // green-100
   })
 
-  it('applies correct background color for moderate air quality', () => {
-    const {getByTestId} = render(<AirQualityCard data={mockDataModerate} />)
+  it('applies correct background color for moderate air quality', async () => {
+    const {getByTestId} = await render(<AirQualityCard data={mockDataModerate} />)
 
     const container = getByTestId('air-quality-card-container')
     expect(container.props.style[1].backgroundColor).toBe('#FEF9C3') // yellow-100
   })
 
   describe('accessibility', () => {
-    it('renders status as text not color-only', () => {
-      const {getByText} = render(<AirQualityCard data={mockData} />)
+    it('renders status as text not color-only', async () => {
+      const {getByText} = await render(<AirQualityCard data={mockData} />)
       // Status must be conveyed via visible text, not color alone
       expect(getByText('45 - airQuality.status.good')).toBeTruthy()
     })
 
-    it('renders status text for moderate quality', () => {
-      const {getByText} = render(<AirQualityCard data={mockDataModerate} />)
+    it('renders status text for moderate quality', async () => {
+      const {getByText} = await render(<AirQualityCard data={mockDataModerate} />)
       expect(getByText('75 - airQuality.status.moderate')).toBeTruthy()
     })
   })

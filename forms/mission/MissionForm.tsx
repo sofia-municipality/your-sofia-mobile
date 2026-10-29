@@ -472,7 +472,7 @@ export function MissionForm({
 
         <TouchableOpacity
           style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
-          onPress={handleSubmit(onSubmit)}
+          onPress={() => handleSubmit(onSubmit)()}
           disabled={isSubmitting}
         >
           {isSubmitting ? (

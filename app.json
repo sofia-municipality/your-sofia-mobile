@@ -80,7 +80,9 @@
             "defaultChannel": "default"
           }
         }
-      ]
+      ],
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true,

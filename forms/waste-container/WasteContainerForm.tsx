@@ -287,7 +287,7 @@ export const WasteContainerForm = forwardRef<any, WasteContainerFormProps>(
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={isSubmitting}
             >
               <Text style={styles.primaryButtonText}>

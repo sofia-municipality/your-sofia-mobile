@@ -343,7 +343,9 @@ export default function ProfileScreen() {
           visible={showForgetMeModal}
           transparent={true}
           animationType="fade"
-          onRequestClose={() => !isDeleting && setShowForgetMeModal(false)}
+          onRequestClose={() => {
+            if (!isDeleting) setShowForgetMeModal(false)
+          }}
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>

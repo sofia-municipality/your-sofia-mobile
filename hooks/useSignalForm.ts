@@ -1,5 +1,5 @@
 import {useState, useCallback} from 'react'
-import {Alert, ScrollView} from 'react-native'
+import {Alert, type ScrollViewInstance} from 'react-native'
 import {useRouter} from 'expo-router'
 import {useTranslation} from 'react-i18next'
 import * as ImagePicker from 'expo-image-picker'
@@ -21,7 +21,7 @@ interface MapObject {
 interface UseSignalFormProps {
   prefilledMapObject: MapObject | null
   prefilledObjectType: string | null
-  scrollViewRef: React.RefObject<ScrollView | null>
+  scrollViewRef: React.RefObject<ScrollViewInstance | null>
   setCurrentLocation: (location: {latitude: number; longitude: number} | null) => void
   setCurrentDateTime: (date: Date) => void
   setNearbyObjects: (objects: MapObject[]) => void

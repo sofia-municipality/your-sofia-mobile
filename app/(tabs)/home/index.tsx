@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  type ScrollViewInstance,
+  type ViewInstance,
 } from 'react-native'
 import {useRef, useCallback, useEffect, useState} from 'react'
 import {useFocusEffect, useRouter} from 'expo-router'
@@ -40,8 +42,8 @@ export default function HomeScreen() {
   const [selectedTopics, setSelectedTopics] = useState<Set<string>>(new Set(['all']))
   const [isMapView, setIsMapView] = useState(false)
   const [isFirstFocus, setIsFirstFocus] = useState(true)
-  const scrollViewRef = useRef<ScrollView>(null)
-  const newsSectionRef = useRef<View>(null)
+  const scrollViewRef = useRef<ScrollViewInstance>(null)
+  const newsSectionRef = useRef<ViewInstance>(null)
   const bellScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const {registerBellAction} = useBellAction()
   const {filterChips, categories} = useUpdateCategories()
