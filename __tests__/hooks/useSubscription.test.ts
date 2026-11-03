@@ -46,7 +46,7 @@ beforeEach(async () => {
 
 describe('useSubscription — load()', () => {
   it('sets subscription to null and finishes loading when no push token', async () => {
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.subscription).toBeNull()
     expect(mockFetch).not.toHaveBeenCalled()
@@ -57,7 +57,7 @@ describe('useSubscription — load()', () => {
     const sub = makeSub()
     mockFetch.mockResolvedValue(sub)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.subscription).toEqual(sub)
@@ -69,7 +69,7 @@ describe('useSubscription — load()', () => {
     await setToken(PUSH_TOKEN)
     mockFetch.mockResolvedValue(null)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.subscription).toBeNull()
@@ -80,7 +80,7 @@ describe('useSubscription — load()', () => {
     mockFetch.mockRejectedValue(new Error('network error'))
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     consoleSpy.mockRestore()
@@ -94,7 +94,7 @@ describe('useSubscription — load()', () => {
     const sub = makeSub({id: 'fresh-id'})
     mockFetch.mockResolvedValue(sub)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     const cached = await AsyncStorage.getItem('subscriptionId')
@@ -104,7 +104,7 @@ describe('useSubscription — load()', () => {
 
 describe('useSubscription — saveSubscription()', () => {
   it('throws when no push token is registered', async () => {
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await expect(act(() => result.current.saveSubscription([], []))).rejects.toThrow(
@@ -119,7 +119,7 @@ describe('useSubscription — saveSubscription()', () => {
     const updated = makeSub({categories: ['cat-1']})
     mockUpdate.mockResolvedValue(updated)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.saveSubscription(['cat-1'], []))
@@ -141,7 +141,7 @@ describe('useSubscription — saveSubscription()', () => {
     const updated = makeSub({categories: ['cat-2']})
     mockUpdate.mockResolvedValue(updated)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     // Clear storage after load so we only have subscription in-state
@@ -163,7 +163,7 @@ describe('useSubscription — saveSubscription()', () => {
     const updated = makeSub({categories: ['cat-3']})
     mockUpdate.mockResolvedValue(updated)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.saveSubscription(['cat-3'], []))
@@ -184,7 +184,7 @@ describe('useSubscription — saveSubscription()', () => {
     const created = makeSub({id: 'new-sub'})
     mockUpdate.mockResolvedValue(created)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.saveSubscription(['cat-4'], []))
@@ -206,7 +206,7 @@ describe('useSubscription — saveSubscription()', () => {
     mockFetch.mockResolvedValue(makeSub())
     mockUpdate.mockResolvedValue(makeSub())
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.saveSubscription([], [], 'jwt-token-abc'))
@@ -222,7 +222,7 @@ describe('useSubscription — saveSubscription()', () => {
 
     const filters = [{filterType: 'all' as const}]
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.saveSubscription([], filters))
@@ -238,7 +238,7 @@ describe('useSubscription — saveSubscription()', () => {
 
 describe('useSubscription — linkUser()', () => {
   it('does nothing when no subscription id available', async () => {
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.linkUser('user-1', 'auth-token'))
@@ -252,7 +252,7 @@ describe('useSubscription — linkUser()', () => {
     const linked = makeSub({user: 'user-1'})
     mockUpdate.mockResolvedValue(linked)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await act(() => result.current.linkUser('user-1', 'auth-token'))
@@ -267,7 +267,7 @@ describe('useSubscription — linkUser()', () => {
     mockFetch.mockResolvedValue(makeSub())
     mockUpdate.mockRejectedValue(new Error('server error'))
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     await expect(act(() => result.current.linkUser('user-1', 'auth-token'))).resolves.not.toThrow()
@@ -280,7 +280,7 @@ describe('useSubscription — reload()', () => {
     const sub = makeSub()
     mockFetch.mockResolvedValue(null)
 
-    const {result} = renderHook(() => useSubscription())
+    const {result} = await renderHook(() => useSubscription())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.subscription).toBeNull()
 

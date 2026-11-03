@@ -25,49 +25,49 @@ describe('useDeviceHeading', () => {
     jest.clearAllMocks()
   })
 
-  it('starts with heading null and available true', () => {
-    const {result} = renderHook(() => useDeviceHeading())
+  it('starts with heading null and available true', async () => {
+    const {result} = await renderHook(() => useDeviceHeading())
     expect(result.current.heading).toBeNull()
     expect(result.current.available).toBe(true)
   })
 
   it('uses trueHeading when >= 0', async () => {
-    const {result} = renderHook(() => useDeviceHeading())
+    const {result} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
-    act(() => capturedCallback!({trueHeading: 90, magHeading: 92, accuracy: 1}))
+    await act(() => capturedCallback!({trueHeading: 90, magHeading: 92, accuracy: 1}))
     expect(result.current.heading).toBe(90)
   })
 
   it('falls back to magHeading when trueHeading < 0', async () => {
-    const {result} = renderHook(() => useDeviceHeading())
+    const {result} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
-    act(() => capturedCallback!({trueHeading: -1, magHeading: 270, accuracy: 1}))
+    await act(() => capturedCallback!({trueHeading: -1, magHeading: 270, accuracy: 1}))
     expect(result.current.heading).toBe(270)
   })
 
   it('ignores readings when both trueHeading and magHeading are < 0', async () => {
-    const {result} = renderHook(() => useDeviceHeading())
+    const {result} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
-    act(() => capturedCallback!({trueHeading: -1, magHeading: -1, accuracy: 0}))
+    await act(() => capturedCallback!({trueHeading: -1, magHeading: -1, accuracy: 0}))
     expect(result.current.heading).toBeNull()
   })
 
   it('updates heading across cardinal directions', async () => {
-    const {result} = renderHook(() => useDeviceHeading())
+    const {result} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
     for (const deg of [0, 90, 180, 270]) {
-      act(() => capturedCallback!({trueHeading: deg, magHeading: deg + 2, accuracy: 1}))
+      await act(() => capturedCallback!({trueHeading: deg, magHeading: deg + 2, accuracy: 1}))
       expect(result.current.heading).toBe(deg)
     }
   })
 
   it('sets available false when watchHeadingAsync rejects', async () => {
     ;(Location.watchHeadingAsync as jest.Mock).mockRejectedValueOnce(new Error('unavailable'))
-    const {result} = renderHook(() => useDeviceHeading())
+    const {result} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
     expect(result.current.available).toBe(false)
@@ -75,10 +75,10 @@ describe('useDeviceHeading', () => {
   })
 
   it('removes subscription on unmount', async () => {
-    const {unmount} = renderHook(() => useDeviceHeading())
+    const {unmount} = await renderHook(() => useDeviceHeading())
     await act(async () => {})
 
-    unmount()
+    await unmount()
     expect(mockRemove).toHaveBeenCalledTimes(1)
   })
 
@@ -90,8 +90,8 @@ describe('useDeviceHeading', () => {
       })
     )
 
-    const {unmount} = renderHook(() => useDeviceHeading())
-    unmount() // unmount before the promise resolves
+    const {unmount} = await renderHook(() => useDeviceHeading())
+    await unmount() // unmount before the promise resolves
 
     await act(async () => {
       resolvePromise({remove: mockRemove})

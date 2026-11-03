@@ -217,7 +217,7 @@ export function DrinkingFountainForm({
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
-          onPress={handleSubmit(onSubmit)}
+          onPress={() => handleSubmit(onSubmit)()}
           disabled={isSubmitting}
         >
           <Text style={styles.primaryButtonText}>
