@@ -13,12 +13,8 @@
       "bundleIdentifier": "bg.sofia.yoursofia",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UISupportedInterfaceOrientations": [
-          "UIInterfaceOrientationPortrait"
-        ],
-        "UISupportedInterfaceOrientations~ipad": [
-          "UIInterfaceOrientationPortrait"
-        ]
+        "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
+        "UISupportedInterfaceOrientations~ipad": ["UIInterfaceOrientationPortrait"]
       }
     },
     "android": {
