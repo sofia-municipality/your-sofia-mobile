@@ -1,5 +1,5 @@
 import React from 'react'
-import {render} from '@testing-library/react-native'
+import {render, screen} from '@testing-library/react-native'
 import {AirQualityCard} from '../../components/AirQualityCard'
 import type {AirQualityData} from '../../types/airQuality'
 
@@ -75,5 +75,28 @@ describe('AirQualityCard', () => {
       const {getByText} = await render(<AirQualityCard data={mockDataModerate} />)
       expect(getByText('75 - airQuality.status.moderate')).toBeTruthy()
     })
+  })
+
+  describe('AQI thresholds', () => {
+    it.each([
+      [0, 'Good', 'airQuality.status.good', '#22C55E', '#DCFCE7'],
+      [50, 'Good', 'airQuality.status.good', '#22C55E', '#DCFCE7'],
+      [51, 'Moderate', 'airQuality.status.moderate', '#EAB308', '#FEF9C3'],
+      [100, 'Moderate', 'airQuality.status.moderate', '#EAB308', '#FEF9C3'],
+      [101, 'Unhealthy', 'airQuality.status.unhealthy', '#F97316', '#FFEDD5'],
+      [150, 'Unhealthy', 'airQuality.status.unhealthy', '#F97316', '#FFEDD5'],
+      [151, 'Very Unhealthy', 'airQuality.status.veryUnhealthy', '#DC2626', '#FEE2E2'],
+      [200, 'Very Unhealthy', 'airQuality.status.veryUnhealthy', '#DC2626', '#FEE2E2'],
+      [201, 'Hazardous', 'airQuality.status.hazardous', '#A855F7', '#F3E8FF'],
+      [350, 'Hazardous', 'airQuality.status.hazardous', '#A855F7', '#F3E8FF'],
+    ] as const)(
+      'AQI %i (%s) shows "%s" in %s on %s',
+      async (aqi, status, label, textColor, backgroundColor) => {
+        await render(<AirQualityCard data={{...mockData, aqi, status}} />)
+
+        expect(screen.getByTestId('air-quality-card-container')).toHaveStyle({backgroundColor})
+        expect(screen.getByText(`${aqi} - ${label}`)).toHaveStyle({color: textColor})
+      }
+    )
   })
 })

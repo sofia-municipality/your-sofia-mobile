@@ -291,3 +291,81 @@ describe('useSubscription — reload()', () => {
     expect(result.current.subscription).toEqual(sub)
   })
 })
+
+describe('useSubscription — additional cases', () => {
+  it.each([true, false])('forwards enabled=%s to updateSubscription', async (enabled) => {
+    await setToken(PUSH_TOKEN)
+    await setSubscriptionId(SUB_ID)
+    mockFetch.mockResolvedValue(makeSub())
+    mockUpdate.mockResolvedValue(makeSub())
+
+    const {result} = await renderHook(() => useSubscription())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await act(() => result.current.saveSubscription(['cat-1'], [], null, enabled))
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      SUB_ID,
+      {categories: ['cat-1'], locationFilters: [], enabled},
+      null,
+      PUSH_TOKEN
+    )
+  })
+
+  it('propagates save failures and keeps the current subscription', async () => {
+    await setToken(PUSH_TOKEN)
+    await setSubscriptionId(SUB_ID)
+    const sub = makeSub()
+    mockFetch.mockResolvedValue(sub)
+    mockUpdate.mockRejectedValue(new Error('validation failed'))
+
+    const {result} = await renderHook(() => useSubscription())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    await expect(act(() => result.current.saveSubscription(['cat-1'], []))).rejects.toThrow(
+      'validation failed'
+    )
+    expect(result.current.subscription).toEqual(sub)
+  })
+
+  it('exposes the push token after loading', async () => {
+    await setToken(PUSH_TOKEN)
+    mockFetch.mockResolvedValue(null)
+
+    const {result} = await renderHook(() => useSubscription())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current.pushTokenString).toBe(PUSH_TOKEN)
+    expect(mockFetch).toHaveBeenCalledWith(PUSH_TOKEN)
+  })
+
+  it('links the user using the subscription in state when no id is cached', async () => {
+    await setToken(PUSH_TOKEN)
+    mockFetch.mockResolvedValue(makeSub())
+    mockUpdate.mockResolvedValue(makeSub({user: 'user-1'}))
+
+    const {result} = await renderHook(() => useSubscription())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    await AsyncStorage.removeItem('subscriptionId')
+
+    await act(() => result.current.linkUser('user-1', 'auth-token'))
+
+    expect(mockUpdate).toHaveBeenCalledWith(SUB_ID, {user: 'user-1'}, 'auth-token')
+  })
+
+  it('clears a previous load error when reload succeeds', async () => {
+    await setToken(PUSH_TOKEN)
+    mockFetch.mockRejectedValueOnce(new Error('network error'))
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    const {result} = await renderHook(() => useSubscription())
+    await waitFor(() => expect(result.current.error).toBe('network error'))
+    consoleSpy.mockRestore()
+
+    mockFetch.mockResolvedValueOnce(makeSub())
+    await act(() => result.current.reload())
+
+    expect(result.current.error).toBeNull()
+    expect(result.current.subscription).toEqual(makeSub())
+  })
+})
