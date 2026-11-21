@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  Dimensions,
   type ScrollViewInstance,
   type ViewInstance,
 } from 'react-native'
@@ -24,8 +23,6 @@ import {useNotifications} from '../../../hooks/useNotifications'
 import {useBellAction} from '../../../contexts/BellActionContext'
 import type {AirQualityData} from '../../../types/airQuality'
 import {SOFIA_DEFAULT_BOUNDS} from '../../../lib/mapBounds'
-
-const {width} = Dimensions.get('window')
 
 // Mock data for air quality (replace with real API data later)
 const mockAirQualityData: AirQualityData = {
@@ -373,7 +370,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   quickServiceCard: {
-    width: (width - 60) / 2,
+    width: '48%',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.md,

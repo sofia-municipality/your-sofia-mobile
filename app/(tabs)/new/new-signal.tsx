@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   TextInput,
   Alert,
-  Dimensions,
+  useWindowDimensions,
   ActivityIndicator,
   Image,
   Platform,
@@ -34,8 +34,6 @@ import {useAuth} from '@/contexts/AuthContext'
 import {getDistanceFromLatLonInMeters} from '@/lib/mapUtils'
 import {colors, fonts, fontSizes} from '@/styles/tokens'
 
-const {height} = Dimensions.get('window')
-
 const SOFIA_DEFAULT_REGION: Region = {
   latitude: 42.6977,
   longitude: 23.3219,
@@ -55,6 +53,7 @@ export default function NewSignal() {
   const router = useRouter()
   const params = useLocalSearchParams()
   const {isContainerAdmin, token} = useAuth()
+  const {height: windowHeight} = useWindowDimensions()
   const cameraRef = useRef<CameraView>(null)
   const scrollViewRef = useRef<ScrollViewInstance>(null)
 
@@ -468,7 +467,7 @@ export default function NewSignal() {
         extraScrollHeight={Platform.OS === 'ios' ? 120 : 80}
       >
         {/* Camera Section */}
-        <View style={styles.cameraContainer}>
+        <View style={[styles.cameraContainer, {height: windowHeight * 0.4}]}>
           {showCamera ? (
             <CameraView ref={cameraRef} style={styles.camera} facing="back" flash="auto" />
           ) : (
@@ -828,7 +827,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   cameraContainer: {
-    height: height * 0.4,
     backgroundColor: '#000',
     position: 'relative',
   },
